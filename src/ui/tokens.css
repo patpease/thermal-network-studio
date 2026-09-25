@@ -1,0 +1,143 @@
+/*
+ * Tokens.
+ *
+ * Surface, ink and accent are Psychrometric Studio's, unchanged, as ZEEL's are
+ * — three tools in one suite share a ground. Heat and cool are ZEEL's heating
+ * and cooling end-use hues: orange is heat, water blue is cooling, and those
+ * are physical conventions rather than styling. A network with blue heating
+ * would be a diagram that lies.
+ *
+ * Declared in THREE places:
+ *
+ *   :root, [data-theme='light']                          the light palette
+ *   @media (prefers-color-scheme: dark) :root:not(...)   a viewer whose OS asks
+ *   [data-theme='dark']                                  a viewer who pressed it
+ *
+ * The two dark blocks are identical by necessity — plain CSS cannot share one
+ * declaration block between a media query and a bare selector — and
+ * tests/tokens.test.ts asserts they stay token-for-token equal. The guard on
+ * the media query is what lets an export container marked light win over a
+ * dark system. Add a colour to all three or it falls back to an initial value,
+ * which for `fill` is opaque black.
+ *
+ * `--heat` and `--cool` are for FILLS AND STROKES ONLY. `--*-ink` is the text
+ * pairing: the hues are tuned to stay apart on a chart, and the orange fails
+ * WCAG AA as text at label sizes. The accent is never a series colour.
+ */
+
+:root {
+  color-scheme: light dark;
+}
+
+:root,
+[data-theme='light'] {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-sunk: #eef1f4;
+  --border: #d9dee5;
+  --border-strong: #bcc5cf;
+  --ink: #14202b;
+  --ink-muted: #5d6b7a;
+  --ink-faint: #8794a2;
+  --accent: #0F5F52;
+  --accent-bright: #3FC98A;
+  --accent-wash: rgba(15, 95, 82, 0.06);
+
+  --heat: #E2842F;
+  --heat-ink: #A65E13;
+  --cool: #2F9BD6;
+  --cool-ink: #1F6FA0;
+
+  /* The mark is a filled tile that inverts as a unit, as ZEEL's does. The
+     building nodes keep their heat and cool hues in both themes. */
+  --mark-ground: #0B2B28;
+  --mark-loop: #3ECF8E;
+  --mark-heat: #E2842F;
+  --mark-cool: #2F9BD6;
+
+  --shadow: 0 1px 2px rgba(20, 32, 43, 0.05), 0 8px 24px -16px rgba(20, 32, 43, 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #10151b;
+    --surface: #171e26;
+    --surface-sunk: #131a21;
+    --border: #2a3543;
+    --border-strong: #3b4959;
+    --ink: #e6ecf3;
+    --ink-muted: #93a1b1;
+    --ink-faint: #6f7d8c;
+    /* The identity green is too dark to read on a dark surface; the bright
+       green carries the accent role instead. */
+    --accent: #3FC98A;
+    --accent-bright: #6FE0AC;
+    --accent-wash: rgba(63, 201, 138, 0.08);
+
+    --heat: #F0A355;
+    --heat-ink: #F5C08D;
+    --cool: #6CB0EE;
+    --cool-ink: #9CCBF4;
+
+    --mark-ground: #F4F7F6;
+    --mark-loop: #0E5C55;
+    --mark-heat: #E2842F;
+    --mark-cool: #2F9BD6;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -16px rgba(0, 0, 0, 0.7);
+  }
+}
+
+[data-theme='dark'] {
+  --bg: #10151b;
+  --surface: #171e26;
+  --surface-sunk: #131a21;
+  --border: #2a3543;
+  --border-strong: #3b4959;
+  --ink: #e6ecf3;
+  --ink-muted: #93a1b1;
+  --ink-faint: #6f7d8c;
+  /* The identity green is too dark to read on a dark surface; the bright
+     green carries the accent role instead. */
+  --accent: #3FC98A;
+  --accent-bright: #6FE0AC;
+  --accent-wash: rgba(63, 201, 138, 0.08);
+
+  --heat: #F0A355;
+  --heat-ink: #F5C08D;
+  --cool: #6CB0EE;
+  --cool-ink: #9CCBF4;
+
+  --mark-ground: #F4F7F6;
+  --mark-loop: #0E5C55;
+  --mark-heat: #E2842F;
+  --mark-cool: #2F9BD6;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -16px rgba(0, 0, 0, 0.7);
+}
+
+/*
+ * Layout tokens. Not colours, so declared ONCE; the three-block rule does not
+ * apply and the token test reads only the palette blocks.
+ *
+ * Breakpoints cannot be tokens (a custom property is not allowed in a media
+ * query), so the numbers are listed here and must match styles.css:
+ *
+ *    860px  viewport  the tab-bar phone layout (as Psychrometric Studio)
+ *    640px  viewport  the footer stacks
+ */
+:root {
+  --gutter: 1.25rem;
+  /* The smallest thing a finger is asked to hit: Apple's 44pt, which is also
+     WCAG 2.5.5's AAA target. Applied only to a coarse pointer. */
+  --tap: 44px;
+  /* Below 16px, iOS Safari zooms the page when a field takes focus and does
+     not zoom back out. */
+  --field-font-touch: 16px;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --gutter: 16px;
+  }
+}

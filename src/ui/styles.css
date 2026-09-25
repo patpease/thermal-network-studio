@@ -1,0 +1,420 @@
+/**
+ * Application styling. The palette is in tokens.css; this file only uses it.
+ *
+ * The chrome — .app-header, .brand, .unit-toggle, .theme-toggle, the scope
+ * line and the studio footer — is copied from ZEEL, which matched it to
+ * Psychrometric Studio. Three tools in one suite should be recognisable as one
+ * suite, and the chrome is what someone reads first. If Psychrometric Studio's
+ * header changes, this one follows.
+ */
+@import './tokens.css';
+
+/* ---------------------------------------------------------------- reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+ * The UA's scheme follows the THEME, not the operating system. With only
+ * `light dark` on :root, a dark-OS viewer who presses light gets light tokens
+ * and dark system widgets, and any control that does not set its own colour
+ * paints white text on a white surface. Heat Balance Studio shipped exactly
+ * that. The bare rule in tokens.css handles the state where nothing is pinned.
+ */
+html[data-theme='light'] { color-scheme: light; }
+html[data-theme='dark'] { color-scheme: dark; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Archivo Variable', 'Archivo', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p, figure {
+  margin: 0;
+}
+
+:where(a, button, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.mono,
+.numeric {
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- shell */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * The header is Psychrometric Studio's, matched deliberately rather than
+ * reinvented: organisation eyebrow, product name, tagline, and the two toggles
+ * on the right. Two tools in one suite should be recognisable as one suite, and
+ * the place that reads hardest is the chrome someone sees first.
+ */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.brand-icon {
+  display: block;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-org {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  /* A link, but the endorsement should not read as a call to action: no
+     underline until it is hovered or focused. */
+  text-decoration: none;
+  width: fit-content;
+}
+
+.brand-org:hover,
+.brand-org:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-tagline {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+}
+
+
+.header-toggles {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.unit-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+
+  /*
+   * Both toggle groups share one height, derived rather than typed twice.
+   * The icon buttons set the size — a 17px glyph with 0.3rem above and below —
+   * and the text buttons match it.
+   *
+   * Without this the text buttons inherit the body's 1.55 line-height and come
+   * out 11px taller than the icon buttons sitting next to them. Deriving the
+   * height from the glyph means a change to the body's leading, or to the icon
+   * size, cannot pull the two groups apart again.
+   */
+  --toggle-glyph: 17px;
+  --toggle-pad-y: 0.3rem;
+  --toggle-height: calc(var(--toggle-glyph) + var(--toggle-pad-y) * 2);
+}
+
+.unit-toggle button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--toggle-height);
+  padding: 0 0.9rem;
+  border: 0;
+  background: var(--surface);
+  color: var(--ink-muted);
+  font: inherit;
+  font-weight: 600;
+  /* Flex centring places the text; leading would only fight the shared height. */
+  line-height: 1;
+  cursor: pointer;
+}
+
+.unit-toggle button.active {
+  background: var(--accent);
+  /* The dark-theme accent is a light green, so white text would vanish on it. */
+  color: var(--surface);
+}
+.theme-toggle button {
+  padding: 0 0.45rem;
+}
+
+/* ------------------------------------------------------- scope statement */
+
+.scope {
+  background: var(--accent-wash);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 1.25rem;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.scope__lead {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  flex: none;
+}
+
+.scope strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+
+/* ----------------------------------------------------------------- main */
+
+.workspace {
+  flex: 1;
+  padding: 1.5rem var(--gutter);
+  max-width: 72rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+.step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.step__number {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.step__title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.25rem 0 0.35rem;
+}
+
+.step__body {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.coming-soon {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------- footer */
+
+.site-footer {
+  --footer-muted: var(--ink-muted);
+  --footer-accent: var(--accent);
+  padding: 16px 1.25rem;
+  background: var(--surface);
+}
+
+/* --- studio footer ---------------------------------------------------
+   Ported from peasestudio.com's BaseLayout. Everything below the two
+   custom properties above is identical in all three tools; those two are
+   the whole of the difference between their palettes. */
+
+.site-footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.footer-identity {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.footer-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.footer-year {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--footer-muted);
+}
+
+.footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--footer-muted);
+  text-decoration: none;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  color: var(--footer-accent);
+}
+
+/* The support link is the only one asking for something, so it carries the
+   accent at rest. The profile links stay muted; if everything is emphasised
+   nothing is. */
+.footer-links a[data-icon='coffee'] {
+  color: var(--footer-accent);
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* The gutter, with room for a notch or a home indicator. The insets are zero
+   everywhere except a phone in landscape, and `viewport-fit=cover` in
+   index.html is what lets them be read. */
+.app-header,
+.scope,
+.site-footer {
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
+}
+
+.site-footer {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* ---------------------------------------------------------------- touch ---
+ * A finger is not a pointer. Keyed on `pointer: coarse`, never on width: a
+ * narrow window on a desk has a mouse, and a tablet in landscape does not. */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: var(--field-font-touch);
+  }
+
+  .unit-toggle button {
+    min-height: var(--tap);
+  }
+}
+
+/* ---------------------------------------------------------------- phone */
+
+@media (max-width: 860px) {
+  /* The tagline is the first thing to go: on a phone the header is chrome,
+     and every line of it is a line the map does not get. */
+  .brand-tagline {
+    display: none;
+  }
+
+  .app-header {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .unit-toggle button {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+  }
+
+  .theme-toggle button {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+}

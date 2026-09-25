@@ -1,0 +1,37 @@
+{
+  "name": "thermal-network-studio",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Pick a neighbourhood, build an ambient-loop thermal energy network, and see how it scores against business as usual.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "preview": "vite preview --port 4186 --strictPort",
+    "preview:worker": "npm run build && wrangler dev --port 8790",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.6",
+    "@types/node": "^26.4.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^30.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.127.1"
+  }
+}
