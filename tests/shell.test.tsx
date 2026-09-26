@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { BRAND } from '../src/config/branding';
-import { SCOPE_STATEMENT, STEPS } from '../src/config/copy';
+import { MAP_COPY, SCOPE_STATEMENT } from '../src/config/copy';
 import { App } from '../src/ui/App';
 
 beforeEach(() => {
@@ -34,10 +34,19 @@ describe('the shell', () => {
     expect(screen.queryByRole('button', { name: /dismiss|close/i })).toBeNull();
   });
 
-  it('lists the five steps of play in order', () => {
+  it('opens on the map, ready to draw a neighbourhood', () => {
     render(<App />);
-    const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    expect(titles).toEqual(STEPS.map((s) => s.title));
+    expect(screen.getByRole('region', { name: 'Map' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: MAP_COPY.drawButton })).toBeTruthy();
+  });
+
+  it('drawing mode offers Finish, Undo and Cancel, and Finish waits for three corners', async () => {
+    render(<App />);
+    await userEvent.click(screen.getByRole('button', { name: MAP_COPY.drawButton }));
+    const finish = screen.getByRole('button', { name: MAP_COPY.finishButton }) as HTMLButtonElement;
+    expect(finish.disabled).toBe(true);
+    await userEvent.click(screen.getByRole('button', { name: MAP_COPY.cancelButton }));
+    expect(screen.getByRole('button', { name: MAP_COPY.drawButton })).toBeTruthy();
   });
 
   it('starts in IP and switches to SI', async () => {

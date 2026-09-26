@@ -17,7 +17,7 @@ export const SCOPE_STATEMENT = {
   emphasis: 'Not for feasibility studies, utility filings or design submissions.',
 } as const;
 
-/** The five steps of play, in order. Shown now as the road map for the build. */
+/** The five steps of play, in order. */
 export const STEPS = [
   { key: 'neighbourhood', title: 'Pick a neighbourhood', body: 'Draw a boundary on the map. Buildings come from OpenStreetMap.' },
   { key: 'loads', title: 'See the demand', body: 'Each building gets an hourly heating and cooling load for a year.' },
@@ -26,6 +26,35 @@ export const STEPS = [
   { key: 'score', title: 'Score it', body: 'Efficiency and carbon, against the buildings as they are today.' },
 ] as const;
 
-export const COMING_SOON = 'In development. The map arrives in phase 03.';
-
 export const MAP_ATTRIBUTION = '© OpenStreetMap contributors';
+
+/** The map screen. */
+export const MAP_COPY = {
+  searchLabel: 'Find a place',
+  searchPlaceholder: 'Mankato, Minnesota',
+  drawButton: 'Draw a neighbourhood',
+  redrawButton: 'Draw again',
+  finishButton: 'Finish',
+  undoButton: 'Undo point',
+  cancelButton: 'Cancel',
+  drawHint: 'Tap the map to place corners. Tap the first corner, or Finish, to close it.',
+  intro:
+    'Draw around a neighbourhood — a campus, a downtown, a few blocks of homes. Buildings come from OpenStreetMap; each gets an hourly heating and cooling load for a year.',
+  loading: 'Reading buildings from OpenStreetMap, a year of weather, and the local grid…',
+  guessedNote:
+    'Faint, dashed buildings are guessed: OpenStreetMap did not say what they are, so the type came from their surroundings or size. Tap one to correct it.',
+  tooMany: (n: number, max: number) =>
+    `${n.toLocaleString('en-US')} heated buildings — a network connects at most ${max}. Draw a smaller area, or take some out.`,
+  none: 'No heated buildings inside that boundary.',
+  contextHeading: 'Site context',
+  contextNote:
+    'Minnesota’s site-suitability criteria, for information. Filled only where this tool can know the answer; the rest is left blank rather than guessed. None of it affects the score.',
+  notKnown: 'Not known to this tool',
+  sourcesHeading: 'Heat sources nearby',
+  sourcesNote: 'Capacities are first estimates. You can change them when you design the network.',
+  noSources: 'None found in OpenStreetMap within 500 m. You can still place them yourself.',
+  metricsHeading: 'The demand',
+  todayHeading: 'Today, without a network',
+  selectedHeading: 'Selected building',
+  include: 'Connected to the network',
+} as const;

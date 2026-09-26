@@ -19,7 +19,15 @@ export type UnitSystem = 'ip' | 'si';
 
 export const DEFAULT_UNITS: UnitSystem = 'ip';
 
-export type Quantity = 'temperature' | 'temperatureDelta' | 'power' | 'energy' | 'area';
+export type Quantity =
+  | 'temperature'
+  | 'temperatureDelta'
+  | 'power'
+  | 'energy'
+  | 'area'
+  | 'powerLarge'
+  | 'energyLarge'
+  | 'density';
 
 /** Watts in one Btu per hour. */
 const W_PER_BTUH = 0.29307107;
@@ -27,6 +35,14 @@ const W_PER_BTUH = 0.29307107;
 const KWH_PER_KBTU = 0.29307107;
 /** Square metres in one square foot. */
 const M2_PER_FT2 = 0.09290304;
+/**
+ * Canonical SI for the big quantities: MW, MWh, GWh/km²·yr. IP: million
+ * Btu/h, MMBtu, and billion Btu/mi²·yr — the unit EPRI's density thresholds
+ * are written in (400 billion Btu/mi² ≈ 45 GWh/km²).
+ */
+const MMBTU_PER_MWH = 3.4121416;
+const KM2_PER_MI2 = 2.58998811;
+const BILLION_BTU_PER_GWH = 3.4121416;
 
 export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
   ip: {
@@ -35,6 +51,9 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     power: 'Btu/h',
     energy: 'kBtu',
     area: 'ft²',
+    powerLarge: 'MMBtu/h',
+    energyLarge: 'MMBtu',
+    density: 'billion Btu/mi²·yr',
   },
   si: {
     temperature: '°C',
@@ -42,6 +61,9 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     power: 'W',
     energy: 'kWh',
     area: 'm²',
+    powerLarge: 'MW',
+    energyLarge: 'MWh',
+    density: 'GWh/km²·yr',
   },
 };
 
@@ -59,6 +81,11 @@ export function toDisplay(quantity: Quantity, si: number, units: UnitSystem): nu
       return si / KWH_PER_KBTU;
     case 'area':
       return si / M2_PER_FT2;
+    case 'powerLarge':
+    case 'energyLarge':
+      return si * MMBTU_PER_MWH;
+    case 'density':
+      return si * BILLION_BTU_PER_GWH * KM2_PER_MI2;
   }
 }
 
@@ -76,5 +103,10 @@ export function fromDisplay(quantity: Quantity, shown: number, units: UnitSystem
       return shown * KWH_PER_KBTU;
     case 'area':
       return shown * M2_PER_FT2;
+    case 'powerLarge':
+    case 'energyLarge':
+      return shown / MMBTU_PER_MWH;
+    case 'density':
+      return shown / (BILLION_BTU_PER_GWH * KM2_PER_MI2);
   }
 }

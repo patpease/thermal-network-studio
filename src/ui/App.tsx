@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { BRAND } from '../config/branding';
-import { COMING_SOON, SCOPE_STATEMENT, STEPS } from '../config/copy';
+import { SCOPE_STATEMENT } from '../config/copy';
 import { DEFAULT_UNITS } from '../units/units';
 import type { UnitSystem } from '../units/units';
 import { Mark } from './Mark';
@@ -9,11 +9,11 @@ import { SiteFooter } from './SiteFooter';
 import { ThemeIcon } from './ThemeIcon';
 import { useTheme } from './theme';
 import type { ThemeChoice } from './theme';
+import { Workspace } from './Workspace';
 
 /**
- * The shell. Phase 00 is chrome and nothing else: the header matched to
- * Psychrometric Studio's, the scope line, the five steps of play as a road
- * map, and the studio footer.
+ * The shell: the header matched to Psychrometric Studio's, the scope line
+ * (permanent furniture, never dismissible), the map workspace, the footer.
  */
 export function App() {
   const theme = useTheme();
@@ -81,16 +81,7 @@ export function App() {
       </p>
 
       <main className="workspace">
-        <ol className="steps">
-          {STEPS.map((step, index) => (
-            <li key={step.key} className="step">
-              <span className="step__number mono">{String(index + 1).padStart(2, '0')}</span>
-              <h2 className="step__title">{step.title}</h2>
-              <p className="step__body">{step.body}</p>
-            </li>
-          ))}
-        </ol>
-        <p className="coming-soon">{COMING_SOON}</p>
+        <Workspace units={units} theme={theme.resolved} />
       </main>
 
       <SiteFooter />

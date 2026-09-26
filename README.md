@@ -15,7 +15,7 @@ nothing kept.
 **It conveys an idea; it does not predict a saving.** Not for feasibility
 studies, utility filings or design submissions.
 
-Status: **phase 00 — scaffold.** See `PLAN.md` and `BACKLOG.md`.
+Status: **phase 03 — the map.** Draw a neighbourhood and read its demand. See `PLAN.md` and `BACKLOG.md`.
 
 ## Development
 
@@ -25,8 +25,9 @@ npm run dev              # http://localhost:5186
 npm test
 npm run build
 npm run preview:worker   # the built site in the real Workers runtime, :8790
+npm run dev:fixtures     # offline: the relay answers from committed fixtures
 ```
 
 ## Licence
 
-MIT. Map data © OpenStreetMap contributors, ODbL (from phase 03).
+MIT. Map data © OpenStreetMap contributors, ODbL. Basemap © OpenFreeMap / OpenMapTiles. Load calibration from NLR ComStock™/ResStock™.

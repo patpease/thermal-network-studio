@@ -154,9 +154,4 @@ export function siteMetrics(demand: Demand, landArea: number): SiteMetrics {
   };
 }
 
-/** Minnesota's load balance bands, as reference marks (D24). Not a score. */
-export function minnesotaBalanceBand(heatingShare: number): 'balanced' | 'typical' | 'heating-dominant' {
-  if (heatingShare <= 0.8) return 'balanced';
-  if (heatingShare <= 0.9) return 'typical';
-  return 'heating-dominant';
-}
+export { minnesotaBalanceBand } from './bands.ts';

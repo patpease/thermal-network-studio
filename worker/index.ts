@@ -12,7 +12,7 @@ import { handle } from './handler';
 import type { Env } from './handler';
 
 export default {
-  fetch(request: Request, env: Env): Promise<Response> {
-    return handle(request, env);
+  fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    return handle(request, env, { cache: caches.default, waitUntil: (p) => ctx.waitUntil(p) });
   },
 };

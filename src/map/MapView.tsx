@@ -1,0 +1,318 @@
+/**
+ * The map: basemap, the drawn boundary, the site's buildings, its sources.
+ *
+ * MapLibre is loaded lazily — it is most of the bundle, and the page is
+ * useful (and the scope line readable) before it arrives.
+ *
+ * Overlays live INSIDE the style, not added after it: a theme change rebuilds
+ * the whole style (see style.ts), and overlays added with addLayer would be
+ * wiped by setStyle and have to be re-added in the right order every time.
+ * Data changes only call setData on the overlay sources.
+ *
+ * Touch (D14): a tap is a click in MapLibre, so drawing works by tapping
+ * vertices; double-tap zoom is switched off while drawing so a quick second
+ * tap is a vertex, not a zoom. Finishing is a button in the panel as well as
+ * a tap on the first vertex, because a double-tap is not discoverable.
+ */
+import { useEffect, useRef, useState } from 'react';
+import type { Feature, FeatureCollection } from 'geojson';
+import type { GeoJSONSource, Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
+
+import type { LonLat, Ring } from '../site/geometry';
+import type { Site } from '../site/classify';
+import { effective } from '../site/neighbourhood';
+import type { Selection } from '../site/neighbourhood';
+import { baseStyle } from './style';
+import type { MapPalette } from './style';
+
+const EMPTY: FeatureCollection = { type: 'FeatureCollection', features: [] };
+
+const RESIDENTIAL = new Set(['single-family', 'small-multifamily', 'large-multifamily']);
+
+export interface MapViewProps {
+  readonly palette: MapPalette;
+  readonly drawing: boolean;
+  readonly draft: readonly LonLat[];
+  readonly boundary: Ring | null;
+  readonly site: Site | null;
+  readonly selection: Selection;
+  readonly selectedId: string | null;
+  readonly flyTo: { readonly center: LonLat; readonly zoom: number; readonly key: number } | null;
+  readonly onDraftPoint: (p: LonLat) => void;
+  readonly onFinishDraft: () => void;
+  readonly onSelectBuilding: (id: string | null) => void;
+}
+
+function draftData(draft: readonly LonLat[]): FeatureCollection {
+  if (draft.length === 0) return EMPTY;
+  const features: Feature[] = draft.map((p, i) => ({
+    type: 'Feature',
+    properties: { first: i === 0 },
+    geometry: { type: 'Point', coordinates: [p[0], p[1]] },
+  }));
+  if (draft.length > 1) {
+    features.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: draft.map((p) => [p[0], p[1]]) } });
+  }
+  return { type: 'FeatureCollection', features };
+}
+
+function boundaryData(boundary: Ring | null): FeatureCollection {
+  if (!boundary) return EMPTY;
+  return {
+    type: 'FeatureCollection',
+    features: [{ type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [boundary.map((p) => [p[0], p[1]])] } }],
+  };
+}
+
+function buildingData(site: Site | null, selection: Selection, selectedId: string | null): FeatureCollection {
+  if (!site) return EMPTY;
+  return {
+    type: 'FeatureCollection',
+    features: site.buildings.map((raw) => {
+      const b = effective(raw, selection);
+      const state = b.archetype === null ? 'unheated' : selection.excluded.has(b.id) ? 'excluded' : 'connected';
+      return {
+        type: 'Feature',
+        id: b.id,
+        properties: {
+          id: b.id,
+          state,
+          sector: b.archetype && RESIDENTIAL.has(b.archetype) ? 'home' : 'work',
+          guessed: b.archetypeGuessed,
+          selected: b.id === selectedId,
+        },
+        geometry: { type: 'Polygon', coordinates: [b.footprint.map((p) => [p[0], p[1]])] },
+      };
+    }),
+  };
+}
+
+function sourceData(site: Site | null): FeatureCollection {
+  if (!site) return EMPTY;
+  return {
+    type: 'FeatureCollection',
+    features: site.sources
+      .filter((s) => s.exchange !== 'in-load')
+      .map((s) => ({
+        type: 'Feature',
+        properties: { kind: s.kind, water: s.exchange === 'water', name: s.name ?? '' },
+        geometry: { type: 'Point', coordinates: [s.at[0], s.at[1]] },
+      })),
+  };
+}
+
+function withOverlays(p: MapPalette): StyleSpecification {
+  const base = baseStyle(p);
+  return {
+    ...base,
+    sources: {
+      ...base.sources,
+      boundary: { type: 'geojson', data: EMPTY },
+      buildings: { type: 'geojson', data: EMPTY },
+      draft: { type: 'geojson', data: EMPTY },
+      sources: { type: 'geojson', data: EMPTY },
+    },
+    layers: [
+      ...base.layers,
+      {
+        id: 'boundary-fill',
+        type: 'fill',
+        source: 'boundary',
+        paint: { 'fill-color': p.boundary, 'fill-opacity': 0.05 },
+      },
+      {
+        id: 'site-building-fill',
+        type: 'fill',
+        source: 'buildings',
+        paint: {
+          'fill-color': ['match', ['get', 'state'], 'connected', ['match', ['get', 'sector'], 'home', p.home, p.work], p.excluded],
+          // Guessed buildings are drawn fainter; excluded and unheated, hollow.
+          'fill-opacity': ['match', ['get', 'state'], 'connected', ['case', ['get', 'guessed'], 0.45, 0.9], 0.15],
+        },
+      },
+      {
+        id: 'site-building-outline',
+        type: 'line',
+        source: 'buildings',
+        paint: {
+          'line-color': ['case', ['get', 'selected'], p.ink, ['match', ['get', 'state'], 'connected', ['match', ['get', 'sector'], 'home', p.home, p.work], p.excluded]],
+          'line-width': ['case', ['get', 'selected'], 2.5, 1],
+        },
+      },
+      {
+        // Dashed outline for guessed buildings: a second line layer, because
+        // line-dasharray cannot be data-driven.
+        id: 'site-building-guessed',
+        type: 'line',
+        source: 'buildings',
+        filter: ['all', ['get', 'guessed'], ['==', ['get', 'state'], 'connected']],
+        paint: { 'line-color': p.ink, 'line-width': 1, 'line-dasharray': [2, 2], 'line-opacity': 0.55 },
+      },
+      {
+        id: 'boundary-line',
+        type: 'line',
+        source: 'boundary',
+        paint: { 'line-color': p.boundary, 'line-width': 2.5 },
+      },
+      {
+        id: 'draft-line',
+        type: 'line',
+        source: 'draft',
+        filter: ['==', ['geometry-type'], 'LineString'],
+        paint: { 'line-color': p.boundary, 'line-width': 2, 'line-dasharray': [2, 1.5] },
+      },
+      {
+        id: 'draft-points',
+        type: 'circle',
+        source: 'draft',
+        filter: ['==', ['geometry-type'], 'Point'],
+        paint: {
+          'circle-radius': ['case', ['get', 'first'], 8, 5],
+          'circle-color': p.surface,
+          'circle-stroke-color': p.boundary,
+          'circle-stroke-width': 2.5,
+        },
+      },
+      {
+        id: 'source-points',
+        type: 'circle',
+        source: 'sources',
+        paint: {
+          'circle-radius': 9,
+          // Waste heat is heat: orange. A water exchanger is water: blue.
+          'circle-color': ['case', ['get', 'water'], p.cool, p.heat],
+          'circle-stroke-color': p.surface,
+          'circle-stroke-width': 2.5,
+        },
+      },
+      {
+        id: 'source-labels',
+        type: 'symbol',
+        source: 'sources',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 11,
+          'text-offset': [0, 1.4],
+          'text-anchor': 'top',
+          'text-optional': true,
+        },
+        paint: { 'text-color': p.ink, 'text-halo-color': p.surface, 'text-halo-width': 1.5 },
+      },
+    ],
+  };
+}
+
+/** Pixels within which a tap on the first vertex closes the boundary. */
+const CLOSE_PX = 14;
+
+export function MapView(props: MapViewProps) {
+  const container = useRef<HTMLDivElement>(null);
+  const map = useRef<MapLibreMap | null>(null);
+  // Handlers and data read through a ref, so the map's listeners — attached
+  // once — always see the latest props. (Psychrometric Studio: a callback that
+  // captured a stale setter wrote to the wrong case.)
+  const latest = useRef(props);
+  latest.current = props;
+  const [failed, setFailed] = useState<string | null>(null);
+
+  const push = () => {
+    const m = map.current;
+    // Not isStyleLoaded(): that stays false while ANY tile is loading, so a
+    // site arriving mid-load was never drawn. setData only needs the source.
+    if (!m || !m.getSource('buildings')) return;
+    const p = latest.current;
+    (m.getSource('boundary') as GeoJSONSource | undefined)?.setData(boundaryData(p.boundary));
+    (m.getSource('buildings') as GeoJSONSource | undefined)?.setData(buildingData(p.site, p.selection, p.selectedId));
+    (m.getSource('draft') as GeoJSONSource | undefined)?.setData(draftData(p.drawing ? p.draft : []));
+    (m.getSource('sources') as GeoJSONSource | undefined)?.setData(sourceData(p.site));
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    let instance: MapLibreMap | null = null;
+    void (async () => {
+      const maplibre = await import('maplibre-gl');
+      await import('maplibre-gl/dist/maplibre-gl.css');
+      if (cancelled || !container.current) return;
+      if (!('WebGL2RenderingContext' in window) && !('WebGLRenderingContext' in window)) {
+        setFailed('This browser cannot draw the map (no WebGL).');
+        return;
+      }
+      instance = new maplibre.Map({
+        container: container.current,
+        style: withOverlays(latest.current.palette),
+        center: [-93.2, 44.95],
+        zoom: 11,
+        attributionControl: { compact: true },
+      });
+      instance.addControl(new maplibre.NavigationControl({ showCompass: false }), 'top-left');
+      instance.on('style.load', push);
+      instance.on('click', (e) => {
+        const p = latest.current;
+        if (p.drawing) {
+          const first = p.draft[0];
+          if (first && p.draft.length >= 3) {
+            const a = instance!.project([first[0], first[1]]);
+            if (Math.hypot(a.x - e.point.x, a.y - e.point.y) <= CLOSE_PX) {
+              p.onFinishDraft();
+              return;
+            }
+          }
+          p.onDraftPoint([e.lngLat.lng, e.lngLat.lat]);
+          return;
+        }
+        const hit = instance!.queryRenderedFeatures(e.point, { layers: ['site-building-fill'] })[0];
+        p.onSelectBuilding(hit ? String(hit.properties['id']) : null);
+      });
+      instance.on('dblclick', (e) => {
+        if (latest.current.drawing) {
+          e.preventDefault();
+          latest.current.onFinishDraft();
+        }
+      });
+      map.current = instance;
+      // Development only: lets a browser test ask the map what it holds.
+      if (import.meta.env.DEV) (window as unknown as { __map?: MapLibreMap }).__map = instance;
+    })().catch((error: unknown) => {
+      if (!cancelled) setFailed(`The map could not start: ${error instanceof Error ? error.message : String(error)}`);
+    });
+    return () => {
+      cancelled = true;
+      instance?.remove();
+      map.current = null;
+    };
+  }, []);
+
+  // Theme: rebuild the style, overlays included. diff: false forces a full
+  // reload, which fires 'style.load' and so re-pushes the overlay data; a
+  // diffed setStyle fires no such event and left every overlay empty.
+  const firstPalette = useRef(true);
+  useEffect(() => {
+    if (firstPalette.current) {
+      firstPalette.current = false;
+      return;
+    }
+    map.current?.setStyle(withOverlays(props.palette), { diff: false });
+  }, [props.palette]);
+
+  useEffect(push, [props.boundary, props.site, props.selection, props.selectedId, props.draft, props.drawing]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    if (props.drawing) m.doubleClickZoom.disable();
+    else m.doubleClickZoom.enable();
+    m.getCanvas().style.cursor = props.drawing ? 'crosshair' : '';
+  }, [props.drawing]);
+
+  useEffect(() => {
+    if (props.flyTo) map.current?.flyTo({ center: [props.flyTo.center[0], props.flyTo.center[1]], zoom: props.flyTo.zoom });
+  }, [props.flyTo]);
+
+  return (
+    <div ref={container} className="map" role="region" aria-label="Map">
+      {failed && <p className="map__failed">{failed}</p>}
+    </div>
+  );
+}

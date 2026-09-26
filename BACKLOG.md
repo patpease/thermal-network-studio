@@ -30,15 +30,38 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       105 tests. Verified in Chromium on a production build behind the real
       Worker and CSP: demo scores 68, 59 ms per run in the worker, ~300 ms on
       the first run while the g-function is tabulated.
-- [ ] **03 Map** — MapLibre + OpenFreeMap, polygon draw (mouse and touch),
-      Overpass and weather relays (heat-balance's relay pattern), classifier,
-      guessed buildings styled apart, sources and anchor tenants, site context
-      panel.
+- [x] **03 Map** — MapLibre + OpenFreeMap with a token-built style in both
+      themes; polygon draw by mouse and touch; the relay (place, site,
+      weather, buildings) with exact host pinning and edge caching; the OSM
+      classifier with guessed flags; sources, anchors, barriers, open space;
+      the information-only context panel; building selection and override;
+      the engine run on every change. Minnesota fixtures from OSM (D28):
+      Highland Park comes out more residential and more heating-dominated
+      than downtown Mankato, as the report says. 146 tests. Verified in
+      Chromium in fixture mode, and on the production build through
+      `wrangler dev` against LIVE Open-Meteo, Census and Overpass — no CSP
+      violations.
 - [ ] **04 Design UI** — source palette, placement, sizing, envelope retrofits.
 - [ ] **05 Results** — Sankey, loop temperature over the year, monthly
       sharing, 25-year bore drift, score breakdown.
 - [ ] **06 Challenges** — goal format, goal library, share links.
 - [ ] **07 Education, export, phone pass, deploy.**
+
+## Not done in 03, deliberately
+
+- **Microsoft US building footprints** where OSM has none. Residential
+  blocks in Mankato return one building. A second footprint source would
+  need its own relay and its own attribution.
+- **Phone layout is stacked, not tabbed.** Map, then panel, scrolling. The
+  sibling tools' tab bar is the phase 07 phone pass.
+- **Levels cannot be overridden** in the UI yet — archetype and inclusion
+  can. `BuildingOverride` already carries `levels`.
+- **Minnesota fixtures cover three sites.** The report's data centres
+  (Mankato, Alexandria, St. Cloud) are not tagged in OSM; the fixtures record
+  what OSM has, and the tests check only that.
+- **MapLibre 6** (D33).
+- **Sources are found but not yet usable** — the design screen (phase 04)
+  turns a candidate into an engine source.
 
 ## Not done in 02, deliberately
 

@@ -43,6 +43,8 @@
   --accent-bright: #3FC98A;
   --accent-wash: rgba(15, 95, 82, 0.06);
 
+  --warn-ink: #7A4708;
+
   --heat: #E2842F;
   --heat-ink: #A65E13;
   --cool: #2F9BD6;
@@ -54,6 +56,25 @@
   --mark-loop: #3ECF8E;
   --mark-heat: #E2842F;
   --mark-cool: #2F9BD6;
+
+  /* The map. MapLibre paints a canvas from a style object and cannot read
+     these; src/map/style.ts reads them from the document and rebuilds the
+     style when the theme changes. Buildings are coloured by sector — homes
+     and everything else — never in heat orange or cooling blue, which mean
+     physics here. */
+  --map-land: #f2f4f6;
+  --map-park: #e2ede5;
+  --map-water: #cfe2f0;
+  --map-road: #ffffff;
+  --map-road-major: #f6ead2;
+  --map-road-casing: #d9dee5;
+  --map-building: #e3e6ea;
+  --map-label: #5d6b7a;
+  --map-label-halo: #ffffff;
+  --site-boundary: #0F5F52;
+  --site-home: #7fa596;
+  --site-work: #8391ad;
+  --site-excluded: #bcc5cf;
 
   --shadow: 0 1px 2px rgba(20, 32, 43, 0.05), 0 8px 24px -16px rgba(20, 32, 43, 0.25);
 }
@@ -74,6 +95,8 @@
     --accent-bright: #6FE0AC;
     --accent-wash: rgba(63, 201, 138, 0.08);
 
+    --warn-ink: #F0C48A;
+
     --heat: #F0A355;
     --heat-ink: #F5C08D;
     --cool: #6CB0EE;
@@ -83,6 +106,20 @@
     --mark-loop: #0E5C55;
     --mark-heat: #E2842F;
     --mark-cool: #2F9BD6;
+
+    --map-land: #141a21;
+    --map-park: #16241e;
+    --map-water: #12263a;
+    --map-road: #27313c;
+    --map-road-major: #3a3829;
+    --map-road-casing: #1a222b;
+    --map-building: #1f2731;
+    --map-label: #93a1b1;
+    --map-label-halo: #10151b;
+    --site-boundary: #3FC98A;
+    --site-home: #5e8e7e;
+    --site-work: #6d7ea3;
+    --site-excluded: #3b4959;
 
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -16px rgba(0, 0, 0, 0.7);
   }
@@ -103,6 +140,8 @@
   --accent-bright: #6FE0AC;
   --accent-wash: rgba(63, 201, 138, 0.08);
 
+  --warn-ink: #F0C48A;
+
   --heat: #F0A355;
   --heat-ink: #F5C08D;
   --cool: #6CB0EE;
@@ -112,6 +151,20 @@
   --mark-loop: #0E5C55;
   --mark-heat: #E2842F;
   --mark-cool: #2F9BD6;
+
+  --map-land: #141a21;
+  --map-park: #16241e;
+  --map-water: #12263a;
+  --map-road: #27313c;
+  --map-road-major: #3a3829;
+  --map-road-casing: #1a222b;
+  --map-building: #1f2731;
+  --map-label: #93a1b1;
+  --map-label-halo: #10151b;
+  --site-boundary: #3FC98A;
+  --site-home: #5e8e7e;
+  --site-work: #6d7ea3;
+  --site-excluded: #3b4959;
 
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -16px rgba(0, 0, 0, 0.7);
 }

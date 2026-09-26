@@ -225,53 +225,303 @@ h1, h2, h3, p, figure {
 
 /* ----------------------------------------------------------------- main */
 
+/*
+ * The workspace: map on the left, panel on the right, filling the height
+ * between the scope line and the footer. Below 860px it stacks — map first,
+ * at a fixed share of the screen, then the panel — so a phone gets a usable
+ * map and the panel scrolls under it (D14).
+ */
 .workspace {
   flex: 1;
-  padding: 1.5rem var(--gutter);
-  max-width: 72rem;
-  width: 100%;
-  margin: 0 auto;
+  display: flex;
+  min-height: 0;
 }
 
-.steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.workspace-map {
+  flex: 1;
   display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: minmax(0, 1fr) 24rem;
+  min-height: min(calc(100dvh - 11rem), 60rem);
 }
 
-.step {
+.map-pane {
+  position: relative;
+  min-height: 24rem;
+  border-right: 1px solid var(--border);
+}
+
+/* Two classes, not one: MapLibre's stylesheet sets .maplibregl-map to
+   position: relative and loads after this one, which collapsed the map to
+   zero height — a blank map with nothing in the console to say why. */
+.map-pane > .map {
+  position: absolute;
+  inset: 0;
+}
+
+.map__failed {
+  padding: 1rem;
+  color: var(--ink-muted);
+}
+
+.side-panel {
+  background: var(--surface-sunk);
+  overflow-y: auto;
+  max-height: calc(100dvh - 8rem);
+}
+
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem;
+}
+
+.card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1rem;
-  box-shadow: var(--shadow);
+  padding: 0.85rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 
-.step__number {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--accent);
-}
-
-.step__title {
-  font-size: 1rem;
+.card__heading {
+  font-size: 0.78rem;
   font-weight: 700;
-  margin: 0.25rem 0 0.35rem;
-}
-
-.step__body {
-  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--ink-muted);
 }
 
-.coming-soon {
-  margin-top: 1.25rem;
-  font-size: 0.85rem;
+.card__subheading {
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--ink-muted);
+  margin: 0.4rem 0 0;
+}
+
+.card__title {
+  font-weight: 700;
+}
+
+.card__note {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem 0.9rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.stat__label {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+}
+
+.stat__value {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.stat__note {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+
+.button-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.button {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.button--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  /* The dark-theme accent is a light green, so white text would vanish on it. */
+  color: var(--surface);
+}
+
+.link-button {
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 0.2rem 0;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+input,
+select {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  min-width: 0;
+}
+
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.search__row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search__row input {
+  flex: 1;
+}
+
+.search__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.message {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.message--error {
+  color: var(--warn-ink);
+}
+
+.check {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.86rem;
+}
+
+.dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+}
+
+.dot--heat {
+  background: var(--heat);
+}
+
+.dot--cool {
+  background: var(--cool);
+}
+
+.muted {
+  color: var(--ink-muted);
+}
+
+.context {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+}
+
+.context__row {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+.context__row dt {
+  font-weight: 600;
+}
+
+.context__row dd {
+  margin: 0;
+}
+
+.context__row--unknown dt {
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.attribution {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+}
+
+/* MapLibre's controls, on the suite's surfaces. */
+.maplibregl-ctrl-group {
+  background: var(--surface);
+}
+
+@media (max-width: 860px) {
+  .workspace-map {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .map-pane {
+    height: 60dvh;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .side-panel {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .context__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+  }
 }
 
 .visually-hidden {
