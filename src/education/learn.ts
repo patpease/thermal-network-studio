@@ -11,6 +11,7 @@ import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
 import { DEFAULT_BAND, GLYCOL_BELOW_C } from '../engine/network';
 import { TOWER_APPROACH } from '../engine/sources';
 import { AIR_SOURCE_LIMITS } from '../engine/heatpumps';
+import { BLE } from '../engine/grid';
 import type { Challenge } from '../challenges/challenges';
 import { SCOPE_STATEMENT } from '../config/copy';
 import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/classify';
@@ -150,6 +151,9 @@ export function sections(f: Formatters): Section[] {
         { text: 'Today’s buildings use the regional mix of fuels and equipment in NLR’s building stock data.', refs: ['nlr'] },
         { text: 'Electricity carbon is the long-run marginal rate for the hour, month and region. Fuel carbon uses EPA factors.', refs: ['cambium', 'epa'] },
         { text: 'HEET shows networked geothermal giving a lower winter electric peak than air-source heat pumps or electric resistance heat.', refs: ['heet'] },
+        { text: `Building-level electrification (BLE) puts an air-source heat pump in each building. In this tool its heating COP follows outdoor air, with resistance heat below ${f.temperature(BLE.resistanceBelow)}, and hot water comes from a heat pump water heater at COP ${BLE.dhwCop}.`, refs: ['tool'] },
+        { text: 'The winter electric peak is the largest hour of electricity from December to February. The Results tab compares the network (TEN) with BLE on the same loads. It is not scored.', refs: ['tool'] },
+        { text: 'In the coldest hours a network uses the plant that still runs. Heat left to electric backup adds to its winter peak.', refs: ['tool'] },
         { text: 'The ground over 25 years is shown and not scored. A challenge may require it.', refs: ['tool'] },
         { text: 'Annual loads match NLR’s building stock data. The hour-by-hour shape is this tool’s model.', refs: ['nlr', 'tool'] },
         { text: `${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, refs: ['tool'] },

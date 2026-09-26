@@ -109,3 +109,16 @@ describe('on Alexandria, where there is room', () => {
     expect(evaluate(c('off-the-air'), runScenario(n, toNetworkDesign(d, w), w), d, { boreholeRoom: room }).met).toBe(true);
   });
 });
+
+describe('easy on the grid (phase 10)', () => {
+  it('fails the suggestion: its cold-snap hours fall to resistance backup', () => {
+    const r = check('easy-on-the-grid', suggestion);
+    expect(r.met).toBe(false);
+    expect(r.goals[0]!.goal.kind).toBe('grid-peak');
+  });
+
+  it('a colder loop keeps the plant running through the cold snap and meets it', () => {
+    const colder: Design = { ...suggestion, band: { min: -3, max: 32 } };
+    expect(check('easy-on-the-grid', colder).met).toBe(true);
+  });
+});

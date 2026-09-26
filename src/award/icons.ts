@@ -62,6 +62,16 @@ export const ICONS: Record<ChallengeIcon, string> = {
     s('M36 12V8M36 12L32.6 14M36 12L39.4 14', ICON_GREEN, 2.4),
     s('M29 5L43 19', ICON_INK, 2.6),
   ].join(''),
+
+  // A transmission tower, and the winter peak brought down.
+  'easy-on-the-grid': [
+    s('M9 42L15.5 7H21.5L28 42', ICON_INK),
+    s('M6 14H31', ICON_INK, 2.6),
+    s('M10 23H27', ICON_INK, 2.4),
+    s('M12.5 32H24.5', ICON_INK, 2.4),
+    s('M35 9L38 14L41 9', ICON_ORANGE, 2.6),
+    s('M38 18V38M34 34L38 38L42 34', ICON_GREEN, 2.8),
+  ].join(''),
 };
 
 /** A standalone 48 × 48 SVG, for the picker. */

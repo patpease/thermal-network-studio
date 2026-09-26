@@ -22,6 +22,8 @@ import type { EnergyResult } from './baseline.ts';
 import { gridIntensity } from './carbon.ts';
 import { neighbourhoodDemand, siteMetrics } from './demand.ts';
 import type { Neighbourhood, SiteMetrics } from './demand.ts';
+import { bleElectricity, gridImpact } from './grid.ts';
+import type { GridImpact } from './grid.ts';
 import { simulateNetwork } from './network.ts';
 import type { NetworkDesign, NetworkResult } from './network.ts';
 
@@ -40,6 +42,8 @@ export interface ScenarioResult {
   readonly baseline: EnergyResult;
   readonly network: NetworkResult & { readonly carbonKg: number; readonly totalSiteKWh: number };
   readonly score: Score;
+  /** Electric peaks: today, building-level electrification, the network. Not scored. */
+  readonly grid: GridImpact;
   /** Hourly demand totals the network serves (after any retrofit), W — for the charts. */
   readonly demand: { heating: Float64Array; dhw: Float64Array; cooling: Float64Array; process: Float64Array };
 }
@@ -83,6 +87,7 @@ export function runScenario(neighbourhood: Neighbourhood, design: NetworkDesign,
     baseline,
     network,
     score: scoreOf(baseline, network),
+    grid: gridImpact(baseline.electricity, bleElectricity(demand, weather), net.electricity),
     demand: { heating: demand.heating, dhw: demand.dhw, cooling: demand.cooling, process: demand.process },
   };
 }

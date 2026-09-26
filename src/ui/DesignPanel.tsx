@@ -6,7 +6,7 @@
  * of what is built sits under them. Every number with a unit goes through
  * format.ts or NumberField, so nothing here knows which system is shown.
  */
-import { BALANCE_COPY, DESIGN_COPY, GLYCOL_COPY, SCALE_COPY, SOURCE_COPY } from '../config/copy';
+import { BALANCE_COPY, DESIGN_COPY, GLYCOL_COPY, GRID_COPY, SCALE_COPY, SOURCE_COPY } from '../config/copy';
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { balanceOf, DESIGN_DIVERSITY } from '../engine/balance';
 import { BOREHOLE_PEAK_W, boreFieldArea, defaultSpot, fromCandidate, nextId, RETROFITS } from '../engine/design';
@@ -137,6 +137,11 @@ function Results({ result, design, running, units, onLearn }: { result: Scenario
       <div className="stats">
         <Stat label="Site energy" value={reduction(score.energyReduction)} note={`${score.efficiencyPoints} points`} />
         <Stat label="Carbon" value={reduction(score.carbonReduction)} note={`${score.carbonPoints} points`} />
+        <Stat
+          label={GRID_COPY.stat}
+          value={reduction(result.grid.winterReduction)}
+          note={GRID_COPY.statNote(withUnit('electricPower', result.grid.network.winterW, units), withUnit('electricPower', result.grid.ble.winterW, units))}
+        />
         <Stat label="System COP" value={sig(network.systemCop, 2)} note="heat and cooling delivered ÷ electricity" />
         <Stat
           label="Unmet hours"

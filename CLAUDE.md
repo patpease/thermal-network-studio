@@ -499,3 +499,19 @@ Things that looked right and were not:
   a tower's parasitic draw is far below a compressor's.
 - In the Sankey it is heat on the side it gives and cooling on the side it
   takes. The map marker stays orange. "Off the air" still excludes it.
+
+## Grid impact (phase 10)
+
+- **`engine/grid.ts` compares the network (TEN) with building-level
+  electrification (BLE)** on the SAME loads the network serves: an
+  air-source heat pump per building (resistance below −25 °C), a heat pump
+  water heater at COP 2.5, an air conditioner, refrigeration as today.
+  `ScenarioResult.grid` holds winter and summer peaks (largest hour) and the
+  year's kWh for today, BLE and the network. Never scored.
+- **Electric demand prints in kW in both systems** (`electricPower` in
+  `units.ts`) — US utilities plan in kW, not Btu/h.
+- **The winter peak is decided by the cold snap.** Below −20 °C the loop's
+  air-source plant stops; whatever the ground cannot carry goes to
+  resistance backup, and in that hour the network draws about as much as
+  resistance heat. The suggestion comes in 7% under BLE on Mankato; a −3 °C
+  loop floor gets 26%. "Easy on the grid" (25%) teaches exactly this.

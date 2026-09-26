@@ -35,7 +35,7 @@ const result = runScenario(neighbourhood, toNetworkDesign(design, weather), weat
 describe('ResultsPanel', () => {
   it('draws the score, the flow, the year, the months and the drift', () => {
     render(<ResultsPanel result={result} design={design} weather={weather} running={false} units="ip" hasSite />);
-    for (const title of [/^Score \d+ of 100$/, /Where the loop’s heat comes from/, /Loop temperature through the year/, /Heat shared between buildings/, /The ground over 25 years/]) {
+    for (const title of [/^Score \d+ of 100$/, /^Winter electric peak/, /Where the loop’s heat comes from/, /Loop temperature through the year/, /Heat shared between buildings/, /The ground over 25 years/]) {
       expect(screen.getByRole('heading', { name: title })).toBeTruthy();
     }
   });
@@ -43,7 +43,7 @@ describe('ResultsPanel', () => {
   it('gives every chart a table, in the displayed units', () => {
     const { container } = render(<ResultsPanel result={result} design={design} weather={weather} running={false} units="si" hasSite />);
     const tables = container.querySelectorAll('.visually-hidden table');
-    expect(tables).toHaveLength(5);
+    expect(tables).toHaveLength(6);
     expect(container.textContent).toContain('MWh');
     expect(container.textContent).not.toContain('MMBtu');
     expect(container.textContent).not.toContain('°F');

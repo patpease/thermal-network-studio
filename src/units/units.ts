@@ -28,7 +28,9 @@ export type Quantity =
   | 'length'
   | 'powerLarge'
   | 'energyLarge'
-  | 'density';
+  | 'density'
+  /** Electric demand. kW in both systems: US utilities bill and plan in kW. */
+  | 'electricPower';
 
 /** Watts in one Btu per hour. */
 const W_PER_BTUH = 0.29307107;
@@ -57,6 +59,7 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     powerLarge: 'MMBtu/h',
     energyLarge: 'MMBtu',
     density: 'billion Btu/mi²·yr',
+    electricPower: 'kW',
   },
   si: {
     temperature: '°C',
@@ -68,11 +71,13 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     powerLarge: 'MW',
     energyLarge: 'MWh',
     density: 'GWh/km²·yr',
+    electricPower: 'kW',
   },
 };
 
 /** Canonical SI value → the number shown in `units`. */
 export function toDisplay(quantity: Quantity, si: number, units: UnitSystem): number {
+  if (quantity === 'electricPower') return si / 1000;
   if (units === 'si') return si;
   switch (quantity) {
     case 'temperature':
@@ -97,6 +102,7 @@ export function toDisplay(quantity: Quantity, si: number, units: UnitSystem): nu
 
 /** A number typed in `units` → canonical SI. The exact inverse of `toDisplay`. */
 export function fromDisplay(quantity: Quantity, shown: number, units: UnitSystem): number {
+  if (quantity === 'electricPower') return shown * 1000;
   if (units === 'si') return shown;
   switch (quantity) {
     case 'temperature':

@@ -1,12 +1,13 @@
 /**
  * The results screen (phase 05): why the design scored what it did.
  *
- * The score first, then the year's heat through the loop, the loop's
+ * The score first, then the grid impact, then the year's heat through the loop, the loop's
  * temperature, the heat buildings shared, and the ground over 25 years.
  * Every chart is drawn at the width it is shown and carries a hidden table.
  */
 import { useMemo } from 'react';
 
+import { GridImpact } from '../charts/GridImpact';
 import { GroundDrift } from '../charts/GroundDrift';
 import { LoopFlow } from '../charts/LoopFlow';
 import { LoopYear } from '../charts/LoopYear';
@@ -41,6 +42,7 @@ export function ResultsPanel({ result, design, weather, running, units, hasSite 
     <div className="panel-body results" aria-busy={running}>
       {running && <p className="message">{RESULTS_COPY.updating}</p>}
       <ScoreBreakdown result={result} units={units} />
+      <GridImpact grid={result.grid} units={units} />
       <LoopFlow flows={flows} units={units} />
       <LoopYear days={days} band={design.band} units={units} />
       <MonthlySharing months={months} units={units} />

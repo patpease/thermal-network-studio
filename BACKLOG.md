@@ -96,10 +96,52 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       point, on the Site tab, the Design tab's balancing card, Site features
       and the Learn tab. Below it: how many more buildings like these would
       reach it, and an Edit boundary button.
-- [ ] **10 Grid impact** — the network's winter electric peak against the
+- [x] **10 Grid impact** — the network's winter electric peak against the
       same buildings on building-level electrification (air-source heat pumps,
-      BLE); an indicator on Results and a new challenge.
+      BLE): a Results chart (winter peak, summer peak, the year; today as a
+      rule), a Design tab stat, Learn facts, and the "Easy on the grid"
+      challenge (winter peak ≥ 25% below BLE, ≤ 100 backup hours).
+- [ ] **11 Save and open** — a project file, as Psychrometric Studio has.
+      See below.
 - **v2: building readiness** (steam heat, electrical panels) — deferred.
+
+## Phase 11 plan: save and open a project file
+
+What a player gets: **Save** downloads `<place>.thermal-network.json`;
+**Open** reads one back and lands on the same neighbourhood, buildings,
+design and challenge, ready to adjust. Nothing is uploaded; the file is the
+only copy. Modelled on Psychrometric Studio's project file (its
+`shared/schema/project.schema.json`, versioned with `MIGRATIONS`).
+
+1. **Format** (`src/io/project.ts`, `schema/project.schema.json`):
+   `{ format: "thermal-network-studio", version: 1, saved, place: {
+   neighbourhood, town, state } (with the player's edits), boundary,
+   selection: { excluded, overrides }, design: { sources, band, retrofit },
+   challenge, units }`. Canonical SI throughout (rule 1); units is only the
+   display the player left it in. The share link's body is the same data —
+   one serialiser feeds both, so they cannot drift.
+2. **The buildings: a snapshot, re-read on open.** The file keeps the
+   normalised site the player saw (footprints, archetypes, levels, found
+   sources). On open the tool shows the snapshot at once — no network call —
+   and offers "Re-read OpenStreetMap" to refresh it, carrying overrides and
+   design across by building id as Edit boundary does. A file still opens
+   when Overpass is down, and a later OSM edit cannot quietly change a saved
+   study.
+3. **Refuse, never half-read**: a future version, a wrong `format`, or a
+   malformed field is refused with one sentence; `MIGRATIONS` upgrades an
+   older version. A schema test enforces the file against the JSON Schema.
+4. **UI**: Save and Open in the header beside Share, and Open on the empty
+   map. Opening over unsaved work asks first. Keyboard: Ctrl/⌘+S saves.
+5. **Rescue** (from Psychrometric Studio's `rescue.ts`, optional): keep the
+   last state in `localStorage` so a crash or a closed tab can be restored
+   once. Its cleanup must not clear what the crash screen needs.
+6. **Tests**: a round trip (save → open → same result to the watt), a v0 →
+   v1 migration fixture, refusal cases, overrides that name a building
+   missing after a re-read.
+
+Open question for the owner: include the building snapshot (bigger file, opens
+offline, frozen study) or only the boundary (small, always current OSM)? The
+plan above assumes the snapshot with a re-read button.
 
 Found in 08, not yet fixed:
 

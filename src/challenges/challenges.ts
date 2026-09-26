@@ -31,9 +31,14 @@ export type Goal =
    */
   | { readonly kind: 'bores-fit' }
   /** Share of all heat put into the loop that came from these kinds, at least. */
-  | { readonly kind: 'heat-from'; readonly sources: readonly DesignSourceKind[]; readonly atLeast: number };
+  | { readonly kind: 'heat-from'; readonly sources: readonly DesignSourceKind[]; readonly atLeast: number }
+  /**
+   * The network's winter electric peak below building-level electrification
+   * (a heat pump in every building, on outdoor air), as a fraction, at least.
+   */
+  | { readonly kind: 'grid-peak'; readonly atLeast: number };
 
-export type ChallengeIcon = 'half-carbon' | 'ground-balance' | 'waste-not' | 'off-the-air';
+export type ChallengeIcon = 'half-carbon' | 'ground-balance' | 'waste-not' | 'off-the-air' | 'easy-on-the-grid';
 
 export interface Challenge {
   readonly id: string;
@@ -91,6 +96,17 @@ export const CHALLENGES: readonly Challenge[] = [
     icon: 'off-the-air',
     goals: [
       { kind: 'without', sources: ['air-source', 'cooling-tower'] },
+      { kind: 'unmet-hours', atMost: 100 },
+    ],
+  },
+  {
+    id: 'easy-on-the-grid',
+    title: 'Easy on the grid',
+    brief: 'A winter electric peak at least 25% below a heat pump in every building, with no more than 100 hours to backup.',
+    idea: 'Building heat pumps on a shared loop draw from water warmer than winter air. The winter electric peak is lower.',
+    icon: 'easy-on-the-grid',
+    goals: [
+      { kind: 'grid-peak', atLeast: 0.25 },
       { kind: 'unmet-hours', atMost: 100 },
     ],
   },
@@ -169,6 +185,10 @@ export function evaluateGoal(goal: Goal, result: ScenarioResult, design: Design,
         asks: `Boreholes fit the open space (about ${limits.boreholeRoom.toLocaleString('en-US')})`,
         now: `${n.toLocaleString('en-US')} boreholes`,
       };
+    }
+    case 'grid-peak': {
+      const r = result.grid.winterReduction;
+      return { goal, met: r >= goal.atLeast, asks: `Winter electric peak at least ${pct(goal.atLeast)} below a heat pump in every building`, now: r >= 0 ? `${pct(r)} below` : `${pct(-r)} above` };
     }
     case 'heat-from': {
       const share = heatShareFrom(result, design, goal.sources);

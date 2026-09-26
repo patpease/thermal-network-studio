@@ -104,6 +104,22 @@ export const SOURCE_COPY = {
   water: 'A heat exchanger on a sewer main, a lake or a river. Gives or takes heat, depending on the water temperature.',
 } as const;
 
+/** Grid impact: the network against a heat pump in every building. */
+export const GRID_COPY = {
+  title: (pct: string) => `Winter electric peak · ${pct}`,
+  lower: (x: string) => `${x} lower than a heat pump in every building`,
+  higher: (x: string) => `${x} higher than a heat pump in every building`,
+  subtitle: 'The largest hour of electricity. A heat pump in every building is building-level electrification (BLE): each building on its own air-source heat pump. Not scored.',
+  ble: 'A heat pump in every building (BLE)',
+  network: 'The network (TEN)',
+  today: 'Today',
+  winter: 'Winter peak, December to February',
+  summer: 'Summer peak, June to August',
+  annual: 'Electricity over the year',
+  stat: 'Winter electric peak',
+  statNote: (network: string, ble: string) => `${network} against ${ble} with a heat pump in every building`,
+} as const;
+
 export const RESULTS_COPY = {
   tab: 'Results',
   needSite: 'Draw a neighbourhood first.',
