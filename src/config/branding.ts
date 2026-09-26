@@ -13,8 +13,8 @@ export const BRAND = {
   organisationUrl: 'https://peasestudio.com/',
   appName: 'Thermal Network Studio',
   tagline: 'Share heat across a neighbourhood',
-  /** Provisional until a real tile is drawn; see ui/Mark.tsx. */
-  markIsPlaceholder: true,
+  /** The mark is drawn in brand/mark.ts (option C, "Under the ground"). */
+  markIsPlaceholder: false,
   /**
    * Where the tool lives. Stamped on every export, so it moves with the
    * deployed route in wrangler.jsonc — workers.dev until a domain is chosen.

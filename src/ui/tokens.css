@@ -56,6 +56,7 @@
   --mark-loop: #3ECF8E;
   --mark-heat: #E2842F;
   --mark-cool: #2F9BD6;
+  --mark-base: #F4F7F6;
 
   /* The map. MapLibre paints a canvas from a style object and cannot read
      these; src/map/style.ts reads them from the document and rebuilds the
@@ -117,6 +118,7 @@
     --mark-loop: #0E5C55;
     --mark-heat: #E2842F;
     --mark-cool: #2F9BD6;
+    --mark-base: #0B2B28;
 
     --map-land: #141a21;
     --map-park: #16241e;
@@ -168,6 +170,7 @@
   --mark-loop: #0E5C55;
   --mark-heat: #E2842F;
   --mark-cool: #2F9BD6;
+  --mark-base: #0B2B28;
 
   --map-land: #141a21;
   --map-park: #16241e;

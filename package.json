@@ -20,7 +20,8 @@
     "carbon:extract": "node scripts/carbon/extract.mjs",
     "geo:counties": "node scripts/geo/counties.mjs",
     "fixtures:sites": "node scripts/fixtures/sites.ts",
-    "dev:fixtures": "TNS_FIXTURES=1 vite"
+    "dev:fixtures": "TNS_FIXTURES=1 vite",
+    "brand:icons": "node scripts/brand/icons.ts"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

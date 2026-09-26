@@ -86,6 +86,9 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
 ## After 07
 
 - [x] Distances in IP (ft) as well as SI; a test holds the context panel to it.
+- [x] The product mark: option C, "Under the ground" — two buildings on the
+      ground line joined by a loop below grade. One source (`brand/mark.ts`)
+      for the header, favicons and award.
 - [x] Balancing card on the Design tab: annual take/give/net and the worst
       hour's net heat to add and remove against the plant connected.
 - [x] The Minnesota study cited in the README only; the Site panel shows
@@ -102,7 +105,6 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
   is fixed until redrawn.
 - **Per-chart hashtags, link previews, a report.** An exported chart and the
   award are the two things this tool hands out.
-- **The mark is still a placeholder** (`BRAND.markIsPlaceholder`).
 
 ## Not done in 06, deliberately
 
@@ -193,7 +195,6 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
 
 - **No `docs/design-system.md` yet.** There is one screen of chrome; the
   document starts when the map gives it something to say.
-- **The mark is a placeholder** (`BRAND.markIsPlaceholder`).
 - **No third-party notices generator.** The only runtime dependencies are
   React and two OFL fonts, listed by hand in `THIRD-PARTY-NOTICES.md`. Add the
   generator when MapLibre arrives.

@@ -18,6 +18,7 @@
 import type { Challenge } from '../challenges/challenges';
 import type { LonLat, Ring } from '../site/geometry';
 import { metresPerDegree } from '../site/geometry';
+import { MARK_STANDARD, markInner } from '../brand/mark';
 import { ICON_BLUE, ICON_GREEN, ICON_INK, ICON_ORANGE, ICONS } from './icons';
 
 export const AWARD_WIDTH = 1080;
@@ -191,16 +192,9 @@ function banner(cx: number, cy: number, width: number, height: number): string {
   ].join('');
 }
 
-/** The product mark, literal colours (ui/Mark.tsx, light tile). */
+/** The product mark, literal colours (brand/mark.ts, standard tile). */
 function mark(x: number, y: number, size: number): string {
-  const k = size / 70;
-  return `<g transform="translate(${x} ${y}) scale(${k})" fill="none">
-<rect width="70" height="70" rx="15" fill="${C.accent}"/>
-<circle cx="35" cy="35" r="15" stroke="#FFFFFF" stroke-width="3"/>
-<path d="M35 20V15M35 50V55M20 35H15M50 35H55" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
-<rect x="29" y="6" width="12" height="10" rx="1.5" fill="${ICON_ORANGE}"/><rect x="29" y="54" width="12" height="10" rx="1.5" fill="${ICON_ORANGE}"/>
-<rect x="6" y="29" width="10" height="12" rx="1.5" fill="${ICON_BLUE}"/><rect x="54" y="29" width="10" height="12" rx="1.5" fill="${ICON_BLUE}"/>
-</g>`;
+  return `<g transform="translate(${x} ${y}) scale(${size / 70})" fill="none">${markInner(MARK_STANDARD)}</g>`;
 }
 
 export function awardSvg(input: AwardInput, fonts: AwardFonts = {}): string {

@@ -106,6 +106,9 @@ simulation budget is a sub-second re-run of a full 8760 (D6); measure it on
 
 - **`<img src>` for the product mark.** An image cannot see a theme pinned with
   the toggle. The mark is inlined in `ui/Mark.tsx` and every colour is a token.
+  The drawing itself lives once in `brand/mark.ts` (option C, "Under the
+  ground"); the favicons are written from it by `npm run brand:icons`, and
+  `tests/mark.test.ts` fails if they drift.
 - **Theme buttons tracking `preference`.** With nothing stored both sit unlit
   and the control looks broken on a first visit. They track `resolved`.
 - **`color-scheme: light dark` alone.** A dark-OS viewer who pins light gets
