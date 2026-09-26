@@ -98,7 +98,7 @@ export const DESIGN_COPY = {
 /** What each kind of source does, as shown on its card. */
 export const SOURCE_COPY = {
   'bore-field': 'Stores heat in the ground between seasons. Gives and takes heat.',
-  'air-source': 'Warms the loop from outdoor air. Heat only. Output falls as the air gets colder.',
+  'air-source': 'Warms or cools the loop with outdoor air, one or the other at a time. Gives and takes heat. Stops in extreme cold and heat.',
   'cooling-tower': 'Removes loop heat to the air by evaporation. Cooling only. Limited by the wet-bulb temperature.',
   'waste-heat': 'Heat from servers, rink chillers or a brewery. Heat only, while warmer than the loop.',
   water: 'A heat exchanger on a sewer main, a lake or a river. Gives or takes heat, depending on the water temperature.',
@@ -182,7 +182,7 @@ export const BALANCE_COPY = {
   sizedAt: (pct: string, worst: string) => `${pct} of the worst hour (${worst}), where loads between buildings cancel.`,
   connected: (x: string, pct: string) => `Connected: ${x} (${pct})`,
   addsHeat: 'Adds heat: bore field, air-source heat pump, waste heat, water.',
-  removesHeat: 'Removes heat: bore field, cooling tower, water.',
+  removesHeat: 'Removes heat: bore field, air-source heat pump, cooling tower, water.',
   boreBalance: 'A bore field keeps its temperature over the years when the heat it gives and takes in a year are close.',
   boreRate: (x: string) => `Bore fields are counted at ${x} per borehole.`,
 } as const;

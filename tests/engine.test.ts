@@ -8,7 +8,7 @@ import { minnesotaBalanceBand, neighbourhoodDemand, siteMetrics } from '../src/e
 import type { Demand } from '../src/engine/demand';
 import { DEMO_DESIGN, DEMO_NEIGHBOURHOOD } from '../src/engine/demo';
 import { COUNTY_REGION, GEA_REGIONS, LRMER_G_PER_KWH } from '../src/engine/generated/cambium';
-import { airSourceCop, coolingCop, heatingCop } from '../src/engine/heatpumps';
+import { airSourceCoolingCop, airSourceCop, coolingCop, heatingCop } from '../src/engine/heatpumps';
 import { simulateNetwork } from '../src/engine/network';
 import { runScenario, scoreOf } from '../src/engine/scenario';
 import { exchangerFraction, sewerTemperature, wetBulb } from '../src/engine/sources';
@@ -62,6 +62,12 @@ describe('heat pumps', () => {
     expect(heatingCop(44)).toBeLessThanOrEqual(8);
     expect(heatingCop(-30)).toBeGreaterThanOrEqual(1.5);
     expect(airSourceCop(-25, 5)).toBe(0);
+    expect(airSourceCoolingCop(50, 30)).toBe(0);
+  });
+
+  it('the air-source heat pump cools the loop better from cooler air', () => {
+    expect(airSourceCoolingCop(20, 20)).toBeGreaterThan(airSourceCoolingCop(35, 20));
+    expect(airSourceCoolingCop(35, 30)).toBeGreaterThanOrEqual(1);
   });
 });
 
@@ -146,6 +152,26 @@ describe('the network', () => {
     const large = simulateNetwork(demand, { sources: [{ kind: 'bore-field', id: 'b', spec: { boreholes: 800 } }] }, weather);
     expect(large.unmetKWh).toBeLessThan(small.unmetKWh);
     expect(large.systemCop).toBeGreaterThan(small.systemCop);
+  });
+
+  it('an air-source heat pump alone both gives and takes heat, one or the other each hour', () => {
+    const r = simulateNetwork(demand, { sources: [{ kind: 'air-source', id: 'a', capacityW: 1e8 }] }, weather);
+    expect(r.sourceInKWh['a']).toBeGreaterThan(0);
+    expect(r.sourceOutKWh['a']).toBeGreaterThan(0);
+    expect(r.electricityKWh.airSource).toBeGreaterThan(0);
+    const supplied = Object.values(r.sourceKWh).reduce((a, b) => a + b, 0);
+    expect(Math.abs(supplied - (r.extractedKWh - r.rejectedKWh))).toBeLessThan(1e-6 * (r.extractedKWh + r.rejectedKWh));
+    // Only the heating cutoff leaves anything to backup in this climate.
+    const cold = Array.from(weather.temperature).filter((t) => t < -20).length;
+    expect(r.unmetHours).toBeLessThanOrEqual(cold);
+  });
+
+  it('in cooling hours the tower goes first and the air-source heat pump takes the rest', () => {
+    const tower = { kind: 'cooling-tower' as const, id: 't', capacityW: 1e8 };
+    const air = { kind: 'air-source' as const, id: 'a', capacityW: 1e8 };
+    const both = simulateNetwork(demand, { sources: [air, tower] }, weather);
+    const towerOnly = simulateNetwork(demand, { sources: [tower] }, weather);
+    expect(both.sourceOutKWh['t']).toBeCloseTo(towerOnly.sourceOutKWh['t']!, 3);
   });
 
   it('projects 25 years of drift whenever there is a bore field, and none without', () => {

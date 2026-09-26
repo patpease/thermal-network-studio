@@ -60,6 +60,19 @@ export function refrigerationCop(loop: number): number {
  * the air gets very cold. Stops below −20 °C air.
  */
 export function airSourceCop(air: number, loop: number): number {
-  if (air < -20) return 0;
+  if (air < AIR_SOURCE_LIMITS.min) return 0;
   return carnotHeating(loop + HEAT_PUMP.approach, air - 5, 0.45, 1.5, 6);
+}
+
+/** Outdoor air, °C, outside which the air-source heat pump stops. */
+export const AIR_SOURCE_LIMITS = { min: -20, max: 46 } as const;
+
+/**
+ * The same machine reversed: it cools the LOOP and rejects to outdoor air.
+ * It heats or cools, never both in one hour — and the loop's net need has
+ * one sign each hour, so that is all it is ever asked. Stops above 46 °C air.
+ */
+export function airSourceCoolingCop(air: number, loop: number): number {
+  if (air > AIR_SOURCE_LIMITS.max) return 0;
+  return carnotCooling(loop - HEAT_PUMP.approach, air + 5, 0.45, 6);
 }

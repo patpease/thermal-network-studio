@@ -50,7 +50,7 @@ describe('balancing the loop', () => {
     };
     const b = balanceOf(run(d), d);
     expect(b.addCapacityW).toBe(100 * BOREHOLE_PEAK_W + 1e6 + 3e5 + 5e5);
-    expect(b.removeCapacityW).toBe(100 * BOREHOLE_PEAK_W + 2e6 + 5e5);
+    expect(b.removeCapacityW).toBe(100 * BOREHOLE_PEAK_W + 1e6 + 2e6 + 5e5);
   });
 });
 

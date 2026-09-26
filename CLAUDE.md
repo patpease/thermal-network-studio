@@ -488,3 +488,14 @@ Things that looked right and were not:
   figure ("300 tons is the recommended minimum size"). `tests/wording.test.ts`
   fails if a name reaches another tab's copy or a challenge. Data licences
   (NLR, Cambium, OpenStreetMap) still need their attribution lines.
+
+## The air-source heat pump is reversible
+
+- **It heats or cools the loop, one or the other each hour** — like a bore
+  field, it counts on both sides of the balance card. The loop's net need
+  has one sign per hour, so it is never asked for both. Heating stops below
+  −20 °C air, cooling above 46 °C (`AIR_SOURCE_LIMITS`).
+- **In cooling hours the tower runs first**, the heat pump takes the rest:
+  a tower's parasitic draw is far below a compressor's.
+- In the Sankey it is heat on the side it gives and cooling on the side it
+  takes. The map marker stays orange. "Off the air" still excludes it.

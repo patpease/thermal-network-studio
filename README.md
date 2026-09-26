@@ -4,7 +4,7 @@
 
 A web game about thermal energy networks. Pick a neighbourhood on the map, see
 every building's hourly heating and cooling demand, build an ambient-temperature
-loop from bore fields, air-source heat pumps, cooling towers and waste heat from
+loop from bore fields, reversible air-source heat pumps, cooling towers and waste heat from
 data centres and sewers — and see how it scores on efficiency and carbon
 against the buildings as they are today.
 

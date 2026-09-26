@@ -4,7 +4,8 @@
  * Five kinds, and every named source in the plan is one of them:
  *
  *   bore-field      the ground: takes and gives, and remembers (ground.ts)
- *   air-source      a central air-to-water heat pump that warms the loop
+ *   air-source      a central air-to-water heat pump that warms or cools the
+ *                   loop, one or the other in any hour
  *   cooling-tower   rejects loop heat to outdoor air
  *   waste-heat      gives heat only, at a temperature above the loop — data
  *                   centres, ice rinks, breweries, supermarket condensers,

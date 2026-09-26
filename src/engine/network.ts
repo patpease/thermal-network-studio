@@ -13,7 +13,8 @@
  *           right side of the loop;
  *        b. the bore field, as far as it can go without the fluid leaving the
  *           operating band;
- *        c. the air-source heat pump (heating) or cooling tower (cooling);
+ *        c. heating: the air-source heat pump. Cooling: the cooling tower,
+ *           then the air-source heat pump run in reverse;
  *        d. anything left is UNMET, carried by electric backup and counted.
  *   3. The loop temperature is the bore field's fluid temperature after (b);
  *      with no bore field it sits at the band edge it is being held at.
@@ -26,14 +27,14 @@ import type { WeatherYear } from '../loads/model.ts';
 import type { Demand } from './demand.ts';
 import { boreField, projectDrift, yearStepper } from './ground.ts';
 import type { DriftYear } from './ground.ts';
-import { airSourceCop, coolingCop, heatingCop, HEAT_PUMP, refrigerationCop } from './heatpumps.ts';
+import { airSourceCoolingCop, airSourceCop, coolingCop, heatingCop, HEAT_PUMP, refrigerationCop } from './heatpumps.ts';
 import { exchangerFraction, groundTemperature, PARASITIC, TOWER_APPROACH, wetBulb } from './sources.ts';
 import type { Source } from './sources.ts';
 
 export interface LoopBand {
   /** °C. Below this the loop is warmed by the air-source heat pump or backup. */
   readonly min: number;
-  /** °C. Above this the loop is cooled by the tower or backup. */
+  /** °C. Above this the loop is cooled by the tower, the air-source heat pump or backup. */
   readonly max: number;
 }
 
@@ -260,8 +261,12 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
       nextT = A - B * q;
     }
 
-    // 2c. Air-source heat pump (heating) or cooling tower (cooling).
+    // 2c. Heating: the air-source heat pump. Cooling: the tower, then the
+    // air-source heat pump in reverse (it uses more electricity than a tower).
     const outdoor = Number(weather.temperature[h]);
+    const shareAir = (wh: number) => {
+      for (const a of air) credit(a.id, (wh * (a.kind === 'air-source' ? a.capacityW : 0)) / airCapacity);
+    };
     if (need > 0 && airCapacity > 0) {
       const cop = airSourceCop(outdoor, band.min);
       if (cop > 0) {
@@ -270,20 +275,31 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
         const e = given / cop;
         elec += e;
         airWh += e;
-        for (const a of air) credit(a.id, (given * (a.kind === 'air-source' ? a.capacityW : 0)) / airCapacity);
+        shareAir(given);
       }
       if (!field) nextT = band.min;
-    } else if (need < 0 && towerCapacity > 0) {
+    } else if (need < 0 && (towerCapacity > 0 || airCapacity > 0)) {
       // A tower cools water to within its approach of the wet bulb, so it can
       // take heat while that is below the loop's upper limit.
       const humidity = weather.relativeHumidity ? Number(weather.relativeHumidity[h]) : undefined;
-      if (wetBulb(outdoor, humidity) + TOWER_APPROACH < Math.max(band.max, nextT)) {
+      if (towerCapacity > 0 && wetBulb(outdoor, humidity) + TOWER_APPROACH < Math.max(band.max, nextT)) {
         const taken = Math.min(-need, towerCapacity);
         need += taken;
         const p = taken * PARASITIC['cooling-tower'];
         elec += p;
         parasiticWh += p;
         for (const t of towers) credit(t.id, (-taken * (t.kind === 'cooling-tower' ? t.capacityW : 0)) / towerCapacity);
+      }
+      if (need < 0 && airCapacity > 0) {
+        const cop = airSourceCoolingCop(outdoor, band.max);
+        if (cop > 0) {
+          const taken = Math.min(-need, airCapacity);
+          need += taken;
+          const e = taken / cop;
+          elec += e;
+          airWh += e;
+          shareAir(-taken);
+        }
       }
       if (!field) nextT = band.max;
     } else if (!field) {

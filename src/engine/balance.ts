@@ -5,7 +5,8 @@
  * Whatever does not cancel hour by hour is the plant's job: the net heat to
  * add or remove in the worst hour, and the net over the year. A bore field
  * counts on both sides at its rule-of-thumb peak rate, the same one the
- * suggestion uses.
+ * suggestion uses; an air-source heat pump and a water exchanger count on
+ * both sides at their capacity.
  */
 import type { Design } from './design.ts';
 import { BOREHOLE_PEAK_W } from './design.ts';
@@ -46,7 +47,7 @@ export function balanceOf(result: ScenarioResult, design: Design): Balance {
     if (s.kind === 'bore-field') {
       add += s.boreholes * BOREHOLE_PEAK_W;
       remove += s.boreholes * BOREHOLE_PEAK_W;
-    } else if (s.kind === 'air-source' || s.kind === 'waste-heat') add += s.capacityW;
+    } else if (s.kind === 'waste-heat') add += s.capacityW;
     else if (s.kind === 'cooling-tower') remove += s.capacityW;
     else {
       add += s.capacityW;

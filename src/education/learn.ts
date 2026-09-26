@@ -10,6 +10,7 @@ import type { SiteMetrics } from '../engine/demand';
 import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
 import { DEFAULT_BAND, GLYCOL_BELOW_C } from '../engine/network';
 import { TOWER_APPROACH } from '../engine/sources';
+import { AIR_SOURCE_LIMITS } from '../engine/heatpumps';
 import type { Challenge } from '../challenges/challenges';
 import { SCOPE_STATEMENT } from '../config/copy';
 import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/classify';
@@ -129,7 +130,8 @@ export function sections(f: Formatters): Section[] {
         { id: 'learn-glycol', text: `A loop colder than ${f.temperature(GLYCOL_BELOW_C)} needs antifreeze (glycol). Glycol adds installation and maintenance cost. Plain-water systems operate in Canada.`, refs: ['heet'] },
         { text: `HEET’s horizontal loop runs in the street below the frost line, where the ground is typically ${f.temperature(10)} to ${f.temperature(15)}. This tool does not model the pipes or their exchange with the ground.`, refs: ['heet', 'tool'] },
         { text: `A bore field needs open ground. This tool counts parks, pitches and surface parking from OpenStreetMap at one borehole per ${f.area(BORE_DEFAULTS.spacing ** 2)}.`, refs: ['tool', 'osm'] },
-        { text: `An air-source heat pump warms the loop from outdoor air. In this tool it stops below ${f.temperature(-20)}.`, refs: ['tool'] },
+        { text: `An air-source heat pump warms or cools the loop with outdoor air, one or the other at a time. In this tool it heats down to ${f.temperature(AIR_SOURCE_LIMITS.min)} and cools up to ${f.temperature(AIR_SOURCE_LIMITS.max)}.`, refs: ['tool'] },
+        { text: 'In cooling hours this tool runs a cooling tower first and the air-source heat pump for the rest. A tower uses less electricity.', refs: ['tool'] },
         { text: `A cooling tower cools water to ${f.delta(TOWER_APPROACH)} above the wet-bulb temperature.`, refs: ['stull', 'tool'] },
         { text: 'Waste heat gives heat only, while it is warmer than the loop.', refs: ['tool'] },
         { text: `This tool counts a supermarket outside the boundary as heat for ${SUPERMARKET_HOMES} homes: ${f.power(SUPERMARKET_HOMES * HOME_AVERAGE_HEAT_W)}, every hour. Inside the boundary its refrigeration is part of its own load.`, refs: ['vctn', 'tool'] },

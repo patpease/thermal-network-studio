@@ -54,21 +54,27 @@ export function loopFlows(result: ScenarioResult, design: Design): Flows {
   const label = (id: string) => {
     const s = design.sources.find((x) => x.id === id);
     if (!s) return { label: id === 'backup' ? 'Electric backup' : id, role: 'neutral' as Role };
-    return { label: 'label' in s && s.label ? s.label : NAME[s.kind], role: ROLE[s.kind] };
+    return { label: 'label' in s && s.label ? s.label : NAME[s.kind], role: ROLE[s.kind], kind: s.kind };
   };
-  const side = (buildings: FlowItem, gross: Readonly<Record<string, number>>) =>
+  // A reversible heat pump is heat on the side it gives, cooling on the side it takes.
+  const roleOn = (x: { role: Role; kind?: DesignSourceKind }, side: 'into' | 'out'): Role =>
+    x.kind === 'air-source' ? (side === 'into' ? 'heat' : 'cool') : x.role;
+  const side = (buildings: FlowItem, gross: Readonly<Record<string, number>>, which: 'into' | 'out') =>
     [
       buildings,
       ...Object.entries(gross)
         .filter(([, v]) => v > 0)
-        .map(([id, kWh]) => ({ id, ...label(id), kWh })),
+        .map(([id, kWh]) => {
+          const l = label(id);
+          return { id, label: l.label, role: roleOn(l, which), kWh };
+        }),
     ]
       .filter((x) => x.kWh > 0)
       .sort((a, b) => b.kWh - a.kWh);
 
   return {
-    into: side({ id: 'buildings-cooling', label: 'Cooling & refrigeration', role: 'cool', kWh: n.rejectedKWh }, n.sourceInKWh),
-    out: side({ id: 'buildings-heating', label: 'Heating & hot water', role: 'heat', kWh: n.extractedKWh }, n.sourceOutKWh),
+    into: side({ id: 'buildings-cooling', label: 'Cooling & refrigeration', role: 'cool', kWh: n.rejectedKWh }, n.sourceInKWh, 'into'),
+    out: side({ id: 'buildings-heating', label: 'Heating & hot water', role: 'heat', kWh: n.extractedKWh }, n.sourceOutKWh, 'out'),
   };
 }
 
