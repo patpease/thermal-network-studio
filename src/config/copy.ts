@@ -39,6 +39,7 @@ export const MAP_COPY = {
   cancelButton: 'Cancel',
   drawHint: 'Tap the map to place corners. Press and drag a corner to move it. Tap the first corner, or Finish, to close the boundary.',
   editButton: 'Edit boundary',
+  retryButton: 'Try again',
   editHint: 'Press and drag a corner to move it. Done re-reads the buildings inside the new boundary. The design and building changes carry over.',
   doneButton: 'Done',
   intro:

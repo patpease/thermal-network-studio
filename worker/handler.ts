@@ -87,6 +87,7 @@ export const pinnedFetch: Fetcher = async (url, init) => {
   return fetch(target.toString(), {
     method: init?.method ?? 'GET',
     ...(init?.body !== undefined ? { body: init.body } : {}),
+    ...(init?.timeoutMs !== undefined ? { signal: AbortSignal.timeout(init.timeoutMs) } : {}),
     headers: { Accept: 'application/json', 'User-Agent': USER_AGENT, ...(init?.headers ?? {}) },
   });
 };

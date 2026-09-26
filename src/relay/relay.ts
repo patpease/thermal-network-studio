@@ -21,7 +21,7 @@ import { boundaryProblem, normaliseElements, overpassQuery } from '../site/osm.t
 import type { OverpassElement, SiteData } from '../site/osm.ts';
 import type { Ring } from '../site/geometry.ts';
 
-export type Fetcher = (url: string, init?: { method?: string; body?: string; headers?: Record<string, string> }) => Promise<Response>;
+export type Fetcher = (url: string, init?: { method?: string; body?: string; headers?: Record<string, string>; timeoutMs?: number }) => Promise<Response>;
 
 export interface RelayResult {
   readonly status: number;
@@ -38,6 +38,21 @@ export const PATHS = {
 } as const;
 
 /**
+ * Public Overpass instances, tried in this order (OpenStreetMap wiki,
+ * "Overpass API", public instances). The main instance is run by volunteers
+ * and is sometimes overloaded or unreachable from Cloudflare's network — a
+ * 521 from a Worker means the connection to it failed. The others carry the
+ * same worldwide data.
+ */
+export const OVERPASS_HOSTS = Object.freeze(['overpass-api.de', 'overpass.private.coffee', 'overpass.kumi.systems']);
+
+/**
+ * Each instance gets this long before the next is tried, ms. A normal answer
+ * takes 5–10 s; three tries keep the worst case to about a minute.
+ */
+export const OVERPASS_TIMEOUT_MS = 20_000;
+
+/**
  * Exact hosts, never suffixes: `overpass-api.de.example.com` ends with an
  * allowed string, and a relay that fetches whatever it is handed is an open
  * proxy on our own domain.
@@ -46,7 +61,7 @@ export const ALLOWED_HOSTS = Object.freeze([
   'geocoding-api.open-meteo.com',
   'archive-api.open-meteo.com',
   'geocoding.geo.census.gov',
-  'overpass-api.de',
+  ...OVERPASS_HOSTS,
 ]);
 
 export function isAllowedHost(hostname: string): boolean {
@@ -334,26 +349,44 @@ export function buildingsCacheKey(boundary: Ring): string {
   return `buildings|${RELAY_VERSION}|${boundary.map(([x, y]) => `${x.toFixed(5)},${y.toFixed(5)}`).join(';')}`;
 }
 
+/** What the player reads when no Overpass instance answers. */
+export const OVERPASS_DOWN =
+  'OpenStreetMap’s building service is not responding right now. It is run by volunteers and is sometimes overloaded or down. Your boundary is kept: try again in a few minutes.';
+
 export async function handleBuildings(body: unknown, fetcher: Fetcher): Promise<RelayResult> {
   const boundary = parseBoundary(body);
   if (isRelayResult(boundary)) return boundary;
-  try {
-    const response = await fetcher('https://overpass-api.de/api/interpreter', {
-      method: 'POST',
-      body: `data=${encodeURIComponent(overpassQuery(boundary))}`,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
-    if (response.status === 429 || response.status === 504) {
-      return problem(503, 'OpenStreetMap’s query service is busy. Try again in a minute.');
+  const data = `data=${encodeURIComponent(overpassQuery(boundary))}`;
+
+  // Try each public instance in turn. Busy (429), down (5xx, including
+  // Cloudflare's 521/522/523/524), slow or unreachable → the next one. A
+  // 400 is our query's fault and would fail everywhere, so it stops here.
+  for (const host of OVERPASS_HOSTS) {
+    let response: Response;
+    try {
+      response = await fetcher(`https://${host}/api/interpreter`, {
+        method: 'POST',
+        body: data,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeoutMs: OVERPASS_TIMEOUT_MS,
+      });
+    } catch {
+      continue;
     }
-    if (!response.ok) return problem(502, `OpenStreetMap’s query service returned ${response.status}.`);
-    const json = (await response.json()) as { elements?: OverpassElement[]; remark?: string };
+    if (response.status === 429 || response.status >= 500) continue;
+    if (!response.ok) return problem(502, `OpenStreetMap’s building service refused the request (${response.status}).`);
+    let json: { elements?: OverpassElement[]; remark?: string };
+    try {
+      json = (await response.json()) as typeof json;
+    } catch {
+      continue; // an HTML error page with a 200: treat as down
+    }
     if (json.remark && /runtime error|timed out|out of memory/i.test(json.remark)) {
-      return problem(503, 'That area was too much for OpenStreetMap’s query service. Draw a smaller one.');
+      return problem(503, 'That area is too large for OpenStreetMap’s building service. Draw a smaller one.');
     }
     const site: SiteData = normaliseElements(json.elements ?? [], boundary);
-    return { status: 200, body: { site, attribution: ATTRIBUTION.osm }, cacheSeconds: CACHE.buildings };
-  } catch {
-    return problem(504, 'OpenStreetMap’s query service could not be reached.');
+    // `servedBy` names the instance that answered, for tracing a live problem.
+    return { status: 200, body: { site, attribution: ATTRIBUTION.osm, servedBy: host }, cacheSeconds: CACHE.buildings };
   }
+  return problem(503, OVERPASS_DOWN);
 }

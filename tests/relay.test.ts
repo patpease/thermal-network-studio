@@ -7,6 +7,8 @@ import {
   handleSite,
   handleWeather,
   isAllowedHost,
+  OVERPASS_DOWN,
+  OVERPASS_HOSTS,
   parseBoundary,
   placeNames,
   siteForCounty,
@@ -180,6 +182,58 @@ describe('/api/buildings', () => {
     expect(body).toContain('[out:json]');
     const site = (r.body as { site: { features: { tags: Record<string, string> }[] } }).site;
     expect(site.features[0]!.tags).toEqual({ amenity: 'townhall', name: 'City Hall' });
+  });
+
+  it('when one Overpass instance is down (Cloudflare 521), asks the next', async () => {
+    const asked: string[] = [];
+    const fetcher: Fetcher = async (url, init) => {
+      const host = new URL(url).hostname;
+      asked.push(host);
+      expect(init?.timeoutMs).toBeGreaterThan(0);
+      if (host === OVERPASS_HOSTS[0]) return new Response('<html>Web server is down</html>', { status: 521 });
+      return jsonResponse({ elements: [] });
+    };
+    const r = await handleBuildings({ boundary: box }, fetcher);
+    expect(r.status).toBe(200);
+    expect(asked).toEqual([OVERPASS_HOSTS[0], OVERPASS_HOSTS[1]]);
+  });
+
+  it('moves on when an instance is busy, times out or answers with an HTML page', async () => {
+    const asked: string[] = [];
+    const fetcher: Fetcher = async (url) => {
+      const host = new URL(url).hostname;
+      asked.push(host);
+      if (host === OVERPASS_HOSTS[0]) return new Response('slow down', { status: 429 });
+      if (host === OVERPASS_HOSTS[1]) throw new Error('The operation was aborted due to timeout');
+      return jsonResponse({ elements: [] });
+    };
+    expect((await handleBuildings({ boundary: box }, fetcher)).status).toBe(200);
+    expect(asked).toEqual([...OVERPASS_HOSTS]);
+  });
+
+  it('when every instance is down, says so plainly and says what to do', async () => {
+    const r = await handleBuildings({ boundary: box }, async () => new Response('down', { status: 521 }));
+    expect(r.status).toBe(503);
+    expect((r.body as { message: string }).message).toBe(OVERPASS_DOWN);
+    expect(OVERPASS_DOWN).toMatch(/try again in a few minutes/);
+    expect(OVERPASS_DOWN).not.toMatch(/\d{3}/);
+  });
+
+  it('stops at a 400: the query is at fault, and every instance would refuse it', async () => {
+    let calls = 0;
+    const r = await handleBuildings({ boundary: box }, async () => {
+      calls++;
+      return new Response('bad', { status: 400 });
+    });
+    expect(calls).toBe(1);
+    expect(r.status).toBe(502);
+  });
+
+  it('pins every Overpass mirror exactly, never by suffix', () => {
+    for (const h of OVERPASS_HOSTS) {
+      expect(isAllowedHost(h)).toBe(true);
+      expect(isAllowedHost(`${h}.example.com`)).toBe(false);
+    }
   });
 
   it('turns an Overpass timeout into “draw a smaller one”', async () => {

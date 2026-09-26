@@ -464,3 +464,18 @@ Things that looked right and were not:
   reach it** (from the connected buildings' average) and offers Edit
   boundary. A fact with a way forward, drawn with the accent rule — not a
   warning, and never a failed goal.
+
+## Overpass, when it is down
+
+- **A 521 from the relay meant Cloudflare could not connect to
+  overpass-api.de.** That service is public and volunteer-run, and it is
+  sometimes overloaded, down or unreachable from Cloudflare's network. The
+  relay now tries `OVERPASS_HOSTS` in order (the main instance, then
+  private.coffee, then Kumi Systems) on a 429, any 5xx, an HTML page, or
+  20 s of silence; a 400 stops (the query is at fault everywhere). If all
+  fail, the player reads `OVERPASS_DOWN` — what happened and to try again in
+  a few minutes — and a Try again button reloads the same boundary, with the
+  design an edit carried.
+- **This sandbox cannot reach the mirrors** (its network policy); only the
+  main instance was verified from `wrangler dev`. `servedBy` in the answer
+  shows which one replied on the live site.

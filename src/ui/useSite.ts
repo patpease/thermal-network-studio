@@ -128,7 +128,12 @@ export function useSite() {
    * link carries — the player's building changes and design — applied once
    * the buildings they refer to have arrived.
    */
+  // The last load asked for, so a failed one can be tried again as it was —
+  // with the design and building changes an edit carried.
+  const lastLoad = useRef<{ boundary: Ring; init?: { selection: Selection; design: Design } } | null>(null);
+
   const load = useCallback(async (boundary: Ring, init?: { selection: Selection; design: Design }) => {
+    lastLoad.current = init ? { boundary, init } : { boundary };
     const mine = ++generation.current;
     const stillMine = () => mine === generation.current;
     setState((s) => ({ ...INITIAL, phase: 'loading', boundary, challengeId: s.challengeId }));
@@ -205,6 +210,12 @@ export function useSite() {
     }
     beforeEdit.current = null;
     void load(ring, { selection: s.selection, design: s.design });
+  }, [load]);
+
+  /** Try the last load again, after a service failure. */
+  const retry = useCallback(() => {
+    const last = lastLoad.current;
+    if (last) void load(last.boundary, last.init);
   }, [load]);
 
   const finishDrawing = useCallback(() => {
@@ -298,6 +309,7 @@ export function useSite() {
   return {
     state,
     startDrawing,
+    retry,
     startEditing,
     finishEditing,
     cancelEditing,

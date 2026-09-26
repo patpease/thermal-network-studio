@@ -32,6 +32,7 @@ export interface SitePanelProps {
   readonly onUndo: () => void;
   readonly onCancel: () => void;
   readonly onEdit: () => void;
+  readonly onRetry: () => void;
   readonly onEditDone: () => void;
   readonly onEditCancel: () => void;
   readonly onToggle: (id: string) => void;
@@ -200,6 +201,11 @@ export function SitePanel(props: SitePanelProps) {
           </>
         )}
         {state.message && <p className="message message--error">{state.message}</p>}
+        {state.phase === 'error' && state.boundary && (
+          <button type="button" className="button" onClick={props.onRetry}>
+            {MAP_COPY.retryButton}
+          </button>
+        )}
         {state.phase === 'loading' && <p className="message">{MAP_COPY.loading}</p>}
       </section>
 

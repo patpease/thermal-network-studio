@@ -62,7 +62,7 @@ relay an open proxy):
 
 | Host | For | Limits to know |
 |---|---|---|
-| `overpass-api.de` | buildings | Fair use; the relay sends a User-Agent and caches a boundary for 7 days |
+| `overpass-api.de`, then `overpass.private.coffee`, then `overpass.kumi.systems` | buildings | Public, volunteer-run. The relay tries them in order when one is down, busy (429), failing (5xx, incl. Cloudflare's 521) or slower than 20 s; the answer's `servedBy` names which one replied. Sends a User-Agent; caches a boundary for 7 days |
 | `archive-api.open-meteo.com` | a year of weather | 10,000 calls/day free; cached 30 days per ~1 km |
 | `geocoding-api.open-meteo.com` | place search | cached 30 days |
 | `geocoding.geo.census.gov` | point → county | cached a year |
@@ -90,6 +90,7 @@ In `preview:worker`, check by hand — none of this is covered by the suite:
 - search a place, draw a boundary, and the panel fills — this is the only
   end-to-end check of Overpass, Open-Meteo and the Census geocoder together
 - the Census lookup fills the town and state on the award card
+- `POST /api/buildings` answers, and its `servedBy` is one of the three Overpass hosts (the mirrors could not be reached from the build sandbox; check them here)
 - a chart's "Save as PNG" and the award's download both save a styled PNG
   with **no** "Refused to apply inline style" in the console. Both work only
   because they avoid `style` attributes (presentation attributes on the

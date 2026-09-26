@@ -28,6 +28,7 @@ function relay(): Plugin {
     return fetch(target.toString(), {
       method: init?.method ?? 'GET',
       ...(init?.body !== undefined ? { body: init.body } : {}),
+      ...(init?.timeoutMs !== undefined ? { signal: AbortSignal.timeout(init.timeoutMs) } : {}),
       headers: { Accept: 'application/json', 'User-Agent': 'thermal-network-studio (dev)', ...(init?.headers ?? {}) },
     });
   };
