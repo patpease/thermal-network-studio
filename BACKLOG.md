@@ -41,11 +41,33 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       Chromium in fixture mode, and on the production build through
       `wrangler dev` against LIVE Open-Meteo, Census and Overpass — no CSP
       violations.
-- [ ] **04 Design UI** — source palette, placement, sizing, envelope retrofits.
+- [x] **04 Design UI** — a Design tab beside Site: connect found sources,
+      add bore fields, air-source heat pumps, towers, sewer, lake/river and
+      waste heat; size them in display units; place and move them on the
+      map (bore field at its true footprint); loop band; envelope retrofit
+      on the network case only; a suggested starting design; live score,
+      energy and carbon reductions, system COP, unmet hours, heat shared, and
+      the 25-year drift shown but not scored. Mankato's suggestion scores 69
+      (80 with a deep retrofit). 164 tests. Verified in Chromium, fixture
+      mode, desk light/dark and phone width.
 - [ ] **05 Results** — Sankey, loop temperature over the year, monthly
       sharing, 25-year bore drift, score breakdown.
 - [ ] **06 Challenges** — goal format, goal library, share links.
 - [ ] **07 Education, export, phone pass, deploy.**
+
+## Not done in 04, deliberately
+
+- **Tower dispatch policy** ("run the tower to balance the ground") is still
+  not a lever; the tower only runs when the bore field cannot hold the band.
+- **Bore spacing is fixed at the default** in the UI; depth and count are
+  editable. The engine takes spacing already.
+- **Per-building retrofits.** One factor for every connected building; the
+  engine already carries a factor per building.
+- **Dragging a placed source.** Move is tap-to-place; drag waits for the
+  phone pass.
+- **Results charts** — phase 05. The summary is numbers only.
+- **The design is not kept.** A new boundary starts an empty design (no
+  storage in v1; share links are phase 06).
 
 ## Not done in 03, deliberately
 
@@ -60,8 +82,6 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
   (Mankato, Alexandria, St. Cloud) are not tagged in OSM; the fixtures record
   what OSM has, and the tests check only that.
 - **MapLibre 6** (D33).
-- **Sources are found but not yet usable** — the design screen (phase 04)
-  turns a candidate into an engine source.
 
 ## Not done in 02, deliberately
 

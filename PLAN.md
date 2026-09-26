@@ -199,5 +199,4 @@ Study* (Buro Happold et al., January 2026)**
 
 ## Open questions
 
-None blocking. Next: deploy phases 00–03 to Workers (see `docs/deploying.md`),
-then phase 04, the design screen.
+None blocking. Phase 04 is built; next is phase 05, the results screen.

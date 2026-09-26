@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_UNITS, fromDisplay, LABELS, toDisplay } from '../src/units/units';
 import type { Quantity } from '../src/units/units';
 
-const QUANTITIES: Quantity[] = ['temperature', 'temperatureDelta', 'power', 'energy', 'area', 'powerLarge', 'energyLarge', 'density'];
+const QUANTITIES: Quantity[] = ['temperature', 'temperatureDelta', 'power', 'energy', 'area', 'length', 'powerLarge', 'energyLarge', 'density'];
 
 describe('units', () => {
   it('defaults to IP, because the tool is US-first', () => {
@@ -29,6 +29,7 @@ describe('units', () => {
     expect(toDisplay('power', 1000, 'ip')).toBeCloseTo(3412.14, 1);
     expect(toDisplay('energy', 1, 'ip')).toBeCloseTo(3.41214, 4);
     expect(toDisplay('area', 1, 'ip')).toBeCloseTo(10.7639, 3);
+    expect(toDisplay('length', 150, 'ip')).toBeCloseTo(492.1, 1);
   });
 
   it('density lands on EPRI’s own pairing: 50 GWh/km² ≈ 440 billion Btu/mi²', () => {

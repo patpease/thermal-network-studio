@@ -668,3 +668,132 @@ select {
     padding-right: 0.4rem;
   }
 }
+
+/* ------------------------------------------------------------ phase 04 */
+
+.tabs {
+  display: flex;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-sunk);
+  border-bottom: 1px solid var(--border);
+  padding: 0 0.9rem;
+}
+
+.tabs__tab {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.7rem 0.9rem 0.6rem;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.tabs__tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.panel-note {
+  padding: 0.9rem;
+}
+
+.score {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.score__total {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score__label {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.button--small {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+}
+
+.found {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.source-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.source-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.source-card:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.source-card__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+}
+
+.number-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.number-field__row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.number-field__row input {
+  flex: 1;
+  width: 100%;
+}
+
+.number-field__row input[aria-invalid='true'] {
+  border-color: var(--warn-ink);
+}
+
+.number-field__unit {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.dot--ground {
+  background: var(--source-ground);
+}

@@ -6,12 +6,12 @@
  */
 import type { WeatherYear } from '../loads/model.ts';
 import type { Neighbourhood } from './demand.ts';
-import type { NetworkDesign } from './network.ts';
+import type { Design } from './design.ts';
 import type { ScenarioResult } from './scenario.ts';
 import type { EngineRequest, EngineResponse } from './worker.ts';
 
 export interface EngineClient {
-  run(neighbourhood: Neighbourhood, design: NetworkDesign, weather: WeatherYear): Promise<{ result: ScenarioResult; ms: number } | null>;
+  run(neighbourhood: Neighbourhood, design: Design, weather: WeatherYear): Promise<{ result: ScenarioResult; ms: number } | null>;
   terminate(): void;
 }
 

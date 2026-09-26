@@ -2,8 +2,12 @@
  * The site's state, from a drawn boundary to the engine's first answer.
  *
  *   draw → boundary → (site, weather, buildings in parallel) → classify →
- *   neighbourhood → engine (no sources yet: business as usual and the
- *   site metrics) → ready
+ *   neighbourhood → engine (the design; with none yet, business as usual and
+ *   the site metrics) → ready
+ *
+ * The design lives here too, beside the site it was made for: a new boundary
+ * starts a new, empty design, because sources placed for one neighbourhood
+ * mean nothing in another.
  *
  * Every step can fail on its own and says so in plain words; a failure never
  * leaves a stale site on the map. A newer boundary supersedes an older one
@@ -12,11 +16,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { createEngine } from '../engine/client';
+import { EMPTY_DESIGN, suggestDesign } from '../engine/design';
+import type { Design } from '../engine/design';
 import type { EngineClient } from '../engine/client';
 import type { ScenarioResult } from '../engine/scenario';
 import type { WeatherYear } from '../loads/model';
 import type { SitePayload, WeatherPayload } from '../relay/relay';
-import { classifySite, MAX_BUILDINGS } from '../site/classify';
+import { boreholeRoom, classifySite, MAX_BUILDINGS } from '../site/classify';
 import type { Site } from '../site/classify';
 import { centroid, ringArea } from '../site/geometry';
 import type { LonLat, Ring } from '../site/geometry';
@@ -35,6 +41,9 @@ export interface SiteState {
   readonly site: Site | null;
   readonly weather: (WeatherYear & { attribution: string; year: number }) | null;
   readonly selection: Selection;
+  readonly design: Design;
+  /** The source waiting for a tap on the map to say where it goes. */
+  readonly placing: string | null;
   readonly result: ScenarioResult | null;
   readonly running: boolean;
   readonly message: string | null;
@@ -48,6 +57,8 @@ const INITIAL: SiteState = {
   site: null,
   weather: null,
   selection: EMPTY_SELECTION,
+  design: EMPTY_DESIGN,
+  placing: null,
   result: null,
   running: false,
   message: null,
@@ -59,6 +70,9 @@ async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   if (!response.ok) throw new Error(body.message ?? `The request failed (${response.status}).`);
   return body;
 }
+
+/** Quiet time before a changed design is run. */
+const RUN_DELAY_MS = 250;
 
 export function useSite() {
   const [state, setState] = useState<SiteState>(INITIAL);
@@ -155,8 +169,40 @@ export function useSite() {
     });
   }, []);
 
-  // Re-run the engine whenever what is connected changes.
-  const { site, selection, place, weather, phase } = state;
+  const updateDesign = useCallback((update: (d: Design) => Design) => {
+    setState((s) => ({ ...s, design: update(s.design) }));
+  }, []);
+
+  /** Wait for a tap on the map to place this source; null stops waiting. */
+  const startPlacing = useCallback((id: string | null) => {
+    setState((s) => ({ ...s, placing: id }));
+  }, []);
+
+  const placeAt = useCallback((p: LonLat) => {
+    setState((s) =>
+      s.placing ? { ...s, placing: null, design: { ...s.design, sources: s.design.sources.map((x) => (x.id === s.placing ? { ...x, at: p } : x)) } } : s,
+    );
+  }, []);
+
+  /** Replace the design with a first suggestion sized from the site's peaks. */
+  const suggest = useCallback(() => {
+    setState((s) => {
+      if (!s.site || !s.result) return s;
+      const design = suggestDesign({
+        peakHeatingW: s.result.site.peakHeatingW,
+        peakCoolingW: s.result.site.peakCoolingW,
+        sources: s.site.sources,
+        centre: centroid(s.site.boundary),
+        boreholeRoom: boreholeRoom(s.site.openSpaceM2),
+      });
+      // Keep the player's loop band and retrofit: a suggestion is sources only.
+      return { ...s, placing: null, design: { ...design, band: s.design.band, retrofit: s.design.retrofit } };
+    });
+  }, []);
+
+  // Re-run the engine whenever what is connected, or the design, changes —
+  // after a short pause, so typing a capacity runs the year once, not per key.
+  const { site, selection, place, weather, phase, design } = state;
   useEffect(() => {
     if (phase !== 'ready' || !site || !place || !weather || !engine.current) return;
     const count = connected(site, selection).length;
@@ -166,15 +212,32 @@ export function useSite() {
     }
     const neighbourhood = toNeighbourhood(site, selection, place.zone, place.region);
     setState((s) => ({ ...s, running: true }));
-    void engine.current
-      .run(neighbourhood, { sources: [] }, weather)
-      .then((r) => {
-        if (r) setState((s) => ({ ...s, result: r.result, running: false }));
-      })
-      .catch((error: unknown) => setState((s) => ({ ...s, running: false, message: error instanceof Error ? error.message : String(error) })));
-  }, [site, selection, place, weather, phase]);
+    const timer = setTimeout(() => {
+      void engine.current
+        ?.run(neighbourhood, design, weather)
+        .then((r) => {
+          if (r) setState((s) => ({ ...s, result: r.result, running: false }));
+        })
+        .catch((error: unknown) => setState((s) => ({ ...s, running: false, message: error instanceof Error ? error.message : String(error) })));
+    }, RUN_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [site, selection, place, weather, phase, design]);
 
-  return { state, startDrawing, addPoint, undoPoint, finishDrawing, clear, toggleBuilding, overrideBuilding, load };
+  return {
+    state,
+    startDrawing,
+    addPoint,
+    undoPoint,
+    finishDrawing,
+    clear,
+    toggleBuilding,
+    overrideBuilding,
+    load,
+    updateDesign,
+    startPlacing,
+    placeAt,
+    suggest,
+  };
 }
 
 /** The area of the draft so far, m², for the live readout. */

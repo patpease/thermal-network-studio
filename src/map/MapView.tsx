@@ -1,5 +1,7 @@
 /**
- * The map: basemap, the drawn boundary, the site's buildings, its sources.
+ * The map: basemap, the drawn boundary, the site's buildings, what was found
+ * nearby, and what the player has built — a bore field at its true footprint,
+ * everything else as a marker.
  *
  * MapLibre is loaded lazily — it is most of the bundle, and the page is
  * useful (and the scope line readable) before it arrives.
@@ -18,6 +20,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { GeoJSONSource, Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
 
+import { boreFieldArea } from '../engine/design';
+import type { Design } from '../engine/design';
+import { metresPerDegree } from '../site/geometry';
 import type { LonLat, Ring } from '../site/geometry';
 import type { Site } from '../site/classify';
 import { effective } from '../site/neighbourhood';
@@ -41,6 +46,10 @@ export interface MapViewProps {
   readonly onDraftPoint: (p: LonLat) => void;
   readonly onFinishDraft: () => void;
   readonly onSelectBuilding: (id: string | null) => void;
+  readonly design: Design;
+  /** A source is waiting for a tap to say where it goes. */
+  readonly placing: boolean;
+  readonly onPlace: (p: LonLat) => void;
 }
 
 function draftData(draft: readonly LonLat[]): FeatureCollection {
@@ -87,18 +96,56 @@ function buildingData(site: Site | null, selection: Selection, selectedId: strin
   };
 }
 
-function sourceData(site: Site | null): FeatureCollection {
+function sourceData(site: Site | null, design: Design): FeatureCollection {
   if (!site) return EMPTY;
+  // A connected candidate is drawn once, as part of the design.
+  const connected = new Set(design.sources.flatMap((s) => ('origin' in s && s.origin ? [s.origin] : [])));
   return {
     type: 'FeatureCollection',
     features: site.sources
-      .filter((s) => s.exchange !== 'in-load')
+      .filter((s) => s.exchange !== 'in-load' && !connected.has(s.id))
       .map((s) => ({
         type: 'Feature',
         properties: { kind: s.kind, water: s.exchange === 'water', name: s.name ?? '' },
         geometry: { type: 'Point', coordinates: [s.at[0], s.at[1]] },
       })),
   };
+}
+
+/** A square of the given area centred on a point, as a polygon ring. */
+function squareAround(at: LonLat, areaM2: number): number[][] {
+  const m = metresPerDegree(at[1]);
+  const half = Math.sqrt(areaM2) / 2;
+  const dx = half / m.x;
+  const dy = half / m.y;
+  return [
+    [at[0] - dx, at[1] - dy],
+    [at[0] + dx, at[1] - dy],
+    [at[0] + dx, at[1] + dy],
+    [at[0] - dx, at[1] + dy],
+    [at[0] - dx, at[1] - dy],
+  ];
+}
+
+/** Heat, cooling or both: what the marker's colour means. */
+const ROLE = { 'bore-field': 'ground', 'air-source': 'heat', 'cooling-tower': 'cool', 'waste-heat': 'heat', water: 'cool' } as const;
+const SHORT = { 'bore-field': 'Bore field', 'air-source': 'Air-source HP', 'cooling-tower': 'Cooling tower', 'waste-heat': 'Waste heat', water: 'Water' } as const;
+
+function designData(design: Design): FeatureCollection {
+  const features: Feature[] = [];
+  for (const s of design.sources) {
+    if (!s.at) continue;
+    const name = 'label' in s ? s.label : SHORT[s.kind];
+    if (s.kind === 'bore-field') {
+      features.push({
+        type: 'Feature',
+        properties: { role: 'ground', name, field: true },
+        geometry: { type: 'Polygon', coordinates: [squareAround(s.at, boreFieldArea(s))] },
+      });
+    }
+    features.push({ type: 'Feature', properties: { role: ROLE[s.kind], name, field: false }, geometry: { type: 'Point', coordinates: [s.at[0], s.at[1]] } });
+  }
+  return { type: 'FeatureCollection', features };
 }
 
 function withOverlays(p: MapPalette): StyleSpecification {
@@ -111,6 +158,7 @@ function withOverlays(p: MapPalette): StyleSpecification {
       buildings: { type: 'geojson', data: EMPTY },
       draft: { type: 'geojson', data: EMPTY },
       sources: { type: 'geojson', data: EMPTY },
+      design: { type: 'geojson', data: EMPTY },
     },
     layers: [
       ...base.layers,
@@ -199,6 +247,40 @@ function withOverlays(p: MapPalette): StyleSpecification {
         },
         paint: { 'text-color': p.ink, 'text-halo-color': p.surface, 'text-halo-width': 1.5 },
       },
+      {
+        id: 'design-field',
+        type: 'fill',
+        source: 'design',
+        filter: ['==', ['get', 'field'], true],
+        paint: { 'fill-color': p.ground, 'fill-opacity': 0.25, 'fill-outline-color': p.ground },
+      },
+      {
+        id: 'design-points',
+        type: 'circle',
+        source: 'design',
+        filter: ['==', ['get', 'field'], false],
+        paint: {
+          'circle-radius': 7,
+          'circle-color': ['match', ['get', 'role'], 'ground', p.ground, 'heat', p.heat, p.cool],
+          'circle-stroke-color': p.ink,
+          'circle-stroke-width': 2,
+        },
+      },
+      {
+        id: 'design-labels',
+        type: 'symbol',
+        source: 'design',
+        filter: ['==', ['get', 'field'], false],
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 11,
+          'text-offset': [0, -1.3],
+          'text-anchor': 'bottom',
+          'text-optional': true,
+        },
+        paint: { 'text-color': p.ink, 'text-halo-color': p.surface, 'text-halo-width': 1.5 },
+      },
     ],
   };
 }
@@ -225,7 +307,8 @@ export function MapView(props: MapViewProps) {
     (m.getSource('boundary') as GeoJSONSource | undefined)?.setData(boundaryData(p.boundary));
     (m.getSource('buildings') as GeoJSONSource | undefined)?.setData(buildingData(p.site, p.selection, p.selectedId));
     (m.getSource('draft') as GeoJSONSource | undefined)?.setData(draftData(p.drawing ? p.draft : []));
-    (m.getSource('sources') as GeoJSONSource | undefined)?.setData(sourceData(p.site));
+    (m.getSource('sources') as GeoJSONSource | undefined)?.setData(sourceData(p.site, p.design));
+    (m.getSource('design') as GeoJSONSource | undefined)?.setData(designData(p.design));
   };
 
   useEffect(() => {
@@ -262,6 +345,10 @@ export function MapView(props: MapViewProps) {
           p.onDraftPoint([e.lngLat.lng, e.lngLat.lat]);
           return;
         }
+        if (p.placing) {
+          p.onPlace([e.lngLat.lng, e.lngLat.lat]);
+          return;
+        }
         const hit = instance!.queryRenderedFeatures(e.point, { layers: ['site-building-fill'] })[0];
         p.onSelectBuilding(hit ? String(hit.properties['id']) : null);
       });
@@ -296,15 +383,15 @@ export function MapView(props: MapViewProps) {
     map.current?.setStyle(withOverlays(props.palette), { diff: false });
   }, [props.palette]);
 
-  useEffect(push, [props.boundary, props.site, props.selection, props.selectedId, props.draft, props.drawing]);
+  useEffect(push, [props.boundary, props.site, props.selection, props.selectedId, props.draft, props.drawing, props.design]);
 
   useEffect(() => {
     const m = map.current;
     if (!m) return;
     if (props.drawing) m.doubleClickZoom.disable();
     else m.doubleClickZoom.enable();
-    m.getCanvas().style.cursor = props.drawing ? 'crosshair' : '';
-  }, [props.drawing]);
+    m.getCanvas().style.cursor = props.drawing || props.placing ? 'crosshair' : '';
+  }, [props.drawing, props.placing]);
 
   useEffect(() => {
     if (props.flyTo) map.current?.flyTo({ center: [props.flyTo.center[0], props.flyTo.center[1]], zoom: props.flyTo.zoom });

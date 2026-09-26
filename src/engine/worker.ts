@@ -7,14 +7,16 @@
  */
 import type { WeatherYear } from '../loads/model.ts';
 import type { Neighbourhood } from './demand.ts';
-import type { NetworkDesign } from './network.ts';
+import { toNetworkDesign } from './design.ts';
+import type { Design } from './design.ts';
 import { runScenario } from './scenario.ts';
 import type { ScenarioResult } from './scenario.ts';
 
 export interface EngineRequest {
   readonly id: number;
   readonly neighbourhood: Neighbourhood;
-  readonly design: NetworkDesign;
+  /** The player's design; its water temperatures are built here, not posted. */
+  readonly design: Design;
   readonly weather: WeatherYear;
 }
 
@@ -26,7 +28,7 @@ self.onmessage = (event: MessageEvent<EngineRequest>) => {
   const { id, neighbourhood, design, weather } = event.data;
   const started = performance.now();
   try {
-    const result = runScenario(neighbourhood, design, weather);
+    const result = runScenario(neighbourhood, toNetworkDesign(design, weather), weather);
     self.postMessage({ id, ok: true, result, ms: performance.now() - started } satisfies EngineResponse);
   } catch (error) {
     self.postMessage({ id, ok: false, error: error instanceof Error ? error.message : String(error) } satisfies EngineResponse);

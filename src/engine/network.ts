@@ -52,6 +52,13 @@ export const BACKUP = { heatingCop: 1, coolingWPerW: 0.33 } as const;
 export interface NetworkDesign {
   readonly sources: readonly Source[];
   readonly band?: LoopBand;
+  /**
+   * An envelope retrofit across every connected building, as a factor on
+   * envelope and infiltration conductance (1 = as built). It changes the
+   * NETWORK case only: business as usual is the stock as it stands today, so
+   * a retrofit earns its points against what is there now (D23).
+   */
+  readonly retrofit?: number;
 }
 
 export interface NetworkResult {

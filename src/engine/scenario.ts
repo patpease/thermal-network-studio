@@ -40,7 +40,7 @@ export interface ScenarioResult {
   readonly baseline: EnergyResult;
   readonly network: NetworkResult & { readonly carbonKg: number; readonly totalSiteKWh: number };
   readonly score: Score;
-  /** Hourly demand totals, W — for the charts. */
+  /** Hourly demand totals the network serves (after any retrofit), W — for the charts. */
   readonly demand: { heating: Float64Array; dhw: Float64Array; cooling: Float64Array; process: Float64Array };
 }
 
@@ -61,9 +61,15 @@ export function scoreOf(baseline: { totalSiteKWh: number; carbonKg: number }, ne
 }
 
 export function runScenario(neighbourhood: Neighbourhood, design: NetworkDesign, weather: WeatherYear): ScenarioResult {
-  const demand = neighbourhoodDemand(neighbourhood, weather);
+  const asBuilt = neighbourhoodDemand(neighbourhood, weather);
+  const retrofit = design.retrofit ?? 1;
+  // The retrofit multiplies whatever each building already carries.
+  const demand =
+    retrofit === 1
+      ? asBuilt
+      : neighbourhoodDemand({ ...neighbourhood, buildings: neighbourhood.buildings.map((b) => ({ ...b, retrofit: (b.retrofit ?? 1) * retrofit })) }, weather);
   const grid = gridIntensity(neighbourhood.region);
-  const baseline = businessAsUsual(demand, neighbourhood.zone, grid);
+  const baseline = businessAsUsual(asBuilt, neighbourhood.zone, grid);
   const net = simulateNetwork(demand, design, weather);
 
   let electricKWh = 0;
@@ -72,7 +78,8 @@ export function runScenario(neighbourhood: Neighbourhood, design: NetworkDesign,
   const network = { ...net, carbonKg: carbon.total, totalSiteKWh: electricKWh };
 
   return {
-    site: siteMetrics(demand, neighbourhood.landArea),
+    // The neighbourhood as it stands: what the site panel describes.
+    site: siteMetrics(asBuilt, neighbourhood.landArea),
     baseline,
     network,
     score: scoreOf(baseline, network),

@@ -25,6 +25,7 @@ export type Quantity =
   | 'power'
   | 'energy'
   | 'area'
+  | 'length'
   | 'powerLarge'
   | 'energyLarge'
   | 'density';
@@ -35,6 +36,7 @@ const W_PER_BTUH = 0.29307107;
 const KWH_PER_KBTU = 0.29307107;
 /** Square metres in one square foot. */
 const M2_PER_FT2 = 0.09290304;
+const M_PER_FT = 0.3048;
 /**
  * Canonical SI for the big quantities: MW, MWh, GWh/km²·yr. IP: million
  * Btu/h, MMBtu, and billion Btu/mi²·yr — the unit EPRI's density thresholds
@@ -51,6 +53,7 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     power: 'Btu/h',
     energy: 'kBtu',
     area: 'ft²',
+    length: 'ft',
     powerLarge: 'MMBtu/h',
     energyLarge: 'MMBtu',
     density: 'billion Btu/mi²·yr',
@@ -61,6 +64,7 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     power: 'W',
     energy: 'kWh',
     area: 'm²',
+    length: 'm',
     powerLarge: 'MW',
     energyLarge: 'MWh',
     density: 'GWh/km²·yr',
@@ -81,6 +85,8 @@ export function toDisplay(quantity: Quantity, si: number, units: UnitSystem): nu
       return si / KWH_PER_KBTU;
     case 'area':
       return si / M2_PER_FT2;
+    case 'length':
+      return si / M_PER_FT;
     case 'powerLarge':
     case 'energyLarge':
       return si * MMBTU_PER_MWH;
@@ -103,6 +109,8 @@ export function fromDisplay(quantity: Quantity, shown: number, units: UnitSystem
       return shown * KWH_PER_KBTU;
     case 'area':
       return shown * M2_PER_FT2;
+    case 'length':
+      return shown * M_PER_FT;
     case 'powerLarge':
     case 'energyLarge':
       return shown / MMBTU_PER_MWH;

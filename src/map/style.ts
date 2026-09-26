@@ -34,6 +34,7 @@ export interface MapPalette {
   readonly home: string;
   readonly work: string;
   readonly excluded: string;
+  readonly ground: string;
   readonly heat: string;
   readonly cool: string;
   readonly ink: string;
@@ -54,6 +55,7 @@ const TOKENS: Record<keyof MapPalette, string> = {
   home: '--site-home',
   work: '--site-work',
   excluded: '--site-excluded',
+  ground: '--source-ground',
   heat: '--heat',
   cool: '--cool',
   ink: '--ink',

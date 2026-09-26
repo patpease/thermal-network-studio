@@ -1,7 +1,8 @@
 /**
- * The map and its panel: phase 03's screen. Owns the site state and the
- * map-only state (selection, fly-to), and rebuilds the map palette when the
- * resolved theme changes.
+ * The map and its panel. Two tabs beside the map — the site and the design —
+ * over one map, which shows both. Owns the site state and the map-only state
+ * (selection, fly-to), and rebuilds the map palette when the resolved theme
+ * changes.
  */
 import { useEffect, useState } from 'react';
 
@@ -9,6 +10,8 @@ import { MapView } from '../map/MapView';
 import { readPalette } from '../map/style';
 import type { MapPalette } from '../map/style';
 import type { UnitSystem } from '../units/units';
+import { DESIGN_COPY } from '../config/copy';
+import { DesignPanel } from './DesignPanel';
 import { SitePanel } from './SitePanel';
 import type { ThemeChoice } from './theme';
 import { useSite } from './useSite';
@@ -17,6 +20,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
   const site = useSite();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ center: [number, number]; zoom: number; key: number } | null>(null);
+  const [tab, setTab] = useState<'site' | 'design'>('site');
   const [palette, setPalette] = useState<MapPalette>(() => readPalette());
 
   // The theme attribute is applied in an effect (theme.ts); read the tokens
@@ -48,24 +52,62 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
           onDraftPoint={site.addPoint}
           onFinishDraft={site.finishDrawing}
           onSelectBuilding={setSelectedId}
+          design={state.design}
+          placing={state.placing !== null}
+          onPlace={site.placeAt}
         />
       </div>
-      <aside className="side-panel" aria-label="Neighbourhood">
-        <SitePanel
-          state={state}
-          units={units}
-          selectedId={selectedId}
-          onFly={(p) => setFlyTo({ center: [p.longitude, p.latitude], zoom: 15, key: Date.now() })}
-          onDraw={() => {
-            setSelectedId(null);
-            site.startDrawing();
-          }}
-          onFinish={site.finishDrawing}
-          onUndo={site.undoPoint}
-          onCancel={site.clear}
-          onToggle={site.toggleBuilding}
-          onOverride={(id, archetype) => site.overrideBuilding(id, { archetype })}
-        />
+      <aside className="side-panel" aria-label="Neighbourhood and design">
+        <div className="tabs" role="tablist" aria-label="Panel">
+          {(['site', 'design'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              id={`tab-${t}`}
+              aria-selected={tab === t}
+              aria-controls={`tabpanel-${t}`}
+              className="tabs__tab"
+              onClick={() => {
+                setTab(t);
+                if (t === 'site') site.startPlacing(null);
+              }}
+            >
+              {t === 'site' ? DESIGN_COPY.tabSite : DESIGN_COPY.tabDesign}
+            </button>
+          ))}
+        </div>
+        <div role="tabpanel" id={`tabpanel-${tab}`} aria-labelledby={`tab-${tab}`}>
+          {tab === 'site' ? (
+            <SitePanel
+              state={state}
+              units={units}
+              selectedId={selectedId}
+              onFly={(p) => setFlyTo({ center: [p.longitude, p.latitude], zoom: 15, key: Date.now() })}
+              onDraw={() => {
+                setSelectedId(null);
+                site.startDrawing();
+              }}
+              onFinish={site.finishDrawing}
+              onUndo={site.undoPoint}
+              onCancel={site.clear}
+              onToggle={site.toggleBuilding}
+              onOverride={(id, archetype) => site.overrideBuilding(id, { archetype })}
+            />
+          ) : (
+            <DesignPanel
+              site={state.site}
+              design={state.design}
+              result={state.result}
+              running={state.running}
+              placing={state.placing}
+              units={units}
+              onUpdate={site.updateDesign}
+              onPlace={site.startPlacing}
+              onSuggest={site.suggest}
+            />
+          )}
+        </div>
       </aside>
     </div>
   );

@@ -50,9 +50,8 @@ worker/       the Worker: an adapter (index.ts) over handler.ts.
 tests/        vitest. Node by default; a DOM test opts in with a docblock.
 ```
 
-Planned, per PLAN.md: `src/engine/` (pure functions and a Web Worker,
-phase 02), `src/map/` and the
-Overpass relay (phase 03).
+`src/engine/design.ts` is the design as the player holds it (phase 04);
+`src/ui/DesignPanel.tsx` edits it.
 
 ## Rules
 
@@ -251,3 +250,39 @@ Things that looked right and were not:
 - **This sandbox resets plain curl to Overpass, but `wrangler dev` reaches
   it** — the Workers runtime egresses differently. Verify live relay paths
   through `preview:worker`, not curl.
+
+## The design (phase 04)
+
+- **Two design shapes, on purpose.** `engine/design.ts` holds the UI's
+  `Design`: sources with a position and, when connected from a found
+  candidate, its `origin`. The engine's `NetworkDesign` has neither. The
+  worker converts — a lake's 8,760 hourly temperatures are built from the
+  weather there, never posted across on each keystroke.
+- **Position never enters the physics** (D12). It is for the map, where a
+  bore field is drawn at its true footprint (boreholes × spacing²) against
+  the site's open space.
+- **A retrofit changes the network case only.** Business as usual is the
+  stock as it stands, so a retrofit earns points against today (D23);
+  `ScenarioResult.site` is the as-built neighbourhood, `demand` the one the
+  network serves. On Mankato's suggestion a deep retrofit moves 69 → 80.
+- **The suggestion is a starting point, deliberately unoptimised**: found
+  sources at their estimates, a bore field up to half the loop's peak
+  extraction (capped by open space), an air-source heat pump for the rest,
+  a tower for 70% of peak rejection. Improving it is the game.
+- **The engine run is debounced 250 ms** in `useSite`, and the client
+  already drops superseded results, so typing a capacity runs the year once.
+- **`NumberField` stores SI and prints the unit.** It keeps its own text
+  while typing and refuses out-of-range values (`aria-invalid`) rather than
+  storing them.
+
+Things that looked right and were not:
+
+- **A connected candidate drawn twice.** The found marker and the design
+  marker sat on the same point with two labels. A connected candidate is now
+  drawn once, as part of the design.
+- **Plant placed at the site centre stacked on one point**, a tower hidden
+  under the bore field. New plant steps round the centre (`defaultSpot`);
+  the suggestion puts it either side of the field, clear of its footprint.
+- **A token added with a substring replace landed twice in one dark block.**
+  `"  --x"` is a substring of `"    --x"`. `tests/tokens.test.ts` caught it —
+  keep adding tokens by hand, one block at a time.
