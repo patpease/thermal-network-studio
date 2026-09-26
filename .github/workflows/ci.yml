@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Type check, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      # The golden tests re-simulate every archetype × zone against the
+      # committed calibration table, and pin the Cambium levelization to the
+      # workbook's own figure. A model change without a refit fails here.
+      #
+      # The generators (calibrate:*, carbon:extract, geo:counties,
+      # fixtures:sites) are deliberately NOT run in CI: they fetch gigabytes
+      # from OEDI or call OSM, and their outputs are committed.
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # Bundles the Worker exactly as a deploy would, without deploying — the
+      # check that catches a Worker that builds under Vite but not esbuild.
+      - name: Worker bundle
+        run: npx wrangler deploy --dry-run --outdir .wrangler/dry-run

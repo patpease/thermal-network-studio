@@ -6,7 +6,8 @@ on efficiency and carbon against the buildings as they are today. For
 engineers, planners, architects, utilities, campus owners and citizens.
 Everything runs in the browser: no account, no upload, nothing kept. MIT.
 
-It is a **Cloudflare Worker, not a Pages site.** They are different products and
+Deploying: `docs/deploying.md` (Workers Builds settings, the pre- and
+post-deploy checks). It is a **Cloudflare Worker, not a Pages site.** They are different products and
 the difference has broken a sibling's deploy: a `functions/` directory is
 ignored here. The Worker entry point is `worker/index.ts`; everything it decides
 is in `worker/handler.ts`, where the suite can reach it.

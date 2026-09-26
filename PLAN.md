@@ -59,7 +59,7 @@ sits on the page and is burned into every export.
 
 | D29 | **Grid carbon: Cambium 2023 long-run marginal CO₂**, Mid-case, levelized 2025–2044 at 3% — the workbook's defaults | Month × hour × 18 GEA regions; county → region map generated alongside. Fuels at EPA factors, combustion CO₂ only on both sides. |
 | D30 | **Dispatch order**: waste heat and water exchangers → bore field (to the loop band) → air-source heat pump / cooling tower → electric backup, counted as unmet | The order is the design the player is making. Default band 2–30 °C. |
-| D31 | **Score is year 1; drift is shown, not scored** — *open, see below* | A design can score well while its ground overheats over 25 years. |
+| D31 | **Score is year 1; the 25-year drift is shown, never scored** (decided after phase 03) | A design can score well while its ground overheats; the drift chart and the fluid limits say so. Challenges (D16) may still demand balance. |
 | D32 | **County decides zone and grid** (phase 03) | The relay turns a point into a county (Census geocoder), and the county into the ASHRAE zone the calibration used (NLR's own tract table) and the Cambium region. Both tables stay server-side. |
 | D33 | **MapLibre GL 5.x** (phase 03) | 6.x exists; staying on 5 until phase 07, where the upgrade is a backlog item. |
 
@@ -199,8 +199,5 @@ Study* (Buro Happold et al., January 2026)**
 
 ## Open questions
 
-Phases 00–03 are done. **Open, needs a decision before phase 05:** should the
-score see the 25-year drift? Today it scores the first year only (D31), and
-the demo design scores 68 while its bore field passes 35 °C by year 25. Options:
-score year 25 instead of year 1; penalise a drift that leaves the fluid limits;
-or keep drift as information and let challenges (D16) demand balance.
+None blocking. Next: deploy phases 00–03 to Workers (see `docs/deploying.md`),
+then phase 04, the design screen.

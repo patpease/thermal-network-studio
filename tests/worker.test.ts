@@ -49,6 +49,11 @@ describe('the content security policy', () => {
   const directive = (name: string) =>
     csp.split('; ').find((d) => d.startsWith(`${name} `)) ?? '';
 
+  it('sends HSTS', async () => {
+    const response = await handle(get('/'), assets(200, '<html>'));
+    expect(response.headers.get('Strict-Transport-Security')).toContain('max-age=31536000');
+  });
+
   it('never allows unsafe-inline or unsafe-eval', () => {
     expect(csp).not.toContain('unsafe-inline');
     expect(csp).not.toContain('unsafe-eval');

@@ -67,7 +67,7 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
 
 - **Minnesota fixtures (D28)** need each site's buildings — phase 03.
 - **Laboratories (D19)** deferred by decision.
-- **The score ignores drift (D31)** — an open question in PLAN.md.
+- **The score ignores drift (D31)** — decided: drift is information, not score.
 - **No thermal mass in the loop itself.** Without a bore field the loop sits
   at a band edge; with one, the ground is the only storage (D15).
 - **Tower dispatch is last-resort.** It runs only once the bore field has
