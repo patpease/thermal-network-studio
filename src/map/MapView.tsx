@@ -359,6 +359,11 @@ export function MapView(props: MapViewProps) {
         }
       });
       map.current = instance;
+      // A place picked while MapLibre was still loading: its fly-to fired
+      // against no map and was lost, leaving the player looking at the whole
+      // metro. Land there now instead.
+      const pending = latest.current.flyTo;
+      if (pending) instance.jumpTo({ center: [pending.center[0], pending.center[1]], zoom: pending.zoom });
       // Development only: lets a browser test ask the map what it holds.
       if (import.meta.env.DEV) (window as unknown as { __map?: MapLibreMap }).__map = instance;
     })().catch((error: unknown) => {

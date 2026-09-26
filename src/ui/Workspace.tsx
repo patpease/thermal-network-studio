@@ -10,17 +10,22 @@ import { MapView } from '../map/MapView';
 import { readPalette } from '../map/style';
 import type { MapPalette } from '../map/style';
 import type { UnitSystem } from '../units/units';
-import { DESIGN_COPY } from '../config/copy';
+import { DESIGN_COPY, RESULTS_COPY } from '../config/copy';
 import { DesignPanel } from './DesignPanel';
+import { ResultsPanel } from './ResultsPanel';
 import { SitePanel } from './SitePanel';
 import type { ThemeChoice } from './theme';
 import { useSite } from './useSite';
+
+type Tab = 'site' | 'design' | 'results';
+
+const TAB_LABEL: Record<Tab, string> = { site: DESIGN_COPY.tabSite, design: DESIGN_COPY.tabDesign, results: RESULTS_COPY.tab };
 
 export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeChoice }) {
   const site = useSite();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ center: [number, number]; zoom: number; key: number } | null>(null);
-  const [tab, setTab] = useState<'site' | 'design'>('site');
+  const [tab, setTab] = useState<Tab>('site');
   const [palette, setPalette] = useState<MapPalette>(() => readPalette());
 
   // The theme attribute is applied in an effect (theme.ts); read the tokens
@@ -38,7 +43,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
   const { state } = site;
 
   return (
-    <div className="workspace-map">
+    <div className="workspace-map" data-tab={tab}>
       <div className="map-pane">
         <MapView
           palette={palette}
@@ -59,7 +64,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
       </div>
       <aside className="side-panel" aria-label="Neighbourhood and design">
         <div className="tabs" role="tablist" aria-label="Panel">
-          {(['site', 'design'] as const).map((t) => (
+          {(['site', 'design', 'results'] as const).map((t) => (
             <button
               key={t}
               type="button"
@@ -70,10 +75,10 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               className="tabs__tab"
               onClick={() => {
                 setTab(t);
-                if (t === 'site') site.startPlacing(null);
+                if (t !== 'design') site.startPlacing(null);
               }}
             >
-              {t === 'site' ? DESIGN_COPY.tabSite : DESIGN_COPY.tabDesign}
+              {TAB_LABEL[t]}
             </button>
           ))}
         </div>
@@ -93,6 +98,15 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               onCancel={site.clear}
               onToggle={site.toggleBuilding}
               onOverride={(id, archetype) => site.overrideBuilding(id, { archetype })}
+            />
+          ) : tab === 'results' ? (
+            <ResultsPanel
+              result={state.result}
+              design={state.design}
+              weather={state.weather}
+              running={state.running}
+              units={units}
+              hasSite={state.site !== null}
             />
           ) : (
             <DesignPanel

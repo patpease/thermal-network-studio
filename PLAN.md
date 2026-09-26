@@ -199,4 +199,4 @@ Study* (Buro Happold et al., January 2026)**
 
 ## Open questions
 
-None blocking. Phase 04 is built; next is phase 05, the results screen.
+None blocking. Phases 04 and 05 are built; next is phase 06, challenges.

@@ -74,14 +74,24 @@ export interface NetworkResult {
     readonly pumping: number;
     readonly backup: number;
   };
-  /** kWh/yr of heat each source put in (+) or took out (−) of the loop. */
+  /** kWh/yr of heat each source put in (+) or took out (−) of the loop, net. */
   readonly sourceKWh: Readonly<Record<string, number>>;
+  /**
+   * The same, gross: what each source gave the loop and what it took, kWh/yr,
+   * both positive. A bore field does both in one year; netting them hides the
+   * store, which is the point of it. `backup` is a source here too.
+   */
+  readonly sourceInKWh: Readonly<Record<string, number>>;
+  readonly sourceOutKWh: Readonly<Record<string, number>>;
   /** Heat the buildings took from, and put into, the loop, kWh/yr. */
   readonly extractedKWh: number;
   readonly rejectedKWh: number;
   /** Heat shared building to building, kWh/yr: Σ min(extracted, rejected). */
   readonly sharedKWh: number;
   readonly sharedByMonth: readonly number[];
+  /** Heat the buildings took from, and put into, the loop each month, kWh. */
+  readonly extractedByMonth: readonly number[];
+  readonly rejectedByMonth: readonly number[];
   /** Hours with any unmet need, and the energy, kWh/yr. */
   readonly unmetHours: number;
   readonly unmetKWh: number;
@@ -114,8 +124,12 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
   const loop = new Float64Array(8760);
   const electricity = new Float64Array(8760);
   const sourceWh: Record<string, number> = {};
+  const inWh: Record<string, number> = {};
+  const outWh: Record<string, number> = {};
   const credit = (id: string, wh: number) => {
     sourceWh[id] = (sourceWh[id] ?? 0) + wh;
+    if (wh > 0) inWh[id] = (inWh[id] ?? 0) + wh;
+    else if (wh < 0) outWh[id] = (outWh[id] ?? 0) - wh;
   };
   let hpWh = 0;
   let airWh = 0;
@@ -124,6 +138,8 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
   let backupWh = 0;
   let sharedWh = 0;
   const sharedMonthly = new Array(12).fill(0);
+  const extractedMonthly = new Array(12).fill(0);
+  const rejectedMonthly = new Array(12).fill(0);
   let unmetHours = 0;
   let unmetWh = 0;
   let deliveredWh = 0;
@@ -152,6 +168,8 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
     const rejected = cool * (1 + 1 / copCool) + proc * (1 + 1 / copRef);
     extractedWh += extracted;
     rejectedWh += rejected;
+    extractedMonthly[month] += extracted;
+    rejectedMonthly[month] += rejected;
     const shared = Math.min(extracted, rejected);
     sharedWh += shared;
     sharedMonthly[month] += shared;
@@ -258,10 +276,14 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
       backup: backupWh / 1000,
     },
     sourceKWh: Object.fromEntries(Object.entries(sourceWh).map(([k, v]) => [k, v / 1000])),
+    sourceInKWh: Object.fromEntries(Object.entries(inWh).map(([k, v]) => [k, v / 1000])),
+    sourceOutKWh: Object.fromEntries(Object.entries(outWh).map(([k, v]) => [k, v / 1000])),
     extractedKWh: extractedWh / 1000,
     rejectedKWh: rejectedWh / 1000,
     sharedKWh: sharedWh / 1000,
     sharedByMonth: sharedMonthly.map((v) => v / 1000),
+    extractedByMonth: extractedMonthly.map((v) => v / 1000),
+    rejectedByMonth: rejectedMonthly.map((v) => v / 1000),
     unmetHours,
     unmetKWh: unmetWh / 1000,
     systemCop: totalElectricWh > 0 ? deliveredWh / totalElectricWh : 0,

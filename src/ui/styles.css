@@ -797,3 +797,181 @@ select {
 .dot--ground {
   background: var(--source-ground);
 }
+
+/* ------------------------------------------------------------ phase 05 */
+
+/* Results need room: the panel widens on its tab, and the map keeps the rest.
+   Desk only — declared after the phone rule and more specific than it, so
+   without the query it would win on a phone too (Psychrometric Studio's
+   trap: a rule's order decides, not its intent). */
+@media (min-width: 861px) {
+  .workspace-map[data-tab='results'] {
+    grid-template-columns: minmax(0, 1fr) minmax(24rem, 44rem);
+  }
+}
+
+.chart {
+  position: relative;
+  margin: 0;
+}
+
+.chart__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.chart__plot {
+  position: relative;
+  width: 100%;
+}
+
+.chart__svg {
+  display: block;
+  overflow: visible;
+  font-family: inherit;
+}
+
+.chart__legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  font-size: 0.76rem;
+  color: var(--ink-muted);
+}
+
+.chart__legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.chart__label {
+  font-size: 11px;
+  fill: var(--ink);
+}
+
+.chart__label--strong {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.chart__value {
+  font-size: 11px;
+  fill: var(--ink-muted);
+}
+
+.chart__axis-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  fill: var(--ink-muted);
+}
+
+.chart__tick {
+  font-size: 10.5px;
+  fill: var(--ink-muted);
+}
+
+.chart__svg .grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.chart__svg .axis {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.chart__svg .rule {
+  stroke: var(--ink-faint);
+  stroke-width: 1;
+}
+
+.chart__svg .crosshair {
+  stroke: var(--ink-muted);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.chart__svg .line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.chart__svg .dot {
+  stroke: var(--surface);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.chart__svg .hit {
+  fill: transparent;
+}
+
+.chart__svg .ribbon {
+  opacity: 0.45;
+  transition: opacity 120ms;
+}
+
+.chart__svg .ribbon:hover {
+  opacity: 0.7;
+}
+
+.chart__svg .ribbon.dim {
+  opacity: 0.12;
+}
+
+.fill--heat { fill: var(--chart-heat); }
+.fill--cool { fill: var(--chart-cool); }
+.fill--ground { fill: var(--chart-ground); }
+.fill--neutral { fill: var(--chart-neutral); }
+.fill--loop { fill: var(--ink); }
+.stroke--heat { stroke: var(--chart-heat); }
+.stroke--cool { stroke: var(--chart-cool); }
+.stroke--ground { stroke: var(--chart-ground); }
+.stroke--neutral { stroke: var(--chart-neutral); }
+.stroke--loop { stroke: var(--ink); }
+
+/* A wash is the series hue at low opacity, never a saturated block. */
+.wash { fill-opacity: 0.28; }
+.fill--loop.wash { fill-opacity: 0.1; }
+
+.chart__tip {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  padding: 0.4rem 0.55rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.chart__tip p {
+  margin: 0;
+}
+
+.chart__tip-title {
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+}
+
+.chart__tip-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.results .card__note {
+  max-width: 60ch;
+}

@@ -50,10 +50,28 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       the 25-year drift shown but not scored. Mankato's suggestion scores 69
       (80 with a deep retrofit). 164 tests. Verified in Chromium, fixture
       mode, desk light/dark and phone width.
-- [ ] **05 Results** — Sankey, loop temperature over the year, monthly
-      sharing, 25-year bore drift, score breakdown.
+- [x] **05 Results** — a Results tab: score breakdown (today against the
+      network, electricity by use), the loop's heat as a balanced Sankey,
+      loop temperature through the year against its band, monthly heat
+      shared between buildings, and the 25-year drift against the fluid
+      limits. Hand-drawn SVG at the width shown, hover on every chart,
+      hidden tables, validated chart palette in both themes. Fixed a lost
+      fly-to when a place is picked before the map loads. 176 tests.
+      Verified in Chromium: desk light and dark, phone width, no console
+      errors.
 - [ ] **06 Challenges** — goal format, goal library, share links.
 - [ ] **07 Education, export, phone pass, deploy.**
+
+## Not done in 05, deliberately
+
+- **Hourly detail.** The loop chart is daily (min, mean, max); an hour-level
+  zoom on a chosen week is a later lever.
+- **Keyboard focus on chart marks.** Hover shows a tooltip; the same values
+  are reachable through each chart's hidden table, but marks take no focus.
+- **Texture for print and forced colours.** Identity never rests on colour
+  alone (labels, legends, tables), but no hatch fill exists yet.
+- **Export.** PNG export of each chart, with the scope line burned in, is
+  phase 07.
 
 ## Not done in 04, deliberately
 
@@ -65,7 +83,6 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
   engine already carries a factor per building.
 - **Dragging a placed source.** Move is tap-to-place; drag waits for the
   phone pass.
-- **Results charts** — phase 05. The summary is numbers only.
 - **The design is not kept.** A new boundary starts an empty design (no
   storage in v1; share links are phase 06).
 

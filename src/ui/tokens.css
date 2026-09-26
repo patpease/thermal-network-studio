@@ -76,7 +76,16 @@
   --site-work: #8391ad;
   --site-excluded: #bcc5cf;
   /* A placed bore field: earth, not heat or cooling — it does both. */
-  --source-ground: #8a6a3a;
+  --source-ground: #9a6420;
+
+  /* Chart marks. Validated as a set (dataviz validate_palette.js, all pairs)
+     against each theme's surface. Light keeps the UI's heat and cool; dark
+     steps both down into the dark band, which the UI's lighter pair misses. */
+  --chart-heat: #E2842F;
+  --chart-cool: #2F9BD6;
+  --chart-ground: #9a6420;
+  --chart-neutral: #8794a2;
+  --chart-grid: #e6eaef;
 
   --shadow: 0 1px 2px rgba(20, 32, 43, 0.05), 0 8px 24px -16px rgba(20, 32, 43, 0.25);
 }
@@ -122,7 +131,12 @@
     --site-home: #5e8e7e;
     --site-work: #6d7ea3;
     --site-excluded: #3b4959;
-    --source-ground: #c8a56c;
+    --source-ground: #8b5b14;
+    --chart-heat: #D6761F;
+    --chart-cool: #3B93DA;
+    --chart-ground: #8b5b14;
+    --chart-neutral: #6f7d8c;
+    --chart-grid: #232d38;
 
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -16px rgba(0, 0, 0, 0.7);
   }
@@ -168,7 +182,12 @@
   --site-home: #5e8e7e;
   --site-work: #6d7ea3;
   --site-excluded: #3b4959;
-  --source-ground: #c8a56c;
+  --source-ground: #8b5b14;
+  --chart-heat: #D6761F;
+  --chart-cool: #3B93DA;
+  --chart-ground: #8b5b14;
+  --chart-neutral: #6f7d8c;
+  --chart-grid: #232d38;
 
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -16px rgba(0, 0, 0, 0.7);
 }

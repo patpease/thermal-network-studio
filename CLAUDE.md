@@ -51,7 +51,9 @@ tests/        vitest. Node by default; a DOM test opts in with a docblock.
 ```
 
 `src/engine/design.ts` is the design as the player holds it (phase 04);
-`src/ui/DesignPanel.tsx` edits it.
+`src/ui/DesignPanel.tsx` edits it. `src/charts/` is the results screen
+(phase 05): `data.ts` (pure) turns a result into what each chart draws, and
+each chart is hand-authored SVG — no chart library.
 
 ## Rules
 
@@ -286,3 +288,40 @@ Things that looked right and were not:
 - **A token added with a substring replace landed twice in one dark block.**
   `"  --x"` is a substring of `"    --x"`. `tests/tokens.test.ts` caught it —
   keep adding tokens by hand, one block at a time.
+
+## The results (phase 05)
+
+- **Five charts on a Results tab**, which widens the panel on a desk (map
+  keeps the rest): score breakdown, the loop's heat as a Sankey, loop
+  temperature through the year, monthly sharing, and 25-year drift. Each is
+  drawn at the width it is shown (`charts/useWidth.ts`, from ZEEL) and has a
+  hidden table.
+- **The Sankey balances by construction**, and `tests/charts.test.ts` checks
+  it to 0.01%: every hour's remainder goes to backup, so heat in equals heat
+  out. A bore field appears on BOTH sides, gross (`sourceInKWh` /
+  `sourceOutKWh`); netting it would hide the store that is its point. The
+  layout is ZEEL's, including "a node is as tall as what passes through it".
+- **Chart colours are their own tokens** (`--chart-heat/cool/ground/neutral`),
+  validated as a set with the dataviz validator, all pairs, against each
+  theme's surface. Light keeps the UI's heat and cool; dark steps both down,
+  because the UI's lighter pair falls outside the dark lightness band. The
+  bore-field brown was re-stepped in both themes (it read grey, then sat too
+  close to heating orange in dark).
+- **Colour is physics, identity is the label.** Orange heat, blue cooling,
+  brown ground, grey backup; the loop is ink. Values wear text tokens. The
+  score's today/network bars are one neutral, wash against solid — the
+  accent is never a series colour.
+- **Rules (band edges, fluid limits) are labelled in a right margin**, not on
+  the plot: inside it they sat on the data.
+
+Things that looked right and were not:
+
+- **A place picked before MapLibre finished loading was never flown to.**
+  The fly-to effect fired against no map and was lost, so the player drew
+  over the whole metro and got "draw under 4 km²". The map now lands on any
+  pending fly-to when it is created. Found by a browser test that raced it.
+- **A desk-only width rule that would have won on a phone.** The results
+  panel's wider column is declared after the phone rule and is more
+  specific; it sits inside `@media (min-width: 861px)` for that reason.
+- **Column headers anchored at the node columns met in the middle** at phone
+  width ("INTO THELOOP THE LOOP"). They anchor at the outer edges now.

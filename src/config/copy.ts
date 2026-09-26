@@ -90,3 +90,13 @@ export const DESIGN_COPY = {
   retrofitNote: 'Business as usual stays the buildings as they are today, so a retrofit earns points against what is there now.',
   estimate: 'Estimated from OpenStreetMap — change it if you know better.',
 } as const;
+
+export const RESULTS_COPY = {
+  tab: 'Results',
+  needSite: 'Draw a neighbourhood first.',
+  needDesign: 'Build something on the Design tab first — the results are about what you built.',
+  updating: 'Updating…',
+  noField: 'No bore field in this design, so there is no ground to drift.',
+  shapeCaveat:
+    'Annual loads are calibrated to NLR ComStock™ and ResStock™; the hour-by-hour shape is this tool’s own model and is not checked against them. The charts convey how the network behaves, not what a real one would save.',
+} as const;
