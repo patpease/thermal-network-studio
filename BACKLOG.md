@@ -101,6 +101,9 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       BLE): a Results chart (winter peak, summer peak, the year; today as a
       rule), a Design tab stat, Learn facts, and the "Easy on the grid"
       challenge (winter peak ≥ 25% below BLE, ≤ 100 backup hours).
+- [ ] **12 More building data** — FEMA USA Structures fills footprints OSM
+      lacks; USACE NSI fills storeys, floor area and unit counts. Reviewed
+      and measured in `docs/building-data.md`; not built.
 - [x] **11 Save and open** — a project file, as Psychrometric Studio has:
       Save file, Open file and Copy a link in one card on the Site and
       Design tabs; Ctrl/⌘+S; the building and weather snapshot opens with no
