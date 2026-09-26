@@ -49,8 +49,8 @@ sits on the page and is burned into every export.
 | D19 | **Labs added as archetype 16** | No ComStock type exists, so its calibration targets are ZEEL's zone intensities, labelled as borrowed, as in heat-balance's Laboratory row. |
 | D20 | **Score = 50% efficiency + 50% carbon** | Both components are always shown beside the blended number |
 | D21 | **Baseline = regional existing stock** | BAU heating fuel mix and cooling from ComStock/ResStock per climate zone and archetype. Aggregates only — no hourly shapes — baked in by the D22 calibration generator. |
-| D22 | **Loads: hybrid 1R1C, per building, in the browser** (EPRI) | Space heating and cooling from a one-resistance, one-capacitance model per building, driven by the site's hourly weather — the method in EPRI 3002029431. **Plus** DHW and process loads (refrigeration, IT, ice) on schedules, which EPRI left out and warned about. Archetype parameters (U-values, mass, ventilation, gains, setpoints by vintage) are **calibrated** so each archetype's annual heating, cooling and DHW land on ComStock/ResStock per climate zone. Extends Heat Balance Studio's UA-and-gains engine rather than starting over. |
-| D23 | **Envelope and vintage are player levers** | Because D22 is physical, a retrofit changes the load. Vintage comes from OSM `start_date` where tagged, else the archetype default, **flagged as guessed** like everything else inferred. |
+| D22 | **Loads: hybrid 1R1C, per building, in the browser** (EPRI). *Built in phase 01: calibrated to ComStock 2025 R3 component loads and ResStock 2025 R1 delivered loads; two multipliers (loss, free gain) per archetype × zone.* | Space heating and cooling from a one-resistance, one-capacitance model per building, driven by the site's hourly weather — the method in EPRI 3002029431. **Plus** DHW and process loads (refrigeration, IT, ice) on schedules, which EPRI left out and warned about. Archetype parameters (U-values, mass, ventilation, gains, setpoints by vintage) are **calibrated** so each archetype's annual heating, cooling and DHW land on ComStock/ResStock per climate zone. Extends Heat Balance Studio's UA-and-gains engine rather than starting over. |
+| D23 | **Envelope and vintage are player levers**. *Four vintage bands (pre-1950, 1950–79, 1980–99, 2000+), not EPRI's five: ComStock's bins straddle EPRI's boundaries.* | Because D22 is physical, a retrofit changes the load. Vintage comes from OSM `start_date` where tagged, else the archetype default, **flagged as guessed** like everything else inferred. |
 | D24 | **Headline network metrics: DOC, LBI, density** (EPRI) | Demand overlap coefficient, load balance index, and thermal demand density, shown as soon as a neighbourhood is picked and before anything is built. They explain *why* a site shares heat well. Density is shown against EPRI's 50–150 GWh/km²·yr range; LBI against Minnesota's heating-dominance bands (≤80 %, 80–90 %, >90 %). Reference marks, not pass/fail. |
 | D25 | **Site context panel: information only** (Minnesota) | Minnesota's eight criteria are listed with what the tool can actually know — load balance, load density, opportunistic resources, open space for a bore field, dividing barriers (highways, rivers), anchor tenants. **Anything it cannot know is left blank, never guessed**: bedrock, grid capacity, existing HVAC, ownership, environmental justice status, contamination. No weights, no 0–100 total, and it never touches the score (D4 and D20 stand). |
 | D26 | **More sources, found in OSM** (Minnesota) | Adds lakes and rivers (surface water), ice rinks, supermarkets, breweries, food and industrial processing, alongside data centres, wastewater plants and sewers. |
@@ -152,6 +152,7 @@ then footprint size.
 | Hotel | ComStock Small/LargeHotel | `tourism=hotel` |
 | Warehouse | ComStock Warehouse | `building=warehouse/industrial` |
 | Laboratory | ZEEL intensities (D19) | `building=laboratory`, `amenity=research_institute` |
+| Supermarket (added in phase 01) | ComStock Grocery | `shop=supermarket` |
 | Data centre (source *and* load) | none, rule-based | `telecom=data_center`, `building=data_center` |
 
 Unknown `building=yes` → the most likely archetype from landuse and footprint,
@@ -192,6 +193,6 @@ Study* (Buro Happold et al., January 2026)**
 
 ## Open questions
 
-None blocking. Next: phase 01 — before writing the generator, confirm the
-current ComStock/ResStock release, its licence, and which aggregate tables
-give annual end-use intensity by building type and climate zone.
+Phase 01 is done. Open for phase 02: how laboratories (D19) become a load —
+ZEEL publishes energy by end use, not thermal load, so a conversion has to be
+chosen before labs can join the calibration.

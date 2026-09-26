@@ -16,7 +16,9 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true
   },
-  "include": ["src", "worker", "tests", "vite.config.ts", "vitest.config.ts"]
+  "include": ["src", "worker", "tests", "scripts/**/*.ts", "vite.config.ts", "vitest.config.ts"]
 }

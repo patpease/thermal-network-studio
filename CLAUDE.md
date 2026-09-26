@@ -27,15 +27,20 @@ a ± tolerance. A score is not a saving.
 
 ```
 src/config/   branding and copy. Every sentence the tool says is in copy.ts.
+src/loads/    the 1R1C load model, archetypes, schedules, and generated/ (the
+              calibration table — GENERATED, never edited by hand).
 src/units/    IP and SI. Converted at the boundary, nowhere else.
+scripts/calibrate/  extract (NLR data → targets.json), weather (AMY2018 per
+              zone), fit (targets → src/loads/generated/calibration.ts).
+data/calibration/   targets.json and weather.json.gz. Committed; the fit and
+              the tests read only these and never touch the network.
 src/ui/       shell, tokens, theme, the mark.
 worker/       the Worker: an adapter (index.ts) over handler.ts.
 tests/        vitest. Node by default; a DOM test opts in with a docblock.
 ```
 
-Planned, per PLAN.md: `src/loads/` and `scripts/calibrate/` (the 1R1C model
-and the generator that fits its parameters, phase 01), `src/engine/` (pure
-functions and a Web Worker, phase 02), `src/map/` and the
+Planned, per PLAN.md: `src/engine/` (pure functions and a Web Worker,
+phase 02), `src/map/` and the
 Overpass relay (phase 03).
 
 ## Rules
@@ -94,6 +99,55 @@ simulation budget is a sub-second re-run of a full 8760 (D6); measure it on
 - **An export must never be the phone layout** (from phase 07).
 - **`pkill -f "wrangler dev"` from a shell whose own command line contains
   that string** kills the shell. Stop the dev server by PID.
+
+## Loads are calibrated, not typed
+
+```
+ComStock / ResStock (OEDI) --calibrate:extract--> data/calibration/targets.json
+NLR AMY2018 county weather  --calibrate:weather--> data/calibration/weather.json.gz
+targets + weather + model   --calibrate:fit-----> src/loads/generated/calibration.ts
+```
+
+- **The targets are thermal loads, not fuel.** ComStock 2025 R3 publishes
+  per-building component loads (`out.loads.htg.*`, `out.loads.clg.*`) and
+  ResStock 2025 R1 delivered loads. A network serves the load; the fuel burned
+  today is only the business-as-usual baseline.
+- **The fit solves two multipliers per archetype × zone** — loss conductance
+  and free gains (internal *and* solar) — so the model's annual heating and
+  cooling equal the stock's. 225/225 exact to 2% or 1 kWh/m², and the fit
+  refuses to write if more than 10% are not. Hourly *shape* is the model's own
+  and is not checked against NLR; say so wherever it matters.
+- **Change the model or `archetypes.ts` → re-run `npm run calibrate:fit`.**
+  `tests/calibration.test.ts` re-simulates every archetype × zone and fails if
+  the committed table no longer matches the committed model.
+- **`calibrate:extract` streams ~3 GB** and takes a few minutes. It is only
+  needed for a new NLR release. The other two run offline in seconds.
+- **The fit runs the browser's own model.** Node 22 strips TypeScript types,
+  so `fit.ts` imports `src/loads/*.ts` directly; that is why those files use
+  `.ts` import specifiers and the tsconfig sets `erasableSyntaxOnly` — no
+  enums, no namespaces, no parameter properties in `src/loads/`.
+- **Attribution.** NLR asks for: "Data includes information from the
+  ComStock™ and ResStock™ datasets developed by the National Laboratory of the
+  Rockies (NLR) with funding from the U.S. Department of Energy (DOE)." It is
+  in the generated table's banner and must reach the page and exports.
+
+Things in this data that look right and are not:
+
+- **ComStock 2025 R3 modelled no service water heating in California.** Those
+  rows read DHW = 0 and would drag every 3B/3C DHW intensity toward zero. The
+  extractor keeps a separate DHW denominator that excludes CA.
+- **Component loads can sum to a hair below zero** where there is almost no
+  heating (a Miami supermarket, −0.04 kWh/m²). They are attributions, not
+  meters. Floored at zero.
+- **NLR's 2018 "Fairbanks" weather file bottoms out at −13.4 °C.** Fairbanks
+  reaches −40. The stock was simulated on it, so calibration stays consistent,
+  but never use this fixture as a real Fairbanks year.
+- **Las Vegas is the textbook 3B city and the wrong one to fit 3B against.**
+  Most of 3B's floor area is in Southern California; the Mojave cost 30–60% on
+  every home type's heating. The fit uses Los Angeles County.
+- **Hospital heating barely depends on the envelope** (it is ventilation and
+  reheat), so a vintage factor fitted to it swings to 3.45 and 0.50. Vintage
+  factors are clamped to 0.5–2 and each clamp is recorded.
 
 ## Two things the reports settled
 

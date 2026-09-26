@@ -60,3 +60,23 @@ What the game takes from it:
 - **Ten qualitative criteria** (Table 3-2, p. 31–32) — champion, ownership,
   financial capacity and so on. The report says they should only be applied
   by people assessing their own community. Not used.
+
+## NLR — ComStock and ResStock (load calibration, phase 01)
+
+The National Laboratory of the Rockies (formerly NREL). Public datasets on the
+Open Energy Data Initiative; index at <https://comstock.nlr.gov/page/datasets>.
+
+- **ComStock 2025 Release 3, AMY2018.** Component loads, national by state,
+  baseline (`component_loads/.../upgrade0_agg.csv`, 2.3 GB, 163,751 models).
+  Suggested citation: Parker, Andrew, et al. 2023. *ComStock Reference
+  Documentation.* NREL/TP-5500-83819.
+- **ResStock 2025 Release 1, AMY2018.** National metadata and annual results,
+  baseline (`upgrade0.csv.gz`, 0.9 GB, 549,971 models): delivered heating,
+  cooling and hot-water loads.
+- **Weather.** NLR AMY2018 county files from the ComStock 2025 R3 release, one
+  county per zone (`scripts/calibrate/weather.mjs` lists them).
+- **Required attribution:** "Data includes information from the ComStock™ and
+  ResStock™ datasets developed by the National Laboratory of the Rockies (NLR)
+  with funding from the U.S. Department of Energy (DOE)."
+- **Known issue carried:** ComStock 2025 R3 did not model service water heating
+  in California; those rows are excluded from DHW figures.
