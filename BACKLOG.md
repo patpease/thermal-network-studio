@@ -22,9 +22,14 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       (163,751 + 549,971 models), 225/225 exact to 2% or 1 kWh/m². Vintage
       envelope factors (D23) and BAU fuel mix and efficiency (D21) generated
       alongside. 74 tests. A unit simulation is 0.23 ms in Node.
-- [ ] **02 Engine, no map** — demo neighbourhood → loads → DOC/LBI/density →
-      loop sim → BAU → score, g-function drift. Pure functions in a Web
-      Worker; measure the 8760 on the production build. Minnesota fixtures.
+- [x] **02 Engine, no map** — `src/engine/`: demand and site metrics (DOC,
+      LBI, density, Minnesota bands), business as usual from the stock's own
+      fuel mix, the ambient loop with fixed dispatch, a finite-line-source
+      bore field with a 25-year drift projection, Cambium LRMER carbon, the
+      score, a demo quarter, and the Web Worker with a latest-wins client.
+      105 tests. Verified in Chromium on a production build behind the real
+      Worker and CSP: demo scores 68, 59 ms per run in the worker, ~300 ms on
+      the first run while the g-function is tabulated.
 - [ ] **03 Map** — MapLibre + OpenFreeMap, polygon draw (mouse and touch),
       Overpass and weather relays (heat-balance's relay pattern), classifier,
       guessed buildings styled apart, sources and anchor tenants, site context
@@ -34,6 +39,23 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       sharing, 25-year bore drift, score breakdown.
 - [ ] **06 Challenges** — goal format, goal library, share links.
 - [ ] **07 Education, export, phone pass, deploy.**
+
+## Not done in 02, deliberately
+
+- **Minnesota fixtures (D28)** need each site's buildings — phase 03.
+- **Laboratories (D19)** deferred by decision.
+- **The score ignores drift (D31)** — an open question in PLAN.md.
+- **No thermal mass in the loop itself.** Without a bore field the loop sits
+  at a band edge; with one, the ground is the only storage (D15).
+- **Tower dispatch is last-resort.** It runs only once the bore field has
+  reached the band's upper limit, which is why the demo's ground warms. A
+  "run the tower to balance the ground" policy is a design lever for phase 04.
+- **One g-function geometry per network.** Several bore fields add their
+  boreholes into one field with the first's spacing and depth.
+- **Business as usual uses the stock's annual average efficiency every
+  hour**, which flattens the seasonal swing of heat pumps and chillers.
+- **Wet bulb from Stull (2011)** off dry bulb and RH; Open-Meteo supplies RH,
+  so the phase 03 weather path must carry it or towers read dry bulb.
 
 ## Not done in 01, deliberately
 

@@ -14,8 +14,9 @@
  * many counties, and its loads are fitted against one. The choice is listed
  * here and in the output so it can be argued with.
  *
- * Output: data/calibration/weather.json.gz — dry bulb in tenths of a °C and
- * global horizontal irradiance in W/m², 8760 hours each, 2018. Committed; the
+ * Output: data/calibration/weather.json.gz — dry bulb in tenths of a °C,
+ * global horizontal irradiance in W/m² and relative humidity in %, 8760 hours
+ * each, 2018. Humidity is for the cooling tower's wet bulb, not the loads. Committed; the
  * tests and the fitting step read it and never touch the network.
  */
 import { writeFileSync } from 'node:fs';
@@ -52,11 +53,12 @@ export const REPRESENTATIVE = {
 async function fetchZone(gisjoin) {
   const temperature = [];
   const ghi = [];
+  const humidity = [];
   let header = null;
   await streamCsv(`${WEATHER}/${gisjoin}_2018.csv`, (row) => {
     if (!header) {
       header = row;
-      if (!row[1]?.startsWith('Dry Bulb') || !row[5]?.startsWith('Global Horizontal')) {
+      if (!row[1]?.startsWith('Dry Bulb') || !row[2]?.startsWith('Relative Humidity') || !row[5]?.startsWith('Global Horizontal')) {
         throw new Error(`Unexpected weather columns: ${row.join(', ')}`);
       }
       return;
@@ -64,9 +66,10 @@ async function fetchZone(gisjoin) {
     if (row.length < 6) return;
     temperature.push(Math.round(Number(row[1]) * 10));
     ghi.push(Math.max(0, Math.round(Number(row[5]))));
+    humidity.push(Math.min(100, Math.max(0, Math.round(Number(row[2])))));
   });
   if (temperature.length !== 8760) throw new Error(`${gisjoin}: ${temperature.length} hours, expected 8760`);
-  return { temperatureTenthsC: temperature, ghiWm2: ghi };
+  return { temperatureTenthsC: temperature, ghiWm2: ghi, relativeHumidityPct: humidity };
 }
 
 async function main() {

@@ -80,3 +80,18 @@ Open Energy Data Initiative; index at <https://comstock.nlr.gov/page/datasets>.
   with funding from the U.S. Department of Energy (DOE)."
 - **Known issue carried:** ComStock 2025 R3 did not model service water heating
   in California; those rows are excluded from DHW figures.
+
+## Engine sources (phase 02)
+
+- **Cambium 2023 LRMER.** Gagnon, Pieter. 2024. *Long-run Marginal Emission
+  Rates for Electricity — Workbooks for 2023 Cambium Data.* NREL Data Catalog,
+  submission 230. <https://data.nlr.gov/submissions/230>. Mid-case, CO₂,
+  combustion, start 2025, 20 years, 3% real, end-use — the workbook defaults.
+- **EPA GHG Emission Factors Hub**, Table 1 (stationary combustion): natural
+  gas 53.06, propane 62.87, distillate fuel oil No. 2 73.96 kg CO₂/MMBtu.
+- **Claesson, J. and Javed, S. 2011.** An analytical method to calculate
+  borehole fluid temperatures for time-scales from minutes to decades.
+  *ASHRAE Transactions* 117(2). The finite line source used in
+  `src/engine/gfunction.ts`.
+- **Stull, R. 2011.** Wet-bulb temperature from relative humidity and air
+  temperature. *J. Appl. Meteor. Climatol.* 50: 2267–2269.

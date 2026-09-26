@@ -11,7 +11,7 @@ import type { WeatherYear } from '../../src/loads/model.ts';
 import type { ClimateZone } from '../../src/loads/zones.ts';
 
 interface Fixture {
-  zones: Record<string, { gisjoin: string; place: string; temperatureTenthsC: number[]; ghiWm2: number[] }>;
+  zones: Record<string, { gisjoin: string; place: string; temperatureTenthsC: number[]; ghiWm2: number[]; relativeHumidityPct: number[] }>;
 }
 
 const path = resolve(dirname(fileURLToPath(import.meta.url)), '../../data/calibration/weather.json.gz');
@@ -26,6 +26,7 @@ export function calibrationWeather(zone: ClimateZone): WeatherYear & { place: st
     place: z.place,
     temperature: Float64Array.from(z.temperatureTenthsC, (t) => t / 10),
     ghi: Float64Array.from(z.ghiWm2),
+    relativeHumidity: Float64Array.from(z.relativeHumidityPct),
     // 1 January 2018 was a Monday.
     firstWeekday: 0,
   };

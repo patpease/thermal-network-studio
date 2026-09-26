@@ -30,6 +30,8 @@ export interface WeatherYear {
   readonly temperature: ArrayLike<number>;
   /** Global horizontal irradiance, W/m², 8760 values. */
   readonly ghi: ArrayLike<number>;
+  /** Relative humidity, %, 8760 values. Only the cooling tower uses it. */
+  readonly relativeHumidity?: ArrayLike<number>;
   /** Day of week of hour 0: 0 = Monday … 6 = Sunday. 1 Jan 2018 was a Monday. */
   readonly firstWeekday: number;
 }

@@ -1,4 +1,4 @@
-# Thermal Network Studio — plan (draft 5)
+# Thermal Network Studio — plan (draft 6)
 
 Repo: `patpease/thermal-network-studio`.
 Status: **phase 00 done; next is 01.** Progress lives in `BACKLOG.md`.
@@ -46,8 +46,8 @@ sits on the page and is burned into every export.
 | D16 | **Challenges are generic goals on any map** | e.g. "Beat BAU carbon by 60% without a cooling tower". A goal is data: constraints + thresholds on engine outputs. |
 | D17 | **CSP allows the OpenFreeMap origin explicitly** | The only third-party origins: OpenFreeMap + the Cloudflare beacon |
 | D18 | **workers.dev for now** | `BRAND.host` follows whenever a domain is chosen |
-| D19 | **Labs added as archetype 16** | No ComStock type exists, so its calibration targets are ZEEL's zone intensities, labelled as borrowed, as in heat-balance's Laboratory row. |
-| D20 | **Score = 50% efficiency + 50% carbon** | Both components are always shown beside the blended number |
+| D19 | ~~Labs added as archetype 16~~ **Deferred** (decided in phase 02). ZEEL publishes energy, not load; revisit with the map, when real campuses appear. | |
+| D20 | **Score = 50% efficiency + 50% carbon** | Efficiency = % less site energy than business as usual; carbon = % less CO₂. Each clamped 0–100 for the score, unclamped value always shown. (Phase 02.) |
 | D21 | **Baseline = regional existing stock** | BAU heating fuel mix and cooling from ComStock/ResStock per climate zone and archetype. Aggregates only — no hourly shapes — baked in by the D22 calibration generator. |
 | D22 | **Loads: hybrid 1R1C, per building, in the browser** (EPRI). *Built in phase 01: calibrated to ComStock 2025 R3 component loads and ResStock 2025 R1 delivered loads; two multipliers (loss, free gain) per archetype × zone.* | Space heating and cooling from a one-resistance, one-capacitance model per building, driven by the site's hourly weather — the method in EPRI 3002029431. **Plus** DHW and process loads (refrigeration, IT, ice) on schedules, which EPRI left out and warned about. Archetype parameters (U-values, mass, ventilation, gains, setpoints by vintage) are **calibrated** so each archetype's annual heating, cooling and DHW land on ComStock/ResStock per climate zone. Extends Heat Balance Studio's UA-and-gains engine rather than starting over. |
 | D23 | **Envelope and vintage are player levers**. *Four vintage bands (pre-1950, 1950–79, 1980–99, 2000+), not EPRI's five: ComStock's bins straddle EPRI's boundaries.* | Because D22 is physical, a retrofit changes the load. Vintage comes from OSM `start_date` where tagged, else the archetype default, **flagged as guessed** like everything else inferred. |
@@ -55,7 +55,11 @@ sits on the page and is burned into every export.
 | D25 | **Site context panel: information only** (Minnesota) | Minnesota's eight criteria are listed with what the tool can actually know — load balance, load density, opportunistic resources, open space for a bore field, dividing barriers (highways, rivers), anchor tenants. **Anything it cannot know is left blank, never guessed**: bedrock, grid capacity, existing HVAC, ownership, environmental justice status, contamination. No weights, no 0–100 total, and it never touches the score (D4 and D20 stand). |
 | D26 | **More sources, found in OSM** (Minnesota) | Adds lakes and rivers (surface water), ice rinks, supermarkets, breweries, food and industrial processing, alongside data centres, wastewater plants and sewers. |
 | D27 | **Anchor tenants marked on the map** (Minnesota) | City hall, library, school, hospital, community centre, place of worship. Information, not score — Minnesota found them to be what makes a project happen. |
-| D28 | **Minnesota's 16 sites: validation only** | Not shipped as challenges (D16 stands). Used as test fixtures for what D24–D25 compute — e.g. a site Minnesota rated as >90 % heating-dominant must not come out balanced. Only indicators we can compute are compared; Minnesota's weighted total is not reproduced. |
+| D28 | **Minnesota's 16 sites: validation only** (moved to phase 03: the fixtures need each site's real buildings, which only the map can supply) | Not shipped as challenges (D16 stands). Used as test fixtures for what D24–D25 compute — e.g. a site Minnesota rated as >90 % heating-dominant must not come out balanced. Only indicators we can compute are compared; Minnesota's weighted total is not reproduced. |
+
+| D29 | **Grid carbon: Cambium 2023 long-run marginal CO₂**, Mid-case, levelized 2025–2044 at 3% — the workbook's defaults | Month × hour × 18 GEA regions; county → region map generated alongside. Fuels at EPA factors, combustion CO₂ only on both sides. |
+| D30 | **Dispatch order**: waste heat and water exchangers → bore field (to the loop band) → air-source heat pump / cooling tower → electric backup, counted as unmet | The order is the design the player is making. Default band 2–30 °C. |
+| D31 | **Score is year 1; drift is shown, not scored** — *open, see below* | A design can score well while its ground overheats over 25 years. |
 
 ## Carried over from the sibling tools (copied, not a shared package)
 
@@ -193,6 +197,8 @@ Study* (Buro Happold et al., January 2026)**
 
 ## Open questions
 
-Phase 01 is done. Open for phase 02: how laboratories (D19) become a load —
-ZEEL publishes energy by end use, not thermal load, so a conversion has to be
-chosen before labs can join the calibration.
+Phase 02 is done. **Open, needs a decision before phase 05:** should the
+score see the 25-year drift? Today it scores the first year only (D31), and
+the demo design scores 68 while its bore field passes 35 °C by year 25. Options:
+score year 25 instead of year 1; penalise a drift that leaves the fluid limits;
+or keep drift as information and let challenges (D16) demand balance.

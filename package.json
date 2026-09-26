@@ -16,7 +16,8 @@
     "deploy": "npm run build && wrangler deploy",
     "calibrate:extract": "node scripts/calibrate/extract.mjs",
     "calibrate:weather": "node scripts/calibrate/weather.mjs",
-    "calibrate:fit": "node scripts/calibrate/fit.ts"
+    "calibrate:fit": "node scripts/calibrate/fit.ts",
+    "carbon:extract": "node scripts/carbon/extract.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",
