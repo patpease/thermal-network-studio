@@ -56,6 +56,6 @@ describe('ResultsPanel', () => {
 
   it('asks for a design before drawing anything', () => {
     render(<ResultsPanel result={result} design={EMPTY_DESIGN} weather={weather} running={false} units="ip" hasSite />);
-    expect(screen.getByText(/Build something on the Design tab first/)).toBeTruthy();
+    expect(screen.getByText(/Add a source on the Design tab first/)).toBeTruthy();
   });
 });

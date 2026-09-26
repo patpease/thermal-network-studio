@@ -34,7 +34,7 @@ export function LoopYear({ days, band, units }: { days: readonly Day[]; band: Lo
     <ChartCard
       id="loop-year"
       title="Loop temperature through the year"
-      subtitle={`Held between ${temp(band.min)} and ${temp(band.max)}. A warmer loop helps the heating heat pumps; a cooler one helps the cooling.`}
+      subtitle={`Held between ${temp(band.min)} and ${temp(band.max)}.`}
       legend={[
         { label: 'Loop, daily mean', role: 'loop', key: 'line' },
         { label: 'Loop, daily range', role: 'loop', key: 'wash' },

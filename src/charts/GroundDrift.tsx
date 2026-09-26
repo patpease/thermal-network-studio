@@ -35,7 +35,7 @@ export function GroundDrift({ drift, units }: { drift: readonly DriftYear[]; uni
     <ChartCard
       id="drift"
       title="The ground over 25 years"
-      subtitle={`${Math.abs(direction) < 0.3 ? 'The field holds roughly steady' : direction > 0 ? 'The field warms: it is given more heat than it gives back' : 'The field cools: it gives more heat than it is given'}. ${outside ? 'By year 25 the fluid leaves its design limits.' : 'The fluid stays inside its design limits.'} Shown, not scored.`}
+      subtitle={`${Math.abs(direction) < 0.3 ? 'Ground temperature changes by less than 0.3 K over 25 years' : direction > 0 ? 'Ground temperature rises over 25 years: more heat goes in than comes out' : 'Ground temperature falls over 25 years: more heat comes out than goes in'}. ${outside ? 'By year 25 the fluid is outside its design limits.' : 'The fluid stays inside its design limits.'} Not scored.`}
       legend={[
         { label: 'Warmest daily fluid', role: 'heat', key: 'line' },
         { label: 'Coldest daily fluid', role: 'cool', key: 'line' },

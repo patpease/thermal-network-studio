@@ -77,15 +77,14 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       beside each challenge; "Save as PNG" on every results chart, drawn at
       desk width in the light theme with the scope line, sources, host and
       month printed on it; the phone tab bar with Map as a screen of its own
-      (D38); deploy checks extended to nine. Verified in Chromium in
+      (D38); deploy checks extended to nine. The wording of phases 03–06
+      rewritten to the same rule, and `tests/wording.test.ts` holds every
+      string in `copy.ts` and every challenge to it. Verified in Chromium in
       fixture mode and on the production build in `wrangler dev` against
       live services: no CSP refusals.
 
 ## Not done in 07, deliberately
 
-- **Older copy is unchanged.** Phase 07's wording rule (facts and
-  references) applies to the Learn tab and site facts; panel notes written
-  in phases 03–06 still carry some explanation.
 - **MapLibre 6** (D33).
 - **Drag to move a placed source.** Placing and moving are by tap.
 - **Per-chart hashtags, link previews, a report.** An exported chart and the

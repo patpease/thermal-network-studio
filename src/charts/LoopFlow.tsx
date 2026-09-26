@@ -66,7 +66,7 @@ export function LoopFlow({ flows, units }: { flows: Flows; units: UnitSystem }) 
     <ChartCard
       id="flow"
       title="Where the loop’s heat comes from, and where it goes"
-      subtitle={`A year: ${energy(total)} through the loop. Both sides are equal — whatever the plant cannot carry falls to electric backup.`}
+      subtitle={`${energy(total)} through the loop in a year. Heat in equals heat out. Heat the plant cannot supply or remove goes to electric backup.`}
       table={{ caption: 'Heat into and out of the loop over a year', head: ['Stream', 'Energy'], rows }}
     >
       {(width) => {

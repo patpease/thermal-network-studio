@@ -6,7 +6,7 @@
  * of what is built sits under them. Every number with a unit goes through
  * format.ts or NumberField, so nothing here knows which system is shown.
  */
-import { DESIGN_COPY } from '../config/copy';
+import { DESIGN_COPY, SOURCE_COPY } from '../config/copy';
 import { boreFieldArea, defaultSpot, fromCandidate, nextId, RETROFITS } from '../engine/design';
 import type { Design, DesignSource, DesignSourceKind } from '../engine/design';
 import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
@@ -38,13 +38,7 @@ const TITLES: Record<DesignSourceKind, string> = {
   water: 'Water exchanger',
 };
 
-const WHAT: Record<DesignSourceKind, string> = {
-  'bore-field': 'Stores summer heat in the ground and takes it back in winter. Gives and takes.',
-  'air-source': 'Warms the loop from outdoor air when nothing else can. Heat only; weaker as the air gets colder.',
-  'cooling-tower': 'Throws loop heat to the air by evaporation. Cooling only; limited by the wet bulb.',
-  'waste-heat': 'Heat someone else already makes — servers, a rink’s chillers, a brewery. Heat only, while warmer than the loop.',
-  water: 'A heat exchanger on water — a sewer main, a lake, a river. Gives or takes, whichever side of the loop it is on.',
-};
+const WHAT: Record<DesignSourceKind, string> = SOURCE_COPY;
 
 type AddKind = 'bore-field' | 'air-source' | 'cooling-tower' | 'sewer' | 'surface' | 'waste-heat';
 
@@ -137,8 +131,8 @@ function Results({ result, design, running, units }: { result: ScenarioResult | 
             Fluid {withUnit('temperature', first.minFluid, units)} to {withUnit('temperature', first.maxFluid, units)} in year one;{' '}
             {withUnit('temperature', last.minFluid, units)} to {withUnit('temperature', last.maxFluid, units)} in year 25.{' '}
             {outside
-              ? `That leaves the ${withUnit('temperature', FLUID_LIMITS.min, units)}–${withUnit('temperature', FLUID_LIMITS.max, units)} a bore field is designed for.`
-              : `Inside the ${withUnit('temperature', FLUID_LIMITS.min, units)}–${withUnit('temperature', FLUID_LIMITS.max, units)} a bore field is designed for.`}{' '}
+              ? `Design limits: ${withUnit('temperature', FLUID_LIMITS.min, units)} to ${withUnit('temperature', FLUID_LIMITS.max, units)}. Outside them by year 25.`
+              : `Design limits: ${withUnit('temperature', FLUID_LIMITS.min, units)} to ${withUnit('temperature', FLUID_LIMITS.max, units)}. Inside them every year.`}{' '}
             {DESIGN_COPY.driftNote}
           </p>
         </>
@@ -204,7 +198,7 @@ function SourceCard(props: {
         <p className="card__note">
           {withUnit('area', boreFieldArea(s), units)} of ground at {withUnit('length', s.spacing ?? BORE_DEFAULTS.spacing, units, 2)} spacing
           {props.room > 0 ? ` · the site’s open space holds about ${props.room.toLocaleString('en-US')}` : ''}.
-          {props.room > 0 && s.boreholes > props.room ? ' More than fits: it would go under buildings or streets.' : ''}
+          {props.room > 0 && s.boreholes > props.room ? ' This is more than the open space holds.' : ''}
         </p>
       )}
       {props.moved !== undefined && <p className="card__note">Moved {withUnit('energyLarge', Math.abs(props.moved) / 1000, units)} a year.</p>}

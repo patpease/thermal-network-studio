@@ -215,7 +215,7 @@ export function SitePanel(props: SitePanelProps) {
                   value={percent(metrics.heatingShare)}
                   note={band === 'balanced' ? 'Minnesota: 80% or less — balanced' : band === 'typical' ? 'Minnesota: 80–90% — typical' : 'Minnesota: over 90% — heating-dominant'}
                 />
-                <Stat label="Demand overlap (DOC)" value={percent(metrics.doc)} note="heat that could be shared hour by hour" />
+                <Stat label="Demand overlap (DOC)" value={percent(metrics.doc)} note="share of demand in the same hours" />
                 <Stat
                   label="Density"
                   value={withUnit('density', metrics.densityGWhPerKm2, units)}

@@ -45,7 +45,7 @@ export function ScoreBreakdown({ result, units }: { result: ScenarioResult; unit
     <ChartCard
       id="score"
       title={`Score ${score.total} of 100`}
-      subtitle="Half energy, half carbon, each the reduction on business as usual — the buildings as they are today, on today’s fuels. A score is not a saving."
+      subtitle="Half energy, half carbon. Each is the reduction on the same buildings today, with today’s fuels. A score is not a saving."
       legend={[
         { label: 'Today', role: 'neutral', key: 'wash' },
         { label: 'With the network', role: 'neutral', key: 'rect' },

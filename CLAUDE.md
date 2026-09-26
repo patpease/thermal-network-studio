@@ -374,10 +374,14 @@ Things that looked right and were not:
 
 ## Learn, export and the phone (phase 07)
 
-- **Help is statements of fact with references** (D37). Every entry in
+- **Every sentence the tool says is a statement of fact** (D37): short, no
+  argument, no metaphor, cited in the Learn tab. Every entry in
   `education/learn.ts` names its source; a modelling choice cites "this
-  tool". `tests/learn.test.ts` rejects "because", "so that", "which is why"
-  and first person there. Keep it that way: short, factual, cited.
+  tool". `tests/learn.test.ts` and `tests/wording.test.ts` reject
+  "because", "so that", "which is why", "deliberately" and first person in
+  the Learn content, in every string in `copy.ts` and in every challenge.
+  New prose goes in `copy.ts` so the test sees it. (Code comments are for
+  developers and keep their reasons.)
 - **Not every site suits a network, and the tool says so with figures**:
   EPRI's 50–150 GWh/km²·yr, Minnesota's heating-share bands and criterion
   weights, and — for the drawn site — its density, heating share, overlap,

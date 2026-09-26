@@ -32,7 +32,7 @@ export function MonthlySharing({ months, units }: { months: readonly Month[]; un
     <ChartCard
       id="monthly"
       title="Heat shared between buildings, month by month"
-      subtitle={`${energy(shared)} a year moved straight from buildings cooling to buildings heating — ${percent(drawn > 0 ? shared / drawn : 0)} of what heating drew from the loop.`}
+      subtitle={`${energy(shared)} a year moved directly from buildings cooling to buildings heating: ${percent(drawn > 0 ? shared / drawn : 0)} of the heat drawn by heating.`}
       legend={[
         { label: 'Heating drew from the loop', role: 'heat', key: 'rect' },
         { label: 'Cooling put into the loop', role: 'cool', key: 'rect' },

@@ -39,20 +39,20 @@ export const MAP_COPY = {
   cancelButton: 'Cancel',
   drawHint: 'Tap the map to place corners. Tap the first corner, or Finish, to close it.',
   intro:
-    'Draw around a neighbourhood — a campus, a downtown, a few blocks of homes. Buildings come from OpenStreetMap; each gets an hourly heating and cooling load for a year.',
+    'Draw a boundary around a neighbourhood: a campus, a downtown or a few blocks of homes. Buildings come from OpenStreetMap. Each building gets an hourly heating and cooling load for one year.',
   loading: 'Reading buildings from OpenStreetMap, a year of weather, and the local grid…',
   guessedNote:
-    'Faint, dashed buildings are guessed: OpenStreetMap did not say what they are, so the type came from their surroundings or size. Tap one to correct it.',
+    'Faint, dashed buildings have a guessed type. OpenStreetMap does not record their use; the type comes from nearby features or building size. Tap a building to change its type.',
   tooMany: (n: number, max: number) =>
-    `${n.toLocaleString('en-US')} heated buildings — a network connects at most ${max}. Draw a smaller area, or take some out.`,
+    `${n.toLocaleString('en-US')} heated buildings. A network in this tool connects at most ${max}. Draw a smaller area or remove buildings.`,
   none: 'No heated buildings inside that boundary.',
   contextHeading: 'Site context',
   contextNote:
-    'Minnesota’s site-suitability criteria, for information. Filled only where this tool can know the answer; the rest is left blank rather than guessed. None of it affects the score.',
+    'Minnesota’s site-suitability criteria, for information. Rows this tool cannot determine are blank. None of these rows affect the score.',
   notKnown: 'Not known to this tool',
   sourcesHeading: 'Heat sources nearby',
-  sourcesNote: 'Capacities are first estimates. You can change them when you design the network.',
-  noSources: 'None found in OpenStreetMap within 500 m. You can still place them yourself.',
+  sourcesNote: 'Capacities are estimates. Change them on the Design tab.',
+  noSources: 'None found in OpenStreetMap within 500 m. Sources can be added on the Design tab.',
   metricsHeading: 'The demand',
   todayHeading: 'Today, without a network',
   selectedHeading: 'Selected building',
@@ -62,62 +62,71 @@ export const MAP_COPY = {
 export const DESIGN_COPY = {
   tabSite: 'Site',
   tabDesign: 'Design',
-  needSite: 'Draw a neighbourhood first. The design is built for the buildings inside it.',
+  needSite: 'Draw a neighbourhood first.',
   intro:
-    'Connect what was found nearby, add plant of your own, and size it. The year re-runs as you go. Every building has its own heat pump on the loop; what you build here keeps the loop inside its band.',
+    'Connect sources found nearby, add plant and set sizes. The year re-runs after each change. Each building has its own heat pump on the loop. The plant keeps the loop between its minimum and maximum temperature.',
   suggest: 'Suggest a starting design',
-  suggestNote: 'A first guess sized from the peaks — deliberately not optimised. Improving it is the game.',
+  suggestNote: 'Sized from the peak loads. Not optimised.',
   addHeading: 'Add',
   foundHeading: 'Found nearby',
   connect: 'Connect',
   connected: 'Connected',
   builtHeading: 'Your network',
-  empty: 'Nothing connected yet. With no plant, every hour the loop needs heat or cooling falls to electric backup.',
+  empty: 'Nothing connected. Without plant, every hour the loop needs heat or cooling goes to electric backup.',
   place: 'Place on map',
   move: 'Move',
   placing: 'Tap the map where it goes.',
   cancelPlacing: 'Cancel',
   remove: 'Remove',
-  unplaced: 'Not placed yet — its position is for the map only; the physics does not use it.',
+  unplaced: 'Not placed. Position is shown on the map and is not used in the calculation.',
   resultsHeading: 'How it performs',
-  scoreNote: 'Half energy, half carbon, each as a reduction on business as usual.',
+  scoreNote: 'Half energy, half carbon. Each is the reduction on the same buildings today.',
   noSources: 'Add a source to score the design.',
   driftHeading: 'The ground after 25 years',
-  driftNote: 'Shown, not scored: year one is what the score counts.',
+  driftNote: 'Not scored. The score uses year one.',
   loopHeading: 'Loop and buildings',
-  bandNote: 'The loop is held between these. A wider band lets the ground do more; a colder loop costs the heat pumps.',
+  bandNote: 'The loop is held between these temperatures.',
   retrofitLabel: 'Envelope retrofit, every connected building',
-  retrofitNote: 'Business as usual stays the buildings as they are today, so a retrofit earns points against what is there now.',
-  estimate: 'Estimated from OpenStreetMap — change it if you know better.',
+  retrofitNote: 'Applies to the network case only. Business as usual is the buildings as they are today.',
+  estimate: 'Estimated from OpenStreetMap.',
+} as const;
+
+/** What each kind of source does, as shown on its card. */
+export const SOURCE_COPY = {
+  'bore-field': 'Stores heat in the ground between seasons. Gives and takes heat.',
+  'air-source': 'Warms the loop from outdoor air. Heat only. Output falls as the air gets colder.',
+  'cooling-tower': 'Removes loop heat to the air by evaporation. Cooling only. Limited by the wet-bulb temperature.',
+  'waste-heat': 'Heat from servers, rink chillers or a brewery. Heat only, while warmer than the loop.',
+  water: 'A heat exchanger on a sewer main, a lake or a river. Gives or takes heat, depending on the water temperature.',
 } as const;
 
 export const RESULTS_COPY = {
   tab: 'Results',
   needSite: 'Draw a neighbourhood first.',
-  needDesign: 'Build something on the Design tab first — the results are about what you built.',
+  needDesign: 'Add a source on the Design tab first.',
   updating: 'Updating…',
-  noField: 'No bore field in this design, so there is no ground to drift.',
+  noField: 'No bore field in this design.',
   shapeCaveat:
-    'Annual loads are calibrated to NLR ComStock™ and ResStock™; the hour-by-hour shape is this tool’s own model and is not checked against them. The charts convey how the network behaves, not what a real one would save.',
+    'Annual loads are calibrated to NLR ComStock™ and ResStock™. The hour-by-hour shape is this tool’s model and is not checked against them. The tool conveys an idea. It does not predict a saving.',
 } as const;
 
 export const CHALLENGE_COPY = {
   heading: 'Challenge',
   label: 'Play',
   sandbox: 'Sandbox — no goals',
-  sandboxNote: 'Build anything. Pick a challenge to play for an award.',
+  sandboxNote: 'No goals. Pick a challenge to earn an award.',
   met: 'Challenge met',
   notYet: 'Not yet',
   award: 'Get your award',
-  runFirst: 'Build something to see where you stand.',
+  runFirst: 'Add a source to see progress.',
   share: 'Copy a link to this design',
-  shared: 'Link copied. It holds the boundary, your changes and the design — the buildings are re-read from OpenStreetMap when it opens.',
-  shareFailed: 'Could not copy. Select the link below and copy it yourself.',
+  shared: 'Link copied. It holds the boundary, building changes, design and challenge. Buildings are re-read from OpenStreetMap when the link opens.',
+  shareFailed: 'Copy failed. Select the link below and copy it.',
 } as const;
 
 export const AWARD_COPY = {
   heading: 'Your award',
-  placeNote: 'Check the names before you post: they come from OpenStreetMap and the Census, and a neighbourhood is only named where OSM names one.',
+  placeNote: 'Names come from OpenStreetMap and the US Census. A neighbourhood name appears only where OpenStreetMap has one. Edit before posting.',
   neighbourhood: 'Neighbourhood',
   town: 'Town or city',
   state: 'State',
@@ -126,9 +135,9 @@ export const AWARD_COPY = {
   postLabel: 'Post text — edit it before you copy',
   copy: 'Copy the text',
   copied: 'Copied.',
-  copyFailed: 'Could not copy. Select the text and copy it yourself.',
+  copyFailed: 'Copy failed. Select the text and copy it.',
   openLinkedIn: 'Open LinkedIn',
-  steps: 'Download the award, copy the text, open LinkedIn, then drag the image into the post. LinkedIn does not let a site attach an image for you, and this tool uploads nothing.',
+  steps: '1. Download the award. 2. Copy the text. 3. Open LinkedIn. 4. Add the image to the post. LinkedIn does not accept images from other sites. This tool uploads nothing.',
   drawing: 'Drawing the award…',
 } as const;
 

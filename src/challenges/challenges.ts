@@ -50,8 +50,8 @@ export const CHALLENGES: readonly Challenge[] = [
   {
     id: 'half-carbon',
     title: 'Half the carbon',
-    brief: 'Cut the neighbourhood’s heating and cooling carbon by half, and leave no more than 50 hours to backup.',
-    idea: 'A shared loop and heat pumps can halve a neighbourhood’s heating and cooling carbon before anything else changes.',
+    brief: 'Cut heating and cooling carbon by half, with no more than 50 hours to backup.',
+    idea: 'A shared loop with a heat pump in each building replaces the fuel each building burns today.',
     icon: 'half-carbon',
     goals: [
       { kind: 'carbon-reduction', atLeast: 0.5 },
@@ -61,8 +61,8 @@ export const CHALLENGES: readonly Challenge[] = [
   {
     id: 'ground-balance',
     title: 'Ground in balance',
-    brief: 'Build a bore field that stays inside its design limits for 25 years, and cut carbon by half.',
-    idea: 'The ground is a battery for seasons: give back in summer what you take in winter, and it lasts.',
+    brief: 'A bore field inside its design limits for 25 years, and carbon cut by half.',
+    idea: 'A bore field stores heat in the ground between seasons. Heat put in during summer is taken back in winter.',
     icon: 'ground-balance',
     goals: [
       { kind: 'with', sources: ['bore-field'] },
@@ -74,8 +74,8 @@ export const CHALLENGES: readonly Challenge[] = [
   {
     id: 'waste-not',
     title: 'Waste not',
-    brief: 'Take at least 15% of the loop’s heat from waste heat or water — a data centre, a rink, a sewer, a lake or a river — with no more than 100 hours to backup.',
-    idea: 'Heat someone else is already throwing away is the cheapest heat there is.',
+    brief: 'At least 15% of the loop’s heat from waste heat or water, with no more than 100 hours to backup.',
+    idea: 'Minnesota’s site-suitability study lists data centres, ice rinks, breweries, wastewater plants, lakes and rivers as thermal resources for networks.',
     icon: 'waste-not',
     goals: [
       { kind: 'heat-from', sources: ['waste-heat', 'water'], atLeast: 0.15 },
@@ -86,8 +86,8 @@ export const CHALLENGES: readonly Challenge[] = [
   {
     id: 'off-the-air',
     title: 'Off the air',
-    brief: 'No air-source heat pump and no cooling tower: ground, water and waste heat only, with no more than 100 hours to backup.',
-    idea: 'A neighbourhood can heat and cool itself from the ground and the water under it, with nothing blowing on the roof.',
+    brief: 'No air-source heat pump and no cooling tower, with no more than 100 hours to backup.',
+    idea: 'A network can run on ground, water and waste heat without outdoor-air plant.',
     icon: 'off-the-air',
     goals: [
       { kind: 'without', sources: ['air-source', 'cooling-tower'] },
