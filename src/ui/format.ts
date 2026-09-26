@@ -25,7 +25,7 @@ export function rangeWithUnit(quantity: Quantity, lowSi: number, highSi: number,
 
 export const percent = (fraction: number) => `${Math.round(fraction * 100)}%`;
 
-/** A network's size: tons in IP (the unit HEET's 300-ton point is written in), MW in SI. */
+/** A network's size: tons in IP (the unit the 300-ton recommended minimum is written in), MW in SI. */
 export function networkSize(tons: number, units: UnitSystem): string {
   return units === 'ip' ? `${sig(tons, 3)} tons` : withUnit('powerLarge', (tons * 3_516.85) / 1e6, units);
 }

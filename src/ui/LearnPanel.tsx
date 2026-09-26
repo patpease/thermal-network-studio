@@ -72,6 +72,7 @@ export function LearnPanel({ site, metrics, units }: { site: Site | null; metric
         <h2 id="learn-refs" className="card__heading">
           {LEARN_COPY.references}
         </h2>
+        <p className="card__note">{LEARN_COPY.notEndorsed}</p>
         <ol className="learn__references">
           {(Object.keys(REFERENCES) as RefId[]).map((r) => (
             <li key={r} id={`ref-${r}`}>

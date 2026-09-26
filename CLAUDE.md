@@ -479,3 +479,12 @@ Things that looked right and were not:
 - **This sandbox cannot reach the mirrors** (its network policy); only the
   main instance was verified from `wrangler dev`. `servedBy` in the answer
   shows which one replied on the live site.
+
+## Organizations are named only on Learn
+
+- **The sources do not endorse the tool.** HEET, EPRI, BDC, VCTN and the
+  Minnesota study are named only on the Learn tab (with a line saying none
+  reviewed or endorses it) and in the README. Elsewhere the app states the
+  figure ("300 tons is the recommended minimum size"). `tests/wording.test.ts`
+  fails if a name reaches another tab's copy or a challenge. Data licences
+  (NLR, Cambium, OpenStreetMap) still need their attribution lines.

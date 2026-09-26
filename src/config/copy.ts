@@ -147,16 +147,17 @@ export const AWARD_COPY = {
 
 export const LEARN_COPY = {
   tab: 'Learn',
+  notEndorsed: 'Sources are cited for the facts taken from them. None of these organizations reviewed or endorses this tool.',
   thisSite: 'This site',
   references: 'References',
 } as const;
 
 export const SCALE_COPY = {
   label: 'Network size',
-  note: (point: string) => `peak load; HEET’s scale point is ${point}`,
-  below: (size: string, point: string) => `This network is ${size}, below ${point}. HEET gives ${point} of shared, balanced load as the point where networks gain economies of scale.`,
+  note: (point: string) => `peak load; ${point} is the recommended minimum`,
+  below: (size: string, point: string) => `This network is ${size}, below the recommended minimum size of ${point} of shared, balanced load.`,
   more: (n: number) => `About ${n.toLocaleString('en-US')} more buildings like these would reach it. Edit the boundary or draw a larger one.`,
-  at: (size: string, point: string) => `This network is ${size}, at or above HEET’s scale point of ${point}.`,
+  at: (size: string, point: string) => `This network is ${size}, at or above the recommended minimum size of ${point}.`,
   edit: 'Edit boundary',
 } as const;
 
@@ -178,7 +179,7 @@ export const BALANCE_COPY = {
   netGiven: (x: string) => `The buildings give ${x} a year more than they take. The plant removes the difference.`,
   peakAdd: 'Heat to add, design',
   peakRemove: 'Heat to remove, design',
-  sizedAt: (pct: string, worst: string) => `${pct} of the worst hour (${worst}), as HEET reports for networks where loads cancel.`,
+  sizedAt: (pct: string, worst: string) => `${pct} of the worst hour (${worst}), where loads between buildings cancel.`,
   connected: (x: string, pct: string) => `Connected: ${x} (${pct})`,
   addsHeat: 'Adds heat: bore field, air-source heat pump, waste heat, water.',
   removesHeat: 'Removes heat: bore field, cooling tower, water.',
