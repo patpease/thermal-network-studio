@@ -145,12 +145,11 @@ only copy. Modelled on Psychrometric Studio's project file (its
 Built with the snapshot and a re-read button (about 350 KB for a Highland
 Park block; the weather year is most of it).
 
-Found in 08, not yet fixed:
+Found in 08, fixed after 11:
 
-- **The drift chart's year 1 is the projection's**, which works in daily
-  means and reads about 0.5 K colder than the hour-by-hour year. The Design
-  tab's text and the glycol flag use the simulated year; the chart does not
-  yet.
+- [x] **The drift chart's year 1 was the projection's** (daily means). The
+      drift is now anchored to the simulated year (`anchorDrift`), so the
+      chart, the glycol flag and "Ground in balance" all read the same year 1.
 
 ## After 07
 

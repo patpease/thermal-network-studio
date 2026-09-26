@@ -62,8 +62,7 @@ export function coldestLoop(result: { loopTemperature: ArrayLike<number>; drift:
   let min = Infinity;
   for (let h = 0; h < result.loopTemperature.length; h++) min = Math.min(min, Number(result.loopTemperature[h]));
   let firstBelowYear: number | null = min < GLYCOL_BELOW_C - 1e-6 ? 1 : null;
-  // Year 1 is the hour-by-hour simulation; the projection's own year 1 works
-  // in daily means and reads ~0.5 K colder, so it is not used here.
+  // Year 1 of the drift IS the simulated year (anchorDrift); start at 2.
   for (const d of result.drift ?? []) {
     if (d.year === 1) continue;
     min = Math.min(min, d.minFluid);
@@ -138,6 +137,29 @@ export interface NetworkResult {
   /** Seasonal COP of the whole system: thermal delivered ÷ electricity. */
   readonly systemCop: number;
   readonly drift: readonly DriftYear[] | null;
+}
+
+/**
+ * The projection anchored to the simulated year. The projection works in
+ * daily means and misses the hourly peaks (at 800 boreholes in 5A its year 1
+ * peaks at 20 °C where the hourly year reaches 27 °C), and the same gap
+ * repeats every year — the day's shape does. So year 1 becomes the hourly
+ * year's own extremes, and each later year moves by the projection's change
+ * from its year 1: min and max offset separately.
+ */
+export function anchorDrift(projected: readonly DriftYear[], loop: ArrayLike<number>): DriftYear[] {
+  const first = projected[0];
+  if (!first) return [];
+  let min = Infinity;
+  let max = -Infinity;
+  for (let h = 0; h < loop.length; h++) {
+    const t = Number(loop[h]);
+    if (t < min) min = t;
+    if (t > max) max = t;
+  }
+  const dMin = min - first.minFluid;
+  const dMax = max - first.maxFluid;
+  return projected.map((d) => ({ ...d, minFluid: d.minFluid + dMin, maxFluid: d.maxFluid + dMax }));
 }
 
 const MONTH_HOURS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31].map((d) => d * 24);
@@ -323,6 +345,7 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
   }
 
   const daily = stepper?.finish() ?? null;
+  const drift = field && daily ? anchorDrift(projectDrift(field, daily), loop) : null;
   const totalElectricWh = hpWh + airWh + parasiticWh + pumpingWh + backupWh;
   return {
     loopTemperature: loop,
@@ -348,6 +371,6 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
     unmetHours,
     unmetKWh: unmetWh / 1000,
     systemCop: totalElectricWh > 0 ? deliveredWh / totalElectricWh : 0,
-    drift: field && daily ? projectDrift(field, daily) : null,
+    drift,
   };
 }

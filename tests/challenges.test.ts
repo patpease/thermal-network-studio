@@ -61,8 +61,16 @@ describe('on downtown Mankato', () => {
   });
 
   it('Ground in balance: a colder loop and more river heat keep the field inside its limits', () => {
-    const d = { ...withWater(suggestion, 8e6), band: { min: -3, max: 30 } };
+    const d = { ...withWater(suggestion, 8e6), band: { min: -1, max: 30 } };
     expect(check('ground-balance', d).met).toBe(true);
+  });
+
+  it('Ground in balance: a loop floor AT the fluid limit leaves it as the field cools', () => {
+    // The hourly year sits on −3 °C; the field cools a little over the years.
+    const d = { ...withWater(suggestion, 8e6), band: { min: -3, max: 30 } };
+    const e = check('ground-balance', d);
+    expect(e.met).toBe(false);
+    expect(e.goals.find((g) => g.goal.kind === 'ground-holds')!.now).toMatch(/^leaves them in year \d+$/);
   });
 
   it('a bore field larger than the open space fails every challenge, and says so', () => {

@@ -9,7 +9,7 @@ import type { Demand } from '../src/engine/demand';
 import { DEMO_DESIGN, DEMO_NEIGHBOURHOOD } from '../src/engine/demo';
 import { COUNTY_REGION, GEA_REGIONS, LRMER_G_PER_KWH } from '../src/engine/generated/cambium';
 import { airSourceCoolingCop, airSourceCop, coolingCop, heatingCop } from '../src/engine/heatpumps';
-import { simulateNetwork } from '../src/engine/network';
+import { anchorDrift, simulateNetwork } from '../src/engine/network';
 import { runScenario, scoreOf } from '../src/engine/scenario';
 import { exchangerFraction, sewerTemperature, wetBulb } from '../src/engine/sources';
 
@@ -203,5 +203,31 @@ describe('the score (D4, D20)', () => {
     const r = runScenario(DEMO_NEIGHBOURHOOD, DEMO_DESIGN, weather);
     expect((r.baseline.siteKWh['natural_gas'] ?? 0) / r.baseline.totalSiteKWh).toBeGreaterThan(0.4);
     expect(r.network.carbonKg).toBeLessThan(r.baseline.carbonKg);
+  });
+});
+
+describe('the drift, anchored to the simulated year', () => {
+  const demand = neighbourhoodDemand(DEMO_NEIGHBOURHOOD, weather);
+  it('year 1 is the hour-by-hour year exactly', () => {
+    const r = simulateNetwork(demand, DEMO_DESIGN, weather);
+    let min = Infinity;
+    let max = -Infinity;
+    for (const t of r.loopTemperature) {
+      min = Math.min(min, t);
+      max = Math.max(max, t);
+    }
+    expect(r.drift![0]!.minFluid).toBeCloseTo(min, 9);
+    expect(r.drift![0]!.maxFluid).toBeCloseTo(max, 9);
+  });
+
+  it('later years keep the projection’s change from its own year 1', () => {
+    const projected = [
+      { year: 1, minFluid: 5, maxFluid: 20, meanWall: 10 },
+      { year: 2, minFluid: 6, maxFluid: 22, meanWall: 11 },
+    ];
+    const loop = Float64Array.from([4, 27]);
+    const a = anchorDrift(projected, loop);
+    expect(a[0]).toMatchObject({ minFluid: 4, maxFluid: 27 });
+    expect(a[1]).toMatchObject({ minFluid: 5, maxFluid: 29, meanWall: 11 });
   });
 });

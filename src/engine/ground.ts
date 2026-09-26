@@ -162,7 +162,11 @@ export function yearStepper(field: BoreField) {
 
 export interface DriftYear {
   readonly year: number;
-  /** Daily-mean fluid temperature extremes, °C. */
+  /**
+   * Fluid temperature extremes, °C. From `projectDrift`, daily means; after
+   * `anchorDrift` (what a result carries), hourly: year 1 is the simulated
+   * year's own and later years move with the projection.
+   */
   readonly minFluid: number;
   readonly maxFluid: number;
   readonly meanWall: number;

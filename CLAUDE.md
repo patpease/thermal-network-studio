@@ -444,10 +444,15 @@ Things that looked right and were not:
 
 - **The loop defaults to 40–90 °F** (HEET), and **below 40 °F it needs
   glycol**: `coldestLoop` finds the coldest fluid and the first year below
-  the line. Year 1 comes from the hour-by-hour simulation; years 2–25 from
-  the projection. The projection's own year 1 works in daily means and reads
-  about 0.5 K colder — using it flagged glycol on a loop that never left
-  40 °F. The flag links to the Learn fact through `onLearn('learn-glycol')`.
+  the line. The flag links to the Learn fact through `onLearn('learn-glycol')`.
+- **The drift is anchored to the simulated year** (`anchorDrift`). The
+  projection works in daily means and misses the hourly peaks — not a fixed
+  0.5 K: at 800 boreholes in 5A its year 1 peaked at 20 °C against the hourly
+  27 °C, and in 3A its minimum sat 5 K above. Year 1 is now the hourly year
+  exactly; each later year moves by the projection's change from its own
+  year 1. It moved one answer: a loop floor AT the −3 °C fluid limit now
+  leaves it as the field cools, so on Mankato "Ground in balance" needs the
+  floor at −1 °C. The daily means had hidden that.
 - **Balancing plant is sized at 80% of the worst hour** (`DESIGN_DIVERSITY`,
   HEET), on the net need.
 - **Nearby means a quarter mile** (`SOURCE_SEARCH_M` = 402, VCTN), and a

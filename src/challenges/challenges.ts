@@ -174,7 +174,8 @@ export function evaluateGoal(goal: Goal, result: ScenarioResult, design: Design,
     case 'ground-holds': {
       const drift = result.network.drift;
       if (!drift || drift.length === 0) return { goal, met: false, asks: 'Ground fluid inside its limits for 25 years', now: 'no bore field' };
-      const bad = drift.find((d) => d.minFluid < FLUID_LIMITS.min || d.maxFluid > FLUID_LIMITS.max);
+      // A loop held AT a limit is inside it; the tolerance is for rounding only.
+      const bad = drift.find((d) => d.minFluid < FLUID_LIMITS.min - 1e-6 || d.maxFluid > FLUID_LIMITS.max + 1e-6);
       return { goal, met: !bad, asks: 'Ground fluid inside its limits for 25 years', now: bad ? `leaves them in year ${bad.year}` : 'holds all 25' };
     }
     case 'bores-fit': {
