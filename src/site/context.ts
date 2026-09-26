@@ -13,6 +13,7 @@
 import type { SiteMetrics } from '../engine/demand.ts';
 import { minnesotaBalanceBand } from '../engine/bands.ts';
 import { boreholeRoom } from './classify.ts';
+import { SOURCE_SEARCH_M } from './osm.ts';
 import type { AnchorKind, Site } from './classify.ts';
 
 /**
@@ -23,11 +24,14 @@ import type { AnchorKind, Site } from './classify.ts';
 export interface Formatters {
   readonly area: (m2: number) => string;
   readonly density: (gwhPerKm2: number) => string;
+  /** A distance, in the displayed unit. */
+  readonly distance: (m: number) => string;
 }
 
 const SI_FORMAT: Formatters = {
   area: (m2) => `${Math.round(m2).toLocaleString('en-US')} m²`,
   density: (d) => `${d.toFixed(0)} GWh/km²·yr`,
+  distance: (m) => `${Math.round(m).toLocaleString('en-US')} m`,
 };
 
 export interface ContextRow {
@@ -76,8 +80,8 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
       known: true,
       finding:
         opportunistic.length === 0
-          ? 'None found in OpenStreetMap within 500 m'
-          : `${opportunistic.length} found within 500 m: ${[...new Set(opportunistic.map((s) => s.kind.replace('-', ' ')))].join(', ')}`,
+          ? `None found in OpenStreetMap within ${format.distance(SOURCE_SEARCH_M)}`
+          : `${opportunistic.length} found within ${format.distance(SOURCE_SEARCH_M)}: ${[...new Set(opportunistic.map((s) => s.kind.replace('-', ' ')))].join(', ')}`,
     },
     {
       key: 'borefield-space',

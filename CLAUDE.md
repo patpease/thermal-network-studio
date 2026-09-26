@@ -408,3 +408,16 @@ Things that looked right and were not:
   and hid the drawing toolbar. The toolbar is now fixed just above the bar.
 - **`pgrep`/`kill` on a pattern that appears in your own command line kills
   your shell** — again. Stop `wrangler dev` by the PIDs of `workerd`.
+
+## After phase 07
+
+- **Every distance goes through `withUnit('length', …)`**, including the
+  500 m source search in sentences (`MAP_COPY.noSources` is a function of the
+  formatted distance). A source list read "260 m away" under IP until a user
+  caught it: rule 2 applies to sentences as much as to numbers in cells.
+- **The boundary can be edited** (`phase: 'editing'`): Edit boundary reopens
+  its corners; press and drag moves one (mouse or finger), during drawing
+  too. The drag turns MapLibre's panning off for its length and swallows the
+  click that ends it, so a drag never also adds a corner. Done re-reads the
+  site and carries the design and building changes over; Cancel restores the
+  state from before the edit exactly, with no fetch.

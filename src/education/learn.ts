@@ -13,6 +13,7 @@ import { DEFAULT_BAND } from '../engine/network';
 import { TOWER_APPROACH } from '../engine/sources';
 import type { Challenge } from '../challenges/challenges';
 import { boreholeRoom } from '../site/classify';
+import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
 export type RefId = 'epri' | 'mn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'tool';
@@ -141,19 +142,23 @@ export function siteFacts(site: Site, metrics: SiteMetrics, f: Formatters): Fact
       refs: ['tool', 'osm'],
     },
     {
-      text: found.length ? `${found.length} waste heat or water ${found.length === 1 ? 'source was' : 'sources were'} found within 500 m.` : 'No waste heat or water source was found within 500 m.',
+      text: found.length
+        ? `${found.length} waste heat or water ${found.length === 1 ? 'source was' : 'sources were'} found within ${f.length(SOURCE_SEARCH_M)}.`
+        : `No waste heat or water source was found within ${f.length(SOURCE_SEARCH_M)}.`,
       refs: ['osm', 'mn'],
     },
   ];
 }
 
 /** One fact about the drawn site that bears on a challenge, or null. */
-export function challengeSiteFact(challenge: Challenge, site: Site, metrics: SiteMetrics): string | null {
+export function challengeSiteFact(challenge: Challenge, site: Site, metrics: SiteMetrics, distance: (m: number) => string): string | null {
   const room = boreholeRoom(site.openSpaceM2);
   const needFull = Math.ceil((metrics.peakHeatingW * 0.72) / BOREHOLE_PEAK_W);
   const found = site.sources.filter((s) => s.exchange !== 'in-load').length;
   const usesGround = challenge.goals.some((g) => g.kind === 'ground-holds' || (g.kind === 'with' && g.sources.includes('bore-field'))) || challenge.id === 'off-the-air';
   if (usesGround) return `This site: open space for about ${room.toLocaleString('en-US')} boreholes; the whole peak heat extraction would need about ${needFull.toLocaleString('en-US')}.`;
-  if (challenge.goals.some((g) => g.kind === 'heat-from')) return found ? `This site: ${found} waste heat or water ${found === 1 ? 'source' : 'sources'} within 500 m.` : 'This site: no waste heat or water source within 500 m.';
+  if (challenge.goals.some((g) => g.kind === 'heat-from')) return found
+      ? `This site: ${found} waste heat or water ${found === 1 ? 'source' : 'sources'} within ${distance(SOURCE_SEARCH_M)}.`
+      : `This site: no waste heat or water source within ${distance(SOURCE_SEARCH_M)}.`;
   return null;
 }

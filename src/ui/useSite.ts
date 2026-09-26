@@ -31,7 +31,7 @@ import type { BuildingOverride, Selection } from '../site/neighbourhood';
 import { boundaryProblem } from '../site/osm';
 import type { SiteData } from '../site/osm';
 
-export type Phase = 'idle' | 'drawing' | 'loading' | 'ready' | 'error';
+export type Phase = 'idle' | 'drawing' | 'editing' | 'loading' | 'ready' | 'error';
 
 export interface PlaceEdits {
   readonly neighbourhood?: string;
@@ -161,6 +161,52 @@ export function useSite() {
     }
   }, []);
 
+  /** Move one corner of the boundary being drawn or edited. */
+  const moveVertex = useCallback((index: number, p: LonLat) => {
+    setState((s) =>
+      (s.phase === 'drawing' || s.phase === 'editing') && index >= 0 && index < s.draft.length
+        ? { ...s, draft: s.draft.map((q, i) => (i === index ? p : q)) }
+        : s,
+    );
+  }, []);
+
+  // The state before an edit began, for Cancel. A ref, not state: it is
+  // never drawn, and a cancelled edit must restore it exactly.
+  const beforeEdit = useRef<SiteState | null>(null);
+
+  /** Reopen the drawn boundary with its corners draggable. */
+  const startEditing = useCallback(() => {
+    const s = current.current;
+    if (!s.boundary || (s.phase !== 'ready' && s.phase !== 'error')) return;
+    beforeEdit.current = s;
+    generation.current++;
+    setState({ ...s, phase: 'editing', draft: s.boundary.slice(0, -1), placing: null, message: null });
+  }, []);
+
+  const cancelEditing = useCallback(() => {
+    const before = beforeEdit.current;
+    beforeEdit.current = null;
+    if (before) setState(before);
+  }, []);
+
+  /**
+   * Re-read the site inside the edited boundary. The player's building
+   * changes and design carry over; buildings no longer inside simply drop
+   * out of the selection's reach.
+   */
+  const finishEditing = useCallback(() => {
+    const s = current.current;
+    if (s.phase !== 'editing') return;
+    const ring: Ring = [...s.draft, s.draft[0]!];
+    const why = boundaryProblem(ring);
+    if (why) {
+      setState({ ...s, message: why });
+      return;
+    }
+    beforeEdit.current = null;
+    void load(ring, { selection: s.selection, design: s.design });
+  }, [load]);
+
   const finishDrawing = useCallback(() => {
     const s = current.current;
     if (s.phase !== 'drawing') return;
@@ -252,6 +298,10 @@ export function useSite() {
   return {
     state,
     startDrawing,
+    startEditing,
+    finishEditing,
+    cancelEditing,
+    moveVertex,
     addPoint,
     undoPoint,
     finishDrawing,

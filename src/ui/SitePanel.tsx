@@ -13,6 +13,7 @@ import type { ArchetypeId } from '../loads/archetypes';
 import { minnesotaBalanceBand } from '../engine/bands';
 import type { Place } from '../relay/relay';
 import { MAX_BUILDINGS } from '../site/classify';
+import { SOURCE_SEARCH_M } from '../site/osm';
 import type { SiteBuilding } from '../site/classify';
 import { siteContext } from '../site/context';
 import { connected, effective } from '../site/neighbourhood';
@@ -30,6 +31,9 @@ export interface SitePanelProps {
   readonly onFinish: () => void;
   readonly onUndo: () => void;
   readonly onCancel: () => void;
+  readonly onEdit: () => void;
+  readonly onEditDone: () => void;
+  readonly onEditCancel: () => void;
   readonly onToggle: (id: string) => void;
   readonly onOverride: (id: string, archetype: ArchetypeId | null) => void;
 }
@@ -165,12 +169,34 @@ export function SitePanel(props: SitePanelProps) {
               </button>
             </div>
           </>
+        ) : state.phase === 'editing' ? (
+          <>
+            <p className="card__note">{MAP_COPY.editHint}</p>
+            <p className="numeric">
+              {state.draft.length} corners · {withUnit('area', draftArea(state.draft), units)}
+            </p>
+            <div className="button-row">
+              <button type="button" className="button button--primary" onClick={props.onEditDone}>
+                {MAP_COPY.doneButton}
+              </button>
+              <button type="button" className="button" onClick={props.onEditCancel}>
+                {MAP_COPY.cancelButton}
+              </button>
+            </div>
+          </>
         ) : (
           <>
             {!site && <p className="card__note">{MAP_COPY.intro}</p>}
-            <button type="button" className="button button--primary" onClick={props.onDraw}>
-              {site || state.boundary ? MAP_COPY.redrawButton : MAP_COPY.drawButton}
-            </button>
+            <div className="button-row">
+              <button type="button" className="button button--primary" onClick={props.onDraw}>
+                {site || state.boundary ? MAP_COPY.redrawButton : MAP_COPY.drawButton}
+              </button>
+              {state.boundary && (state.phase === 'ready' || state.phase === 'error') && (
+                <button type="button" className="button" onClick={props.onEdit}>
+                  {MAP_COPY.editButton}
+                </button>
+              )}
+            </div>
           </>
         )}
         {state.message && <p className="message message--error">{state.message}</p>}
@@ -237,14 +263,14 @@ export function SitePanel(props: SitePanelProps) {
               {MAP_COPY.sourcesHeading}
             </h2>
             {site.sources.length === 0 ? (
-              <p className="card__note">{MAP_COPY.noSources}</p>
+              <p className="card__note">{MAP_COPY.noSources(withUnit('length', SOURCE_SEARCH_M, units))}</p>
             ) : (
               <>
                 <ul className="list">
                   {site.sources.map((s) => (
                     <li key={s.id}>
                       <span className={`dot dot--${s.exchange === 'water' ? 'cool' : 'heat'}`} aria-hidden />
-                      {s.name ?? s.kind.replace('-', ' ')} <span className="muted">— {s.kind.replace('-', ' ')}, {s.distanceM === 0 ? 'inside' : `${s.distanceM} m away`}</span>
+                      {s.name ?? s.kind.replace('-', ' ')} <span className="muted">— {s.kind.replace('-', ' ')}, {s.distanceM === 0 ? 'inside' : `${withUnit('length', s.distanceM, units, 2)} away`}</span>
                       {s.exchange === 'in-load' ? (
                         <span className="muted">
                           {s.distanceM === 0 ? ' · its refrigeration is counted in its load' : ' · outside the boundary: draw it in to count its refrigeration'}
@@ -269,6 +295,7 @@ export function SitePanel(props: SitePanelProps) {
               {siteContext(site, metrics, {
                 area: (m2) => withUnit('area', m2, units),
                 density: (d) => withUnit('density', d, units),
+                distance: (m) => withUnit('length', m, units),
               }).map((row) => (
                 <div key={row.key} className={row.known ? 'context__row' : 'context__row context__row--unknown'}>
                   <dt>{row.criterion}</dt>

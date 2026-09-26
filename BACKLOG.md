@@ -83,10 +83,19 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       fixture mode and on the production build in `wrangler dev` against
       live services: no CSP refusals.
 
+## After 07
+
+- [x] Distances in IP (ft) as well as SI; a test holds the context panel to it.
+- [x] Edit a drawn boundary: press and drag a corner (mouse or touch), Done
+      re-reads the site and keeps the design; also works while drawing.
+
 ## Not done in 07, deliberately
 
 - **MapLibre 6** (D33).
-- **Drag to move a placed source.** Placing and moving are by tap.
+- **Drag to move a placed source.** Placing and moving are by tap. Boundary
+  corners drag; the same handler could serve sources.
+- **Adding or removing a corner while editing.** Corners move; their number
+  is fixed until redrawn.
 - **Per-chart hashtags, link previews, a report.** An exported chart and the
   award are the two things this tool hands out.
 - **The mark is still a placeholder** (`BRAND.markIsPlaceholder`).

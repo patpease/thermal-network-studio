@@ -65,6 +65,19 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
     site.finishDrawing();
     if (phone) setTab('site');
   };
+  const edit = () => {
+    setSelectedId(null);
+    site.startEditing();
+    if (phone) setTab('map');
+  };
+  const editDone = () => {
+    site.finishEditing();
+    if (phone) setTab('site');
+  };
+  const editCancel = () => {
+    site.cancelEditing();
+    if (phone) setTab('site');
+  };
 
   // Arrival: a full share link restores everything; a challenge link (what an
   // award's post carries) only picks the challenge. Read once.
@@ -114,6 +127,8 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
         <MapView
           palette={palette}
           drawing={state.phase === 'drawing'}
+          editing={state.phase === 'editing'}
+          onMoveVertex={site.moveVertex}
           draft={state.draft}
           boundary={state.boundary}
           site={state.site}
@@ -144,6 +159,17 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               {MAP_COPY.undoButton}
             </button>
             <button type="button" className="button" onClick={site.clear}>
+              {MAP_COPY.cancelButton}
+            </button>
+          </div>
+        )}
+        {phone && state.phase === 'editing' && (
+          <div className="map-toolbar" role="group" aria-label="Editing">
+            <span>{MAP_COPY.editHint}</span>
+            <button type="button" className="button button--primary" onClick={editDone}>
+              {MAP_COPY.doneButton}
+            </button>
+            <button type="button" className="button" onClick={editCancel}>
               {MAP_COPY.cancelButton}
             </button>
           </div>
@@ -197,6 +223,9 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
                 if (phone) setTab('map');
               }}
               onFinish={finish}
+              onEdit={edit}
+              onEditDone={editDone}
+              onEditCancel={editCancel}
               onUndo={site.undoPoint}
               onCancel={site.clear}
               onToggle={site.toggleBuilding}
@@ -223,7 +252,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
                   running={state.running}
                   onChange={site.setChallenge}
                   onAward={() => setShowAward(true)}
-                  siteFact={challenge && state.result ? challengeSiteFact(challenge, state.site, state.result.site) : null}
+                  siteFact={challenge && state.result ? challengeSiteFact(challenge, state.site, state.result.site, (m) => withUnit('length', m, units)) : null}
                 />
                 {showAward && challenge && evaluation?.met && state.result && state.site && (
                   <AwardCard

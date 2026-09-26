@@ -31,6 +31,9 @@ const where = siteForCounty('27013')!;
 const weather = calibrationWeather(where.zone);
 const metrics = runScenario(toNeighbourhood(site, EMPTY_SELECTION, where.zone, where.region), { sources: [] }, weather).site;
 
+const ft = (d: number) => withUnit('length', d, 'ip');
+const m = (d: number) => withUnit('length', d, 'si');
+
 const all = (units: UnitSystem) => [...sections(fmt(units)).flatMap((s) => s.facts), ...siteFacts(site, metrics, fmt(units))];
 
 describe('Learn content', () => {
@@ -71,9 +74,10 @@ describe('facts about the drawn site', () => {
   });
 
   it('puts the right fact beside each challenge', () => {
-    expect(challengeSiteFact(challengeById('ground-balance')!, site, metrics)).toMatch(/^This site: open space for about/);
-    expect(challengeSiteFact(challengeById('off-the-air')!, site, metrics)).toMatch(/^This site: open space for about/);
-    expect(challengeSiteFact(challengeById('waste-not')!, site, metrics)).toMatch(/^This site: \d+ waste heat or water sources? within 500 m\.$/);
-    expect(challengeSiteFact(challengeById('half-carbon')!, site, metrics)).toBeNull();
+    expect(challengeSiteFact(challengeById('ground-balance')!, site, metrics, ft)).toMatch(/^This site: open space for about/);
+    expect(challengeSiteFact(challengeById('off-the-air')!, site, metrics, ft)).toMatch(/^This site: open space for about/);
+    expect(challengeSiteFact(challengeById('waste-not')!, site, metrics, ft)).toMatch(/^This site: \d+ waste heat or water sources? within 1,640 ft\.$/);
+    expect(challengeSiteFact(challengeById('waste-not')!, site, metrics, m)).toMatch(/within 500 m\.$/);
+    expect(challengeSiteFact(challengeById('half-carbon')!, site, metrics, ft)).toBeNull();
   });
 });

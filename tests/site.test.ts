@@ -211,6 +211,13 @@ describe('the Minnesota sites (D28): what OSM lets us check', () => {
     // No weights and no total, anywhere in it.
     expect(JSON.stringify(rows)).not.toMatch(/weight|score/i);
   });
+
+  it('prints the search distance in the displayed unit, never a bare "m" under IP', () => {
+    const ip = { area: (m2: number) => `${m2} ft²`, density: (d: number) => `${d}`, distance: (m: number) => `${Math.round(m / 0.3048)} ft` };
+    const row = siteContext(mankato, null, ip).find((r) => r.key === 'opportunistic')!;
+    expect(row.finding).toMatch(/within 1640 ft/);
+    expect(row.finding).not.toMatch(/\b500 m\b/);
+  });
 });
 
 describe('the D11 cap', () => {

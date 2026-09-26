@@ -37,7 +37,10 @@ const RESIDENTIAL = new Set(['single-family', 'small-multifamily', 'large-multif
 export interface MapViewProps {
   readonly palette: MapPalette;
   readonly drawing: boolean;
+  /** An existing boundary reopened: corners draggable, no new corners. */
+  readonly editing: boolean;
   readonly draft: readonly LonLat[];
+  readonly onMoveVertex: (index: number, p: LonLat) => void;
   readonly boundary: Ring | null;
   readonly site: Site | null;
   readonly selection: Selection;
@@ -52,15 +55,16 @@ export interface MapViewProps {
   readonly onPlace: (p: LonLat) => void;
 }
 
-function draftData(draft: readonly LonLat[]): FeatureCollection {
+function draftData(draft: readonly LonLat[], closed: boolean): FeatureCollection {
   if (draft.length === 0) return EMPTY;
   const features: Feature[] = draft.map((p, i) => ({
     type: 'Feature',
-    properties: { first: i === 0 },
+    properties: { first: i === 0 && !closed, i },
     geometry: { type: 'Point', coordinates: [p[0], p[1]] },
   }));
   if (draft.length > 1) {
-    features.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: draft.map((p) => [p[0], p[1]]) } });
+    const line = closed ? [...draft, draft[0]!] : draft;
+    features.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: line.map((p) => [p[0], p[1]]) } });
   }
   return { type: 'FeatureCollection', features };
 }
@@ -222,6 +226,14 @@ function withOverlays(p: MapPalette): StyleSpecification {
         },
       },
       {
+        // A finger-sized target over each corner, for press-and-drag. Never seen.
+        id: 'draft-hit',
+        type: 'circle',
+        source: 'draft',
+        filter: ['==', ['geometry-type'], 'Point'],
+        paint: { 'circle-radius': 18, 'circle-color': p.boundary, 'circle-opacity': 0 },
+      },
+      {
         id: 'source-points',
         type: 'circle',
         source: 'sources',
@@ -304,9 +316,10 @@ export function MapView(props: MapViewProps) {
     // site arriving mid-load was never drawn. setData only needs the source.
     if (!m || !m.getSource('buildings')) return;
     const p = latest.current;
-    (m.getSource('boundary') as GeoJSONSource | undefined)?.setData(boundaryData(p.boundary));
+    // While editing, the draft IS the boundary; the old line would double it.
+    (m.getSource('boundary') as GeoJSONSource | undefined)?.setData(boundaryData(p.editing ? null : p.boundary));
     (m.getSource('buildings') as GeoJSONSource | undefined)?.setData(buildingData(p.site, p.selection, p.selectedId));
-    (m.getSource('draft') as GeoJSONSource | undefined)?.setData(draftData(p.drawing ? p.draft : []));
+    (m.getSource('draft') as GeoJSONSource | undefined)?.setData(draftData(p.drawing || p.editing ? p.draft : [], p.editing));
     (m.getSource('sources') as GeoJSONSource | undefined)?.setData(sourceData(p.site, p.design));
     (m.getSource('design') as GeoJSONSource | undefined)?.setData(designData(p.design));
   };
@@ -331,8 +344,57 @@ export function MapView(props: MapViewProps) {
       });
       instance.addControl(new maplibre.NavigationControl({ showCompass: false }), 'top-left');
       instance.on('style.load', push);
+      // Press and hold a corner, then drag it — mouse or finger. The map's own
+      // panning is off for the length of the drag, and the click that ends a
+      // drag is swallowed so it does not also add a corner.
+      let dragging: number | null = null;
+      let moved = false;
+      let swallowClick = false;
+      const grab = (e: { preventDefault: () => void; features?: { properties: Record<string, unknown> }[] }) => {
+        const p = latest.current;
+        if (!(p.drawing || p.editing)) return;
+        const index = Number(e.features?.[0]?.properties['i']);
+        if (!Number.isInteger(index)) return;
+        e.preventDefault();
+        dragging = index;
+        moved = false;
+        instance!.dragPan.disable();
+        instance!.getCanvas().style.cursor = 'grabbing';
+      };
+      const drag = (e: { lngLat: { lng: number; lat: number } }) => {
+        if (dragging === null) return;
+        moved = true;
+        latest.current.onMoveVertex(dragging, [e.lngLat.lng, e.lngLat.lat]);
+      };
+      const release = () => {
+        if (dragging === null) return;
+        dragging = null;
+        swallowClick = moved;
+        instance!.dragPan.enable();
+        instance!.getCanvas().style.cursor = latest.current.drawing ? 'crosshair' : '';
+      };
+      instance.on('mousedown', 'draft-hit', grab);
+      instance.on('touchstart', 'draft-hit', grab);
+      instance.on('mousemove', drag);
+      instance.on('touchmove', drag);
+      instance.on('mouseup', release);
+      instance.on('touchend', release);
+      instance.on('touchcancel', release);
+      instance.on('mouseenter', 'draft-hit', () => {
+        if (dragging === null && (latest.current.drawing || latest.current.editing)) instance!.getCanvas().style.cursor = 'grab';
+      });
+      instance.on('mouseleave', 'draft-hit', () => {
+        if (dragging === null) instance!.getCanvas().style.cursor = latest.current.drawing ? 'crosshair' : '';
+      });
+
       instance.on('click', (e) => {
         const p = latest.current;
+        if (swallowClick) {
+          swallowClick = false;
+          return;
+        }
+        // Editing moves corners only; a click adds nothing and selects nothing.
+        if (p.editing) return;
         if (p.drawing) {
           const first = p.draft[0];
           if (first && p.draft.length >= 3) {
@@ -395,15 +457,15 @@ export function MapView(props: MapViewProps) {
     map.current?.setStyle(withOverlays(props.palette), { diff: false });
   }, [props.palette]);
 
-  useEffect(push, [props.boundary, props.site, props.selection, props.selectedId, props.draft, props.drawing, props.design]);
+  useEffect(push, [props.boundary, props.site, props.selection, props.selectedId, props.draft, props.drawing, props.editing, props.design]);
 
   useEffect(() => {
     const m = map.current;
     if (!m) return;
-    if (props.drawing) m.doubleClickZoom.disable();
+    if (props.drawing || props.editing) m.doubleClickZoom.disable();
     else m.doubleClickZoom.enable();
     m.getCanvas().style.cursor = props.drawing || props.placing ? 'crosshair' : '';
-  }, [props.drawing, props.placing]);
+  }, [props.drawing, props.editing, props.placing]);
 
   useEffect(() => {
     if (props.flyTo) map.current?.flyTo({ center: [props.flyTo.center[0], props.flyTo.center[1]], zoom: props.flyTo.zoom });
