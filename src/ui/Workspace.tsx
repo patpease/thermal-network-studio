@@ -17,6 +17,7 @@ import { challengeSiteFact } from '../education/learn';
 import { readLocation, shareUrl } from '../io/share';
 import { boreholeRoom } from '../site/classify';
 import { centroid } from '../site/geometry';
+import { connected } from '../site/neighbourhood';
 import { AwardCard } from './AwardCard';
 import { ChallengeCard } from './ChallengeCard';
 import { DesignPanel } from './DesignPanel';
@@ -294,6 +295,11 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               }}
               onSuggest={site.suggest}
               onLearn={openLearn}
+              onEditBoundary={() => {
+                edit();
+                if (!phone) setTab('site');
+              }}
+              connectedCount={state.site ? connected(state.site, state.selection).length : 0}
             />
             {state.site && (
               <div className="panel-body panel-body--bottom">

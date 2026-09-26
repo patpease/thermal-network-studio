@@ -7,7 +7,7 @@
  */
 import { useState } from 'react';
 
-import { MAP_COPY } from '../config/copy';
+import { MAP_COPY, SCALE_COPY } from '../config/copy';
 import { ARCHETYPES } from '../loads/archetypes';
 import type { ArchetypeId } from '../loads/archetypes';
 import type { Place } from '../relay/relay';
@@ -17,7 +17,8 @@ import type { SiteBuilding } from '../site/classify';
 import { siteContext } from '../site/context';
 import { connected, effective } from '../site/neighbourhood';
 import type { UnitSystem } from '../units/units';
-import { percent, rangeWithUnit, sig, tonnes, withUnit } from './format';
+import { networkSize, percent, rangeWithUnit, sig, tonnes, withUnit } from './format';
+import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { draftArea } from './useSite';
 import type { SiteState } from './useSite';
 
@@ -142,6 +143,7 @@ export function SitePanel(props: SitePanelProps) {
   const floor = buildings.reduce((s, b) => s + b.floorArea, 0);
   const selected = site && props.selectedId ? site.buildings.find((b) => b.id === props.selectedId) : undefined;
   const metrics = result?.site ?? null;
+  const scale = metrics ? scaleOf(metrics, buildings.length) : null;
 
   return (
     <div className="panel-body">
@@ -246,7 +248,19 @@ export function SitePanel(props: SitePanelProps) {
                   note={`${rangeWithUnit('density', 50, 150, units)} is typical of networks`}
                 />
                 <Stat label="Peak heating" value={withUnit('powerLarge', metrics.peakHeatingW / 1e6, units)} />
+                <Stat label={SCALE_COPY.label} value={networkSize(scale!.tons, units)} note={SCALE_COPY.note(networkSize(SCALE_POINT_TONS, units))} />
               </div>
+              {scale && scale.belowPoint && (
+                <div className="scale-note" role="note">
+                  <p>{SCALE_COPY.below(networkSize(scale.tons, units), networkSize(SCALE_POINT_TONS, units))}</p>
+                  {scale.moreBuildings !== null && <p>{SCALE_COPY.more(scale.moreBuildings)}</p>}
+                  {(state.phase === 'ready' || state.phase === 'error') && (
+                    <button type="button" className="button" onClick={props.onEdit}>
+                      {SCALE_COPY.edit}
+                    </button>
+                  )}
+                </div>
+              )}
               <h3 className="card__subheading">{MAP_COPY.todayHeading}</h3>
               <div className="stats">
                 <Stat label="Site energy" value={withUnit('energyLarge', result.baseline.totalSiteKWh / 1000, units)} note="heating, cooling, hot water, refrigeration" />
@@ -294,6 +308,7 @@ export function SitePanel(props: SitePanelProps) {
                 area: (m2) => withUnit('area', m2, units),
                 density: (d) => withUnit('density', d, units),
                 distance: (m) => withUnit('length', m, units),
+                size: (tons) => networkSize(tons, units),
               }).map((row) => (
                 <div key={row.key} className={row.known ? 'context__row' : 'context__row context__row--unknown'}>
                   <dt>{row.criterion}</dt>

@@ -11,6 +11,7 @@
  * Suitability Study (Jan 2026), Table 3-1 and Table D-1.
  */
 import type { SiteMetrics } from '../engine/demand.ts';
+import { scaleOf } from '../engine/scale.ts';
 import { boreholeRoom } from './classify.ts';
 import { SOURCE_SEARCH_M } from './osm.ts';
 import type { AnchorKind, Site } from './classify.ts';
@@ -25,12 +26,15 @@ export interface Formatters {
   readonly density: (gwhPerKm2: number) => string;
   /** A distance, in the displayed unit. */
   readonly distance: (m: number) => string;
+  /** A network size from tons. */
+  readonly size: (tons: number) => string;
 }
 
 const SI_FORMAT: Formatters = {
   area: (m2) => `${Math.round(m2).toLocaleString('en-US')} m²`,
   density: (d) => `${d.toFixed(0)} GWh/km²·yr`,
   distance: (m) => `${Math.round(m).toLocaleString('en-US')} m`,
+  size: (tons) => `${((tons * 3_516.85) / 1e6).toFixed(2)} MW`,
 };
 
 export interface ContextRow {
@@ -64,6 +68,12 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
       criterion: 'Load balance',
       known: metrics !== null,
       finding: metrics ? `${pct(metrics.heatingShare)} of thermal demand is heating` : '',
+    },
+    {
+      key: 'scale',
+      criterion: 'Network size',
+      known: metrics !== null,
+      finding: metrics ? `${format.size(scaleOf(metrics, site.buildings.filter((b) => b.archetype).length).tons)} peak load` : '',
     },
     {
       key: 'load-density',

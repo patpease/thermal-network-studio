@@ -91,9 +91,11 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       80% of the worst hour (HEET); nearby sources within a quarter mile
       (VCTN); a supermarket outside the boundary counted as 25 homes of heat;
       Learn notes on the street loop and what the tool does not see.
-- [ ] **09 Scale** — shared load in tons against HEET's 300-ton
-      economies-of-scale point, on the Site and Design tabs, guiding a
-      player below it to connect more buildings.
+- [x] **09 Scale** — network size (the larger of peak heating and peak
+      cooling, in tons; MW in SI) against HEET's 300-ton economies-of-scale
+      point, on the Site tab, the Design tab's balancing card, Site features
+      and the Learn tab. Below it: how many more buildings like these would
+      reach it, and an Edit boundary button.
 - [ ] **10 Grid impact** — the network's winter electric peak against the
       same buildings on building-level electrification (air-source heat pumps,
       BLE); an indicator on Results and a new challenge.

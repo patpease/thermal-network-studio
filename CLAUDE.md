@@ -448,3 +448,14 @@ Things that looked right and were not:
 - **Nearby means a quarter mile** (`SOURCE_SEARCH_M` = 402, VCTN), and a
   supermarket outside the boundary is a waste-heat source of 25 homes
   (`SUPERMARKET_HOMES` × `HOME_AVERAGE_HEAT_W` = 80 kW).
+
+## Scale (phase 09)
+
+- **Network size is the larger of peak heating and peak cooling, in tons**
+  (`engine/scale.ts`, 3,516.85 W per ton), against HEET's 300-ton
+  economies-of-scale point. Tons in IP, MW in SI (`format.networkSize`) —
+  HEET writes the point in tons, and rule 2 still holds.
+- **Below the point, the tool says how many more buildings like these would
+  reach it** (from the connected buildings' average) and offers Edit
+  boundary. A fact with a way forward, drawn with the accent rule — not a
+  warning, and never a failed goal.

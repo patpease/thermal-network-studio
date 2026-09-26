@@ -13,6 +13,7 @@ import { TOWER_APPROACH } from '../engine/sources';
 import type { Challenge } from '../challenges/challenges';
 import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/classify';
 import { DESIGN_DIVERSITY } from '../engine/balance';
+import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
@@ -64,6 +65,8 @@ export interface Formatters {
   readonly length: (m: number) => string;
   readonly power: (w: number) => string;
   readonly delta: (k: number) => string;
+  /** A network size from tons (tons in IP, MW in SI). */
+  readonly size: (tons: number) => string;
 }
 
 export interface Fact {
@@ -104,7 +107,7 @@ export function sections(f: Formatters): Section[] {
         { text: 'Heat moves between buildings only in hours when some heat and others cool. EPRI’s Framingham study found 1.5% overlap with space conditioning alone.', refs: ['epri'] },
         { text: 'Hot water, data centres, ice rinks and supermarkets add demand in hours that space heating and cooling do not.', refs: ['epri'] },
         { text: 'Mixing buildings that cool with buildings that heat — an office beside homes — raises system efficiency and shrinks the bore field.', refs: ['heet'] },
-        { text: `HEET’s Massachusetts checklist puts the economies-of-scale point at about 300 tons (${f.power(300 * 3517)}) of shared load, with heating and cooling balanced over the year.`, refs: ['heet'] },
+        { text: `HEET’s Massachusetts checklist puts the economies-of-scale point at about ${f.size(SCALE_POINT_TONS)} of shared load, with heating and cooling balanced over the year.`, refs: ['heet'] },
         { text: `Waste heat can serve buildings within about a quarter mile (${f.length(402)}) of its source. Refrigeration heat from one large supermarket can heat about 15–30 nearby homes.`, refs: ['vctn'] },
         { text: 'Buildings on steam heat need a new heating system to connect. Many older homes need an electrical panel upgrade for a heat pump.', refs: ['heet'] },
         { text: 'HEET lists weatherization — air sealing and insulation — as an essential part of electrification.', refs: ['heet'] },
@@ -167,6 +170,15 @@ export function siteFacts(site: Site, metrics: SiteMetrics, f: Formatters): Fact
       refs: ['epri'],
     },
     { text: `Demand overlap here is ${Math.round(metrics.doc * 100)}%.`, refs: ['epri'] },
+    (() => {
+      const scale = scaleOf(metrics, site.buildings.filter((b) => b.archetype).length);
+      return {
+        text: scale.belowPoint
+          ? `Peak load here is ${f.size(scale.tons)}, below HEET’s economies-of-scale point of ${f.size(SCALE_POINT_TONS)}.`
+          : `Peak load here is ${f.size(scale.tons)}, at or above HEET’s economies-of-scale point of ${f.size(SCALE_POINT_TONS)}.`,
+        refs: ['heet'] as RefId[],
+      };
+    })(),
     {
       text: `Open space here is ${f.area(site.openSpaceM2)}, room for about ${room.toLocaleString('en-US')} boreholes. A field for the whole peak heat extraction would need about ${needFull.toLocaleString('en-US')}.`,
       refs: ['tool', 'osm'],

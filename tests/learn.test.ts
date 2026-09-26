@@ -11,7 +11,7 @@ import { siteForCounty } from '../src/relay/relay';
 import { classifySite } from '../src/site/classify';
 import { EMPTY_SELECTION, toNeighbourhood } from '../src/site/neighbourhood';
 import type { SiteData } from '../src/site/osm';
-import { rangeWithUnit, withUnit } from '../src/ui/format';
+import { networkSize, rangeWithUnit, withUnit } from '../src/ui/format';
 import type { UnitSystem } from '../src/units/units';
 
 const fmt = (units: UnitSystem): Formatters => ({
@@ -22,6 +22,7 @@ const fmt = (units: UnitSystem): Formatters => ({
   length: (m) => withUnit('length', m, units, 3),
   power: (w) => withUnit('power', w, units, 2),
   delta: (k) => withUnit('temperatureDelta', k, units, 2),
+  size: (tons) => networkSize(tons, units),
 });
 
 const site = classifySite(

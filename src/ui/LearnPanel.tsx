@@ -9,7 +9,7 @@ import { REFERENCES, sections, siteFacts } from '../education/learn';
 import type { Fact, Formatters, RefId } from '../education/learn';
 import type { Site } from '../site/classify';
 import type { UnitSystem } from '../units/units';
-import { rangeWithUnit, withUnit } from './format';
+import { networkSize, rangeWithUnit, withUnit } from './format';
 
 function formatters(units: UnitSystem): Formatters {
   return {
@@ -20,6 +20,7 @@ function formatters(units: UnitSystem): Formatters {
     length: (m) => withUnit('length', m, units, 3),
     power: (w) => (w >= 1e6 ? withUnit('powerLarge', w / 1e6, units, 2) : withUnit('power', w, units, 2)),
     delta: (k) => withUnit('temperatureDelta', k, units, 2),
+    size: (tons) => networkSize(tons, units),
   };
 }
 

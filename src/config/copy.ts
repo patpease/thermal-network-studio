@@ -150,6 +150,15 @@ export const LEARN_COPY = {
   references: 'References',
 } as const;
 
+export const SCALE_COPY = {
+  label: 'Network size',
+  note: (point: string) => `peak load; HEET’s scale point is ${point}`,
+  below: (size: string, point: string) => `This network is ${size}, below ${point}. HEET gives ${point} of shared, balanced load as the point where networks gain economies of scale.`,
+  more: (n: number) => `About ${n.toLocaleString('en-US')} more buildings like these would reach it. Edit the boundary or draw a larger one.`,
+  at: (size: string, point: string) => `This network is ${size}, at or above HEET’s scale point of ${point}.`,
+  edit: 'Edit boundary',
+} as const;
+
 export const GLYCOL_COPY = {
   flag: (coldest: string, limit: string, year: number) =>
     year <= 1 ? `Needs glycol. The loop reaches ${coldest}, below ${limit}.` : `Needs glycol from year ${year}. The bore field drifts to ${coldest}, below ${limit}.`,

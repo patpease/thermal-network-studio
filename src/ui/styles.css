@@ -1294,3 +1294,18 @@ a.button {
   outline-offset: 3px;
   border-radius: 3px;
 }
+
+/* The scale note: a fact with a way forward. Accent rule, not a warning. */
+.scale-note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.84rem;
+  border-left: 3px solid var(--accent);
+  padding: 0.35rem 0 0.35rem 0.6rem;
+}
+
+.scale-note p {
+  margin: 0;
+}

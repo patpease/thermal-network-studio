@@ -6,7 +6,8 @@
  * of what is built sits under them. Every number with a unit goes through
  * format.ts or NumberField, so nothing here knows which system is shown.
  */
-import { BALANCE_COPY, DESIGN_COPY, GLYCOL_COPY, SOURCE_COPY } from '../config/copy';
+import { BALANCE_COPY, DESIGN_COPY, GLYCOL_COPY, SCALE_COPY, SOURCE_COPY } from '../config/copy';
+import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { balanceOf, DESIGN_DIVERSITY } from '../engine/balance';
 import { BOREHOLE_PEAK_W, boreFieldArea, defaultSpot, fromCandidate, nextId, RETROFITS } from '../engine/design';
 import type { Design, DesignSource, DesignSourceKind } from '../engine/design';
@@ -18,7 +19,7 @@ import type { Site, SourceCandidate } from '../site/classify';
 import { centroid } from '../site/geometry';
 import type { UnitSystem } from '../units/units';
 import { NumberField } from './NumberField';
-import { sig, withUnit } from './format';
+import { networkSize, sig, withUnit } from './format';
 
 export interface DesignPanelProps {
   readonly site: Site | null;
@@ -32,6 +33,10 @@ export interface DesignPanelProps {
   readonly onSuggest: () => void;
   /** Open the Learn tab at an anchor. */
   readonly onLearn?: (anchor: string) => void;
+  /** Reopen the boundary for editing (the scale note's way to add buildings). */
+  readonly onEditBoundary?: () => void;
+  /** Buildings connected, for the scale note's estimate. */
+  readonly connectedCount?: number;
 }
 
 const TITLES: Record<DesignSourceKind, string> = {
@@ -198,7 +203,24 @@ function Cover({ label, needW, worstW, haveW, role, units }: { label: string; ne
   );
 }
 
-function BalanceCard({ result, design, units }: { result: ScenarioResult; design: Design; units: UnitSystem }) {
+function ScaleNote({ result, count, units, onEdit }: { result: ScenarioResult; count: number; units: UnitSystem; onEdit?: (() => void) | undefined }) {
+  const scale = scaleOf(result.site, count);
+  const point = networkSize(SCALE_POINT_TONS, units);
+  if (!scale.belowPoint) return <p className="card__note">{SCALE_COPY.at(networkSize(scale.tons, units), point)}</p>;
+  return (
+    <div className="scale-note" role="note">
+      <p>{SCALE_COPY.below(networkSize(scale.tons, units), point)}</p>
+      {scale.moreBuildings !== null && <p>{SCALE_COPY.more(scale.moreBuildings)}</p>}
+      {onEdit && (
+        <button type="button" className="button" onClick={onEdit}>
+          {SCALE_COPY.edit}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function BalanceCard({ result, design, units, count, onEdit }: { result: ScenarioResult; design: Design; units: UnitSystem; count: number; onEdit?: (() => void) | undefined }) {
   const b = balanceOf(result, design);
   const energy = (kWh: number) => withUnit('energyLarge', Math.abs(kWh) / 1000, units);
   return (
@@ -206,6 +228,7 @@ function BalanceCard({ result, design, units }: { result: ScenarioResult; design
       <h2 id="balance-heading" className="card__heading">
         {BALANCE_COPY.heading}
       </h2>
+      <ScaleNote result={result} count={count} units={units} onEdit={onEdit} />
       <div className="stats">
         <Stat label={BALANCE_COPY.taken} value={energy(b.takenKWh)} note={BALANCE_COPY.perYear} />
         <Stat label={BALANCE_COPY.given} value={energy(b.givenKWh)} note={BALANCE_COPY.perYear} />
@@ -329,7 +352,7 @@ export function DesignPanel(props: DesignPanelProps) {
   return (
     <div className="panel-body">
       <Results result={props.result} design={design} running={props.running} units={units} onLearn={props.onLearn} />
-      {props.result && <BalanceCard result={props.result} design={design} units={units} />}
+      {props.result && <BalanceCard result={props.result} design={design} units={units} count={props.connectedCount ?? 0} onEdit={props.onEditBoundary} />}
 
       <section className="card" aria-labelledby="add-heading">
         <p className="card__note">{DESIGN_COPY.intro}</p>
