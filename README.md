@@ -37,6 +37,10 @@ with page numbers are in `docs/references.md`.
   follow the study's site-suitability criteria. Its sixteen Minnesota sites
   are test fixtures. The app does not reproduce the study's scores or
   weights.
+- **Building Decarbonization Coalition**, *Thermal Energy Networks*
+  (<https://buildingdecarb.org/initiatives/tens>), **HEET**'s *Networked
+  Geothermal Toolkit*, and **Vermont Community Thermal Networks**' sheets
+  within it — cited in the Learn tab.
 
 ## Development
 

@@ -15,13 +15,28 @@ import { boreholeRoom } from '../site/classify';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
-export type RefId = 'epri' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'tool';
+export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'tool';
 
 export const REFERENCES: Record<RefId, { short: string; full: string; url?: string }> = {
   epri: {
     short: 'EPRI 2024',
     full: 'EPRI. Mapping Heating and Cooling Loads to Assess the Potential of Thermal Energy Networks. Technical Update 3002029431, 2024.',
     url: 'https://restservice.epri.com/publicdownload/000000003002029431/0/Product',
+  },
+  bdc: {
+    short: 'BDC',
+    full: 'Building Decarbonization Coalition. Thermal Energy Networks. Initiative page, 2026.',
+    url: 'https://buildingdecarb.org/initiatives/tens',
+  },
+  heet: {
+    short: 'HEET',
+    full: 'HEET (Home Energy Efficiency Team). Networked Geothermal Toolkit: Definition of Geothermal Networks (2023); Networked Geothermal Site & Design Considerations (Massachusetts); Understanding Local Geological Assets; Building Stock: What to Look For; Mitigating Future Peaks.',
+    url: 'https://heet.org/',
+  },
+  vctn: {
+    short: 'VCTN',
+    full: 'Vermont Community Thermal Networks, in the HEET toolkit. Moving Heat; Energy from Wastewater; Thermal Energy Network Opportunities Chart.',
+    url: 'https://www.vctn.org/toolkit',
   },
   nlr: {
     short: 'NLR ComStock/ResStock',
@@ -67,8 +82,13 @@ export function sections(f: Formatters): Section[] {
       id: 'network',
       title: 'A thermal energy network',
       facts: [
-        { text: 'A thermal energy network connects buildings to a shared water loop. Each building has a heat pump.', refs: ['epri'] },
+        { text: 'A thermal energy network uses underground, water-filled pipes to move heat between buildings and sources such as the ground, lakes, rivers and wastewater.', refs: ['bdc'] },
+        { text: 'Each building has a ground-source heat pump on the shared loop.', refs: ['bdc', 'heet'] },
         { text: 'A building that heats takes heat from the loop. A building that cools puts heat into it.', refs: ['epri'] },
+        { text: `HEET describes a single closed loop held between about ${f.temperature(4.4)} and ${f.temperature(32.2)}, the range where ground-source heat pumps run most efficiently.`, refs: ['heet'] },
+        { text: 'Boreholes store summer heat in the bedrock for use in winter. Part of it dissipates; much of it is available weeks or months later.', refs: ['heet'] },
+        { text: 'With load cancelling between buildings, HEET reports systems designed at about 80% of the combined peak load.', refs: ['heet'] },
+        { text: 'Thirteen US states have passed thermal energy network legislation, including laws that allow or require utility pilots.', refs: ['bdc'] },
         { text: `This tool models an ambient loop held between two temperatures you set. The default is ${f.temperature(DEFAULT_BAND.min)} to ${f.temperature(DEFAULT_BAND.max)}.`, refs: ['tool'] },
         { text: 'Heat the loop cannot supply or remove goes to electric backup and is counted as unmet hours.', refs: ['tool'] },
       ],
@@ -80,6 +100,13 @@ export function sections(f: Formatters): Section[] {
         { text: `Existing networks typically serve ${f.densityRange(50, 150)} of thermal demand.`, refs: ['epri'] },
         { text: 'Heat moves between buildings only in hours when some heat and others cool. EPRI’s Framingham study found 1.5% overlap with space conditioning alone.', refs: ['epri'] },
         { text: 'Hot water, data centres, ice rinks and supermarkets add demand in hours that space heating and cooling do not.', refs: ['epri'] },
+        { text: 'Mixing buildings that cool with buildings that heat — an office beside homes — raises system efficiency and shrinks the bore field.', refs: ['heet'] },
+        { text: `HEET’s Massachusetts checklist puts the economies-of-scale point at about 300 tons (${f.power(300 * 3517)}) of shared load, with heating and cooling balanced over the year.`, refs: ['heet'] },
+        { text: `Waste heat can serve buildings within about a quarter mile (${f.length(402)}) of its source. Refrigeration heat from one large supermarket can heat about 15–30 nearby homes.`, refs: ['vctn'] },
+        { text: 'Buildings on steam heat need a new heating system to connect. Many older homes need an electrical panel upgrade for a heat pump.', refs: ['heet'] },
+        { text: 'HEET lists weatherization — air sealing and insulation — as an essential part of electrification.', refs: ['heet'] },
+        { text: 'Planned street works, repaving and leak-prone gas mains lower the cost of installing a loop. This tool does not see them.', refs: ['heet', 'tool'] },
+        { text: 'Bedrock depth, groundwater, well yield and contaminated sites affect drilling. This tool does not see them.', refs: ['heet', 'tool'] },
         { text: `This tool looks for data centres, ice rinks, breweries, food processing, wastewater plants, supermarkets, lakes and rivers within ${f.length(SOURCE_SEARCH_M)} of the boundary.`, refs: ['tool', 'osm'] },
         { text: 'A challenge can be impossible at a given site. A dense downtown may lack open ground for a bore field; a site with no waste heat or water nearby cannot take heat from them.', refs: ['tool'] },
       ],
@@ -91,10 +118,15 @@ export function sections(f: Formatters): Section[] {
         { text: `A bore field stores heat in the ground between seasons. This tool places boreholes ${f.length(BORE_DEFAULTS.spacing)} apart, ${f.length(BORE_DEFAULTS.depth)} deep, in ground of conductivity ${BORE_DEFAULTS.conductivity} W/m·K.`, refs: ['tool', 'claesson'] },
         { text: `Bore field fluid is held between ${f.temperature(FLUID_LIMITS.min)} and ${f.temperature(FLUID_LIMITS.max)} in this tool.`, refs: ['tool'] },
         { text: `At about ${f.power(BOREHOLE_PEAK_W)} per borehole at peak, a field of 100 boreholes gives about ${f.power(100 * BOREHOLE_PEAK_W)}.`, refs: ['tool'] },
+        { text: `Boreholes run about ${f.length(61)} to ${f.length(213)} deep, as close as ${f.length(6.1)} apart, and can sit in streets or parking lots.`, refs: ['heet'] },
+        { text: 'Glycol in the loop adds installation and maintenance cost. Plain-water systems operate in Canada.', refs: ['heet'] },
         { text: `A bore field needs open ground. This tool counts parks, pitches and surface parking from OpenStreetMap at one borehole per ${f.area(BORE_DEFAULTS.spacing ** 2)}.`, refs: ['tool', 'osm'] },
         { text: `An air-source heat pump warms the loop from outdoor air. In this tool it stops below ${f.temperature(-20)}.`, refs: ['tool'] },
         { text: `A cooling tower cools water to ${f.delta(TOWER_APPROACH)} above the wet-bulb temperature.`, refs: ['stull', 'tool'] },
         { text: 'Waste heat gives heat only, while it is warmer than the loop.', refs: ['tool'] },
+        { text: 'A Vancouver ice rink supplies heat and hot water equal to 43 homes from its refrigeration.', refs: ['vctn'] },
+        { text: `Residential wastewater leaves buildings at about ${f.temperature(21)}. A wastewater system can be a heat source or a heat sink.`, refs: ['vctn'] },
+        { text: 'A Vancouver neighbourhood meets about 70% of its heating and cooling needs with heat recovered from wastewater.', refs: ['vctn'] },
         { text: `Sewer water runs about ${f.temperature(12)} to ${f.temperature(22)} through the year. Lake and river water follow the air a month late and stay above ${f.temperature(4)}.`, refs: ['tool'] },
       ],
     },
@@ -105,6 +137,7 @@ export function sections(f: Formatters): Section[] {
         { text: 'The score is half energy and half carbon, each the reduction on the same buildings as they are today.', refs: ['tool'] },
         { text: 'Today’s buildings use the regional mix of fuels and equipment in NLR’s building stock data.', refs: ['nlr'] },
         { text: 'Electricity carbon is the long-run marginal rate for the hour, month and region. Fuel carbon uses EPA factors.', refs: ['cambium', 'epa'] },
+        { text: 'HEET shows networked geothermal giving a lower winter electric peak than air-source heat pumps or electric resistance heat.', refs: ['heet'] },
         { text: 'The ground over 25 years is shown and not scored. A challenge may require it.', refs: ['tool'] },
         { text: 'Annual loads match NLR’s building stock data. The hour-by-hour shape is this tool’s model.', refs: ['nlr', 'tool'] },
         { text: 'The tool conveys an idea. It does not predict a saving.', refs: ['tool'] },

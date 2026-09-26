@@ -95,3 +95,68 @@ Open Energy Data Initiative; index at <https://comstock.nlr.gov/page/datasets>.
   `src/engine/gfunction.ts`.
 - **Stull, R. 2011.** Wet-bulb temperature from relative humidity and air
   temperature. *J. Appl. Meteor. Climatol.* 50: 2267–2269.
+
+## Learn tab sources (after phase 07)
+
+### Building Decarbonization Coalition — Thermal Energy Networks
+
+<https://buildingdecarb.org/initiatives/tens> (read 26 Sep 2026; latest item
+dated 22 May 2026).
+
+- TENs "use a network of underground, water-filled pipes to enable heat
+  exchange between buildings and energy sources, such as lakes and rivers,
+  energy intensive structures, wastewater systems, or even the stable
+  temperature of the earth." Ground-source heat pumps serve the buildings.
+- "Thirteen states have passed some form of TENs-related legislation,
+  including laws that now allow or mandate regulated utilities to develop
+  thermal energy network pilots."
+- Claims ground-source heat pumps are "nearly six times more efficient" than
+  an average gas furnace. **Not used**: the tool computes its own system COP
+  and does not quote a multiplier.
+
+### HEET — Networked Geothermal Toolkit
+
+Toolkit index (Google Doc, "HEET Net Geo Toolkit ReadMe") and the documents
+it links, read 26 Sep 2026.
+
+- *Definition of Geothermal Networks* (© 2023): single closed loop in the
+  street below the frost line (ground typically in the 50s °F); boreholes
+  "several hundred feet" into bedrock as seasonal storage ("a percentage of
+  that energy dissipates, but much … is available … weeks or even months
+  later"); loop held at "approximately 40°–90° Fahrenheit"; load cancelling
+  "allows systems to be designed at approximately 80% of peak load"; backup
+  heater/cooler for unusual events.
+- *Networked Geothermal Site & Design Considerations* (Massachusetts
+  checklist): bedrock at ~35 ft average in most of MA; boreholes ~6 in wide,
+  "roughly 200-700 feet deep, spaced as close as every 20 feet"; mixed
+  heating and cooling buildings shrink the bore field; electric panel
+  capacity; steam-heated buildings need replacement systems; planned
+  repaving, leak-prone gas pipe and gas constraints as siting factors;
+  "economies of scale inflection point is approximately at a shared load of
+  300 tons, given that the annual heating and cooling loads are well
+  balanced"; "avoid glycol" (adds installation and maintenance cost;
+  plain-water systems in Canada); permitting (wetlands, rivers, drilling
+  fluids).
+- *Understanding Local Geological Assets*: key data — bedrock and overburden,
+  depth to bedrock, thermal conductivity, static water table, well yield,
+  contaminated sites.
+- *Building Stock: What to Look For*: weatherization, mixed use, distribution
+  system (steam), electric panel and wiring.
+- *Mitigating Future Peaks*: networked geothermal gives the lowest winter
+  electric peak, below air-source heat pumps and electric resistance.
+
+### Vermont Community Thermal Networks (in the HEET toolkit)
+
+<https://www.vctn.org/toolkit>
+
+- *Moving Heat*: loop water about 50 °F; waste heat "can be recirculated to
+  buildings within about ¼ mile"; one supermarket's refrigeration can heat
+  "about 15-30 nearby homes"; a Vancouver ice rink supplies the equivalent of
+  43 homes; a Vancouver neighbourhood meets "about 70%" of heating and
+  cooling needs from wastewater heat.
+- *Energy from Wastewater*: residential wastewater leaves buildings at about
+  70 °F; commercial and industrial up to 140 °F; a wastewater system can be a
+  source or a sink.
+- *Thermal Energy Network Opportunities Chart*: wastewater plants, planned
+  street openings, open land for bore fields, refrigeration, food and
+  beverage manufacturing, water bodies, substations.
