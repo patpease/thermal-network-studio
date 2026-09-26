@@ -11,17 +11,23 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       assets, real 404s, `no-store` on a failed asset) and in Chromium (no
       console or CSP errors, fonts load, no sideways scroll at 360 px, pinned
       light on a dark OS holds).
-- [ ] **01 EULP generator** — archetype × climate-zone hourly shapes from
-      ComStock/ResStock, plus BAU heating fuel mix and cooling (D21). Golden
-      tests. First: confirm the data release and licence, and measure how
-      large the reduced set is.
-- [ ] **02 Engine, no map** — demo neighbourhood → loads → loop sim → BAU →
-      score, g-function drift. Pure functions in a Web Worker; measure the
-      8760 on the production build.
+- [x] **Plan draft 5** — revised against EPRI 3002029431 and the Minnesota
+      site suitability study (Jan 2026). Loads move from NREL shapes to a
+      calibrated 1R1C (D22); DOC/LBI/density become headline metrics (D24);
+      Minnesota's criteria become an information-only panel (D25). See
+      `docs/references.md`.
+- [ ] **01 Load model + calibration** — 1R1C per building plus DHW and
+      process loads; archetype × vintage parameters fitted to ComStock/ResStock
+      annual intensities by climate zone; BAU fuel mix (D21). First: confirm
+      the data release, licence, and which aggregate tables to fit to.
+- [ ] **02 Engine, no map** — demo neighbourhood → loads → DOC/LBI/density →
+      loop sim → BAU → score, g-function drift. Pure functions in a Web
+      Worker; measure the 8760 on the production build. Minnesota fixtures.
 - [ ] **03 Map** — MapLibre + OpenFreeMap, polygon draw (mouse and touch),
-      Overpass relay (heat-balance's relay pattern), classifier, guessed
-      buildings styled apart, source detection.
-- [ ] **04 Design UI** — source palette, placement, sizing.
+      Overpass and weather relays (heat-balance's relay pattern), classifier,
+      guessed buildings styled apart, sources and anchor tenants, site context
+      panel.
+- [ ] **04 Design UI** — source palette, placement, sizing, envelope retrofits.
 - [ ] **05 Results** — Sankey, loop temperature over the year, monthly
       sharing, 25-year bore drift, score breakdown.
 - [ ] **06 Challenges** — goal format, goal library, share links.

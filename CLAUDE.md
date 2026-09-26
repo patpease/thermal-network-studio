@@ -11,8 +11,10 @@ the difference has broken a sibling's deploy: a `functions/` directory is
 ignored here. The Worker entry point is `worker/index.ts`; everything it decides
 is in `worker/handler.ts`, where the suite can reach it.
 
-**Read this file first.** `PLAN.md` holds the decisions (D1–D21) and the phase
+**Read this file first.** `PLAN.md` holds the decisions (D1–D28) and the phase
 list — a record of *why*. `BACKLOG.md` is what is done and what is next.
+`docs/references.md` holds the two reports the plan was revised against, with
+the figures taken from each and their page numbers.
 
 ## The framing is load-bearing
 
@@ -31,8 +33,9 @@ worker/       the Worker: an adapter (index.ts) over handler.ts.
 tests/        vitest. Node by default; a DOM test opts in with a docblock.
 ```
 
-Planned, per PLAN.md: `scripts/eulp/` (the load-shape generator, phase 01),
-`src/engine/` (pure functions and a Web Worker, phase 02), `src/map/` and the
+Planned, per PLAN.md: `src/loads/` and `scripts/calibrate/` (the 1R1C model
+and the generator that fits its parameters, phase 01), `src/engine/` (pure
+functions and a Web Worker, phase 02), `src/map/` and the
 Overpass relay (phase 03).
 
 ## Rules
@@ -91,6 +94,16 @@ simulation budget is a sub-second re-run of a full 8760 (D6); measure it on
 - **An export must never be the phone layout** (from phase 07).
 - **`pkill -f "wrangler dev"` from a shell whose own command line contains
   that string** kills the shell. Stop the dev server by PID.
+
+## Two things the reports settled
+
+- **Minnesota's scorecard is information, not a score.** The context panel
+  shows what the tool can know and leaves the rest **blank** — never a
+  plausible default. It has no weights and no total, and nothing in it reaches
+  the score (efficiency + carbon, D20).
+- **Space conditioning alone makes every neighbourhood look the same.** EPRI's
+  Framingham run came out LBI 0.98. DHW and process loads are part of the load
+  model, not an extension of it.
 
 ## The map (from phase 03)
 

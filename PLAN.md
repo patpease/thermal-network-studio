@@ -1,4 +1,4 @@
-# Thermal Network Studio — plan (draft 4)
+# Thermal Network Studio — plan (draft 5)
 
 Repo: `patpease/thermal-network-studio`.
 Status: **phase 00 done; next is 01.** Progress lives in `BACKLOG.md`.
@@ -13,6 +13,10 @@ from data centres and sewers, and the game runs a year against it. The score
 is how much more efficient and lower-carbon the network is than business as
 usual.
 
+Revised in draft 5 against two reports — EPRI's load-mapping method and
+Minnesota's site suitability study. What each changed is in
+**Revisions from the reports** below; the sources are in `docs/references.md`.
+
 The audience runs from engineers to citizens, so the same simulation has to
 read two ways: a clear story on top, and the numbers one click down.
 
@@ -25,10 +29,10 @@ sits on the page and is burned into every export.
 | # | Decision | What follows from it |
 |---|---|---|
 | D1 | **Ambient loop (5GDHC)** with a heat pump in every building | Loop temperature is the state. Heating and cooling rejection cancel out on the loop, and that sharing is the thing the game teaches. |
-| D2 | **US first** | NREL EULP loads, ASHRAE climate zones, NREL Cambium grid carbon |
+| D2 | **US first** | ComStock/ResStock calibration targets, ASHRAE climate zones, NREL Cambium grid carbon |
 | D3 | **Sandbox + challenges** | Free play on any map, with scenario goals on the same engine |
 | D4 | **Score = efficiency + carbon** | Cost is shown but not scored |
-| D5 | **NREL ComStock/ResStock EULP, precomputed** | A build-time generator: archetype × climate zone → normalised 8760 shape, scaled by floor area. It is committed and never edited by hand. |
+| D5 | ~~NREL EULP shapes, precomputed~~ **Superseded by D22.** | |
 | D6 | **Hourly 8760 in a Web Worker** | Budget: a sub-second re-run |
 | D7 | **One UI, progressive depth** | Story first, then numbers, then assumptions |
 | D8 | **Sources are found in OSM or placed by the player** | Overpass also pulls data centres, wastewater plants and similar. The player can add hypothetical sources. |
@@ -42,9 +46,16 @@ sits on the page and is burned into every export.
 | D16 | **Challenges are generic goals on any map** | e.g. "Beat BAU carbon by 60% without a cooling tower". A goal is data: constraints + thresholds on engine outputs. |
 | D17 | **CSP allows the OpenFreeMap origin explicitly** | The only third-party origins: OpenFreeMap + the Cloudflare beacon |
 | D18 | **workers.dev for now** | `BRAND.host` follows whenever a domain is chosen |
-| D19 | **Labs added as archetype 16** | No EULP type exists, so it takes ZEEL's zone intensities with an EULP hospital/office shape. This is a borrowed profile and is labelled as one, as in heat-balance's Laboratory row. |
+| D19 | **Labs added as archetype 16** | No ComStock type exists, so its calibration targets are ZEEL's zone intensities, labelled as borrowed, as in heat-balance's Laboratory row. |
 | D20 | **Score = 50% efficiency + 50% carbon** | Both components are always shown beside the blended number |
-| D21 | **Baseline = regional existing stock** | BAU heating fuel mix and cooling from ComStock/ResStock per climate zone and archetype. Baked in by the same generator as D5. |
+| D21 | **Baseline = regional existing stock** | BAU heating fuel mix and cooling from ComStock/ResStock per climate zone and archetype. Aggregates only — no hourly shapes — baked in by the D22 calibration generator. |
+| D22 | **Loads: hybrid 1R1C, per building, in the browser** (EPRI) | Space heating and cooling from a one-resistance, one-capacitance model per building, driven by the site's hourly weather — the method in EPRI 3002029431. **Plus** DHW and process loads (refrigeration, IT, ice) on schedules, which EPRI left out and warned about. Archetype parameters (U-values, mass, ventilation, gains, setpoints by vintage) are **calibrated** so each archetype's annual heating, cooling and DHW land on ComStock/ResStock per climate zone. Extends Heat Balance Studio's UA-and-gains engine rather than starting over. |
+| D23 | **Envelope and vintage are player levers** | Because D22 is physical, a retrofit changes the load. Vintage comes from OSM `start_date` where tagged, else the archetype default, **flagged as guessed** like everything else inferred. |
+| D24 | **Headline network metrics: DOC, LBI, density** (EPRI) | Demand overlap coefficient, load balance index, and thermal demand density, shown as soon as a neighbourhood is picked and before anything is built. They explain *why* a site shares heat well. Density is shown against EPRI's 50–150 GWh/km²·yr range; LBI against Minnesota's heating-dominance bands (≤80 %, 80–90 %, >90 %). Reference marks, not pass/fail. |
+| D25 | **Site context panel: information only** (Minnesota) | Minnesota's eight criteria are listed with what the tool can actually know — load balance, load density, opportunistic resources, open space for a bore field, dividing barriers (highways, rivers), anchor tenants. **Anything it cannot know is left blank, never guessed**: bedrock, grid capacity, existing HVAC, ownership, environmental justice status, contamination. No weights, no 0–100 total, and it never touches the score (D4 and D20 stand). |
+| D26 | **More sources, found in OSM** (Minnesota) | Adds lakes and rivers (surface water), ice rinks, supermarkets, breweries, food and industrial processing, alongside data centres, wastewater plants and sewers. |
+| D27 | **Anchor tenants marked on the map** (Minnesota) | City hall, library, school, hospital, community centre, place of worship. Information, not score — Minnesota found them to be what makes a project happen. |
+| D28 | **Minnesota's 16 sites: validation only** | Not shipped as challenges (D16 stands). Used as test fixtures for what D24–D25 compute — e.g. a site Minnesota rated as >90 % heating-dominant must not come out balanced. Only indicators we can compute are compared; Minnesota's weighted total is not reproduced. |
 
 ## Carried over from the sibling tools (copied, not a shared package)
 
@@ -52,7 +63,8 @@ sits on the page and is burned into every export.
 |---|---|
 | all three | Vite + React 19 + TS, vitest, Cloudflare **Worker** (not Pages), the three wrangler settings that fail quietly, CSP with no `unsafe-inline`, `strictPort` dev ports |
 | heat-balance-studio | Relay pattern: one `relay.ts` with all the logic, thin adapters in the Worker and in the Vite dev server, an edge cache keyed on rounded coords + `DERIVATION_VERSION`, exact host pinning. Reused for **Overpass** and **Open-Meteo**. |
-| heat-balance-studio | Open-Meteo archive with the UTC timezone fix, EPW upload, geocoder that shows alternatives |
+| heat-balance-studio | Open-Meteo archive with the UTC timezone fix, EPW upload, geocoder that shows alternatives. Now drives the 1R1C model for a full year, not only a design day. |
+| heat-balance-studio | UA, internal gains and schedules (`engine/ua.ts`, `gains.ts`, PNNL-derived schedules) — the starting point for D22 |
 | psychrometric-studio | Chrome, tokens, IP/SI at the edge, export rules (ADR 0004) |
 | zeel | Sankey layout, palette validation, notes vs warnings, the "conveys an idea" framing |
 
@@ -62,10 +74,13 @@ sits on the page and is burned into every export.
 1 Neighbourhood  draw polygon -> Overpass relay -> footprints, levels, tags,
                  candidate sources -> player adds/removes buildings
 2 Loads          classify archetype (tags -> landuse -> footprint heuristic ->
-                 player override) -> floor area -> scale EULP shape for the
-                 site's climate zone -> heating, cooling, DHW 8760 per building
-3 Design         place and size: bore field, ASHP, cooling tower, sewer HX,
-                 data-centre recovery
+                 player override) + vintage -> box geometry from footprint and
+                 levels -> calibrated 1R1C + DHW + process -> heating, cooling
+                 8760 per building, driven by the site's weather year
+  Read the site  DOC, LBI, density; site context panel (information only)
+3 Design         place and size: bore field, ASHP, cooling tower, surface
+                 water, sewer/wastewater HX, waste heat (data centre, rink,
+                 supermarket, brewery, process); retrofit envelopes
 4 Simulate       hourly: net building load on the loop (building HP COP depends
                  on loop temp) -> dispatch sources to hold the loop within a
                  band -> loop temp, electricity, unmet hours; g-function drift
@@ -78,25 +93,37 @@ sits on the page and is burned into every export.
 1. **OSM is thin.** Most buildings are just `building=yes` with no levels.
    The fallback chain has to show which buildings were **guessed**, and a
    guessed building must look different on the map.
-2. **Using EULP data.** The raw data is huge. The generator has to reduce it to
-   something like 15 archetypes × 16 climate zones × 3 end uses, normalised per
-   floor area and quantised, while keeping the bundle small.
-3. **Dispatch.** Which source runs, and in what order, is the design choice the
+2. **Calibrating 1R1C.** A gray-box model is only as good as its parameters.
+   The generator fits each archetype × vintage to ComStock/ResStock annual
+   end-use intensities per climate zone, and golden tests pin that the fit
+   holds. Hourly *shape* is the model's own and is not checked against NREL —
+   say so on the page.
+3. **EPRI's warning.** Space conditioning alone made Framingham DOC 1.5 %,
+   LBI 0.98 — every neighbourhood would look the same and the game would have
+   one answer. DHW and process cooling are what create sharing, so they are
+   in from the first engine commit and a test asserts a mixed-use fixture is
+   not near LBI 1.
+4. **Dispatch.** Which source runs, and in what order, is the design choice the
    player is really making. It needs a simple, explainable rule set, not an
    optimiser.
-4. **Honest score.** Show the observed range, never ± a tolerance. The
+5. **Honest score.** Show the observed range, never ± a tolerance. The
    baseline assumptions sit beside the score.
-5. **A third-party tile origin in the CSP.** The sibling tools have none. We
+6. **A third-party tile origin in the CSP.** The sibling tools have none. We
    either allow OpenFreeMap explicitly or relay tiles through the Worker.
 
 ## Phases (draft)
 
 - **00 Scaffold** — copied scaffold, new brand, Worker, CSP
-- **01 EULP generator** — archetype × climate-zone shapes, golden tests
-- **02 Engine, no map** — fixed demo neighbourhood → loads → loop sim →
-  baseline → score, g-function drift. Pure functions, Web Worker.
-- **03 Map** — MapLibre, polygon draw (mouse and touch), Overpass relay,
-  classifier, guessed-building styling
+- **01 Load model + calibration** — 1R1C per building, DHW and process
+  schedules, archetype × vintage parameter table fitted to ComStock/ResStock
+  annual intensities by climate zone (a generator, committed output). A
+  committed fixture weather year; no network in tests.
+- **02 Engine, no map** — fixed demo neighbourhood → loads → DOC/LBI/density →
+  loop sim → baseline → score, g-function drift. Pure functions, Web Worker.
+  Minnesota fixtures (D28) for the site metrics.
+- **03 Map** — MapLibre, polygon draw (mouse and touch), Overpass and weather
+  relays, classifier, guessed-building styling, sources and anchor tenants,
+  site context panel
 - **04 Design UI** — source palette, placement, sizing
 - **05 Results** — Sankey, loop temperature over the year, monthly
   heating/cooling sharing, 25-year bore drift, score breakdown
@@ -105,10 +132,10 @@ sits on the page and is burned into every export.
 
 ## Proposed archetypes (Q1 — for review)
 
-Each maps to a ComStock or ResStock type. OSM tags go first, then landuse,
+Each is calibrated to a ComStock or ResStock type (D22). OSM tags go first, then landuse,
 then footprint size.
 
-| Archetype | EULP source | Typical OSM signal |
+| Archetype | Calibration target | Typical OSM signal |
 |---|---|---|
 | Single-family detached | ResStock | `building=house/detached`, small footprint in residential landuse |
 | Small multifamily (2–4) | ResStock | `building=semidetached_house/terrace`, small `apartments` |
@@ -124,12 +151,47 @@ then footprint size.
 | Outpatient clinic | ComStock Outpatient | `amenity=clinic/doctors` |
 | Hotel | ComStock Small/LargeHotel | `tourism=hotel` |
 | Warehouse | ComStock Warehouse | `building=warehouse/industrial` |
-| Laboratory | borrowed (see D19) | `building=laboratory`, `amenity=research_institute` |
+| Laboratory | ZEEL intensities (D19) | `building=laboratory`, `amenity=research_institute` |
 | Data centre (source *and* load) | none, rule-based | `telecom=data_center`, `building=data_center` |
 
 Unknown `building=yes` → the most likely archetype from landuse and footprint,
 **flagged as guessed**.
 
+## Revisions from the reports
+
+**EPRI, *Mapping Heating and Cooling Loads to Assess the Potential of Thermal
+Energy Networks* (3002029431, 2024)**
+
+- Per-building 1R1C from footprints and a synthetic stock → **D22** replaces
+  precomputed NREL shapes. It runs on any weather year, responds to retrofits,
+  and is cheap: 500 buildings × 8760 hours is a few million steps.
+- DOC and LBI → **D24**. DOC is computed from demand alone, before any design,
+  so it says what sharing is *available*; the simulation says what the design
+  *captured*. Showing both is the lesson.
+- Their own caveat — space conditioning only reads as heating-dominated
+  everywhere — is why DHW and process loads are not optional (hard problem 3).
+- A number to be careful with: the report gives the minimum cluster as
+  "800 billion BTU (100 GWh)", but 800 × 10⁹ Btu is 234 GWh. Quote the Btu
+  figure, which is the one they applied, and note the discrepancy.
+
+**Minnesota Department of Commerce, *Thermal Energy Network Site Suitability
+Study* (Buro Happold et al., January 2026)**
+
+- The weighted scorecard is **not** adopted as a score (D4 stands). Its
+  criteria become the information-only context panel → **D25**, filled only
+  where the tool genuinely knows the answer.
+- Load-balance bands (≤80 / 80–90 / >90 % heating-dominant) → reference marks
+  on LBI (**D24**).
+- Opportunistic thermal resources — lakes and rivers, ice rinks, breweries,
+  supermarkets, processing plants → **D26**. Barriers between a source and the
+  buildings (a highway, a river) are named in the context panel, since D12
+  models no pipes to feel them.
+- Anchor tenants → **D27**. Single ownership, new development and anchor
+  tenants recur in every high-scoring site; worth teaching, not scoring.
+- The 16 scored sites → fixtures only (**D28**).
+
 ## Open questions
 
-None blocking. Next step: create `patpease/thermal-network-studio` with this plan as the first commit, then start Phase 00.
+None blocking. Next: phase 01 — before writing the generator, confirm the
+current ComStock/ResStock release, its licence, and which aggregate tables
+give annual end-use intensity by building type and climate zone.
