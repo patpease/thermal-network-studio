@@ -69,9 +69,9 @@ function safeJson(text: string): unknown {
 // ----------------------------------------------------------- fixture mode
 
 const FIXTURE_SITES = [
-  { key: 'mankato-downtown', label: 'Downtown Mankato, Minnesota (fixture)', county: '27013' },
-  { key: 'highland-park', label: 'Highland Park, St. Paul, Minnesota (fixture)', county: '27123' },
-  { key: 'alexandria-city-hall', label: 'Alexandria, Minnesota (fixture)', county: '27041' },
+  { key: 'mankato-downtown', label: 'Downtown Mankato, Minnesota (fixture)', county: '27013', town: 'Mankato' },
+  { key: 'highland-park', label: 'Highland Park, St. Paul, Minnesota (fixture)', county: '27123', town: 'St. Paul' },
+  { key: 'alexandria-city-hall', label: 'Alexandria, Minnesota (fixture)', county: '27041', town: 'Alexandria' },
 ];
 
 function loadFixture(key: string) {
@@ -93,7 +93,8 @@ function fixtureAnswer(url: URL, body: string): RelayResult {
   const nearest = (point: [number, number]) =>
     FIXTURE_SITES.find((s) => pointInRing(point, loadFixture(s.key).data.boundary)) ?? FIXTURE_SITES[0]!;
   if (url.pathname === PATHS.site) {
-    return { status: 200, body: siteForCounty(nearest(at).county) };
+    const f = nearest(at);
+    return { status: 200, body: { ...siteForCounty(f.county), town: f.town, state: 'MN' } };
   }
   if (url.pathname === PATHS.weather) {
     const site = siteForCounty(nearest(at).county)!;

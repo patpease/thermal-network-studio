@@ -221,3 +221,24 @@ describe('the D11 cap', () => {
     expect(() => toNeighbourhood(highland, EMPTY_SELECTION, '6A', 'MISO_North')).toThrow(/at most 500/);
   });
 });
+
+describe('neighbourhood name', () => {
+  const ring = square(400);
+  const [cx, cy] = centroid(ring);
+  const place = (id: string, name: string, kind: string, at: [number, number]) => ({ id, tags: { place: kind, name }, geometry: { type: 'point' as const, at } });
+  const data = (features: ReturnType<typeof place>[]): SiteData => ({ version: 1, boundary: ring, features, skipped: 0 });
+
+  it('takes the one inside the boundary over a nearer one outside', () => {
+    const s = classifySite(data([place('n1', 'Outside', 'neighbourhood', [cx + 0.006, cy]), place('n2', 'Inside', 'suburb', [cx + 0.001, cy])]));
+    expect(s.placeName).toBe('Inside');
+  });
+
+  it('prefers a neighbourhood to the suburb it sits in', () => {
+    const s = classifySite(data([place('n1', 'Suburb', 'suburb', [cx, cy]), place('n2', 'Hood', 'neighbourhood', [cx + 0.001, cy])]));
+    expect(s.placeName).toBe('Hood');
+  });
+
+  it('is null when OSM names none, never guessed', () => {
+    expect(classifySite(data([])).placeName).toBeNull();
+  });
+});

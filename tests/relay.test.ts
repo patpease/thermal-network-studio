@@ -8,6 +8,7 @@ import {
   handleWeather,
   isAllowedHost,
   parseBoundary,
+  placeNames,
   siteForCounty,
   standardOffsetSeconds,
   yearFromArchive,
@@ -46,6 +47,30 @@ describe('/api/site', () => {
     const r = await handleSite(new URLSearchParams('lat=44.16&lon=-94.0'), fetcher);
     expect(r.status).toBe(200);
     expect(r.body).toMatchObject({ countyFips: '27013', zone: '6A' });
+  });
+
+  it('names the town and state the point is in, preferring an incorporated place', async () => {
+    const fetcher: Fetcher = async (url) => {
+      expect(new URL(url).searchParams.get('layers')).toContain('Incorporated Places');
+      return jsonResponse({
+        result: {
+          geographies: {
+            Counties: [{ GEOID: '27013' }],
+            'Incorporated Places': [{ BASENAME: 'Mankato', NAME: 'Mankato city' }],
+            'County Subdivisions': [{ BASENAME: 'Mankato' }],
+            States: [{ STUSAB: 'MN', NAME: 'Minnesota' }],
+          },
+        },
+      });
+    };
+    const r = await handleSite(new URLSearchParams('lat=44.16&lon=-94.0'), fetcher);
+    expect(r.body).toMatchObject({ town: 'Mankato', state: 'MN' });
+  });
+
+  it('falls back to a census-designated place, then a township, and never invents one', () => {
+    expect(placeNames({ 'Census Designated Places': [{ BASENAME: 'Columbia' }], States: [{ STUSAB: 'MD' }] })).toEqual({ town: 'Columbia', state: 'MD' });
+    expect(placeNames({ 'County Subdivisions': [{ BASENAME: 'Framingham' }] })).toEqual({ town: 'Framingham', state: null });
+    expect(placeNames({})).toEqual({ town: null, state: null });
   });
 
   it('says plainly when a point is outside the United States', async () => {

@@ -95,6 +95,12 @@ export interface Site {
   /** Parks, pitches and surface parking inside the boundary, m². */
   readonly openSpaceM2: number;
   readonly skipped: number;
+  /**
+   * The neighbourhood's name from OSM (place=neighbourhood, suburb or
+   * quarter): one inside the boundary, nearest its centre, else the nearest
+   * within the search margin. Null when OSM names none — never guessed.
+   */
+  readonly placeName?: string | null;
 }
 
 // --------------------------------------------------------------- archetypes
@@ -455,6 +461,7 @@ export function classifySite(data: SiteData): Site {
 
   sources.sort((a, b) => a.distanceM - b.distanceM);
   return {
+    placeName: neighbourhoodName(data.features, boundary),
     boundary,
     areaM2: Math.round(ringArea(boundary)),
     buildings,
@@ -463,6 +470,21 @@ export function classifySite(data: SiteData): Site {
     openSpaceM2: Math.round(openSpace),
     skipped: data.skipped,
   };
+}
+
+const PLACE_RANK: Record<string, number> = { neighbourhood: 0, quarter: 1, suburb: 2 };
+
+function neighbourhoodName(features: SiteData['features'], boundary: Ring): string | null {
+  const centre = centroid(boundary);
+  const named = features
+    .filter((f) => f.geometry.type === 'point' && f.tags['place'] && f.tags['name'] && PLACE_RANK[f.tags['place']] !== undefined)
+    .map((f) => {
+      const at = f.geometry.type === 'point' ? f.geometry.at : centre;
+      return { name: f.tags['name']!, inside: pointInRing(at, boundary), d: distance(at, centre), rank: PLACE_RANK[f.tags['place']!]! };
+    })
+    // Inside first; then the finer kind (a neighbourhood over a suburb); then nearest.
+    .sort((a, b) => Number(b.inside) - Number(a.inside) || a.rank - b.rank || a.d - b.d);
+  return named[0]?.name ?? null;
 }
 
 /** Bore-field room in open space at a 6 m grid. A rough ceiling, stated. */

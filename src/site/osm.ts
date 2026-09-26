@@ -62,6 +62,7 @@ const KEEP = new Set([
   'parking',
   'name',
   'operator',
+  'place',
 ]);
 
 function keepTags(tags: Record<string, string> | undefined): Record<string, string> {
@@ -189,6 +190,7 @@ export function overpassQuery(boundary: Ring): string {
   way["natural"="water"](${box});
   relation["natural"="water"](${box});
   way["waterway"~"^(river|canal)$"](${box});
+  node["place"~"^(neighbourhood|suburb|quarter)$"]["name"](${box});
 );
 out geom(${box}) tags;`;
 }

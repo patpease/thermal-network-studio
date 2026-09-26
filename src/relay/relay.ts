@@ -54,7 +54,7 @@ export function isAllowedHost(hostname: string): boolean {
 }
 
 /** Bump to invalidate every cached answer when a derivation changes. */
-export const RELAY_VERSION = '1';
+export const RELAY_VERSION = '2';
 
 const DAY = 86400;
 export const CACHE = { place: 30 * DAY, site: 365 * DAY, weather: 30 * DAY, buildings: 7 * DAY } as const;
@@ -125,6 +125,34 @@ export interface SitePayload {
   readonly zone: ClimateZone;
   readonly region: (typeof GEA_REGIONS)[number];
   readonly attribution: string;
+  /** The town or city, when the point is in one (Census place), else null. */
+  readonly town?: string | null;
+  /** Two-letter state, e.g. "MN". */
+  readonly state?: string | null;
+}
+
+interface CensusFeature {
+  readonly GEOID?: string;
+  readonly BASENAME?: string;
+  readonly NAME?: string;
+  readonly STUSAB?: string;
+}
+
+/**
+ * Town and state from the Census geocoder's answer. A town is an incorporated
+ * place, else a census-designated place, else the county subdivision (a New
+ * England town, a Midwest township) — whatever the point is actually in.
+ * Pure, so the tests read it without the network.
+ */
+export function placeNames(geographies: Record<string, readonly CensusFeature[] | undefined>): { town: string | null; state: string | null } {
+  const first = (layer: string) => geographies[layer]?.[0];
+  const town =
+    first('Incorporated Places')?.BASENAME ??
+    first('Census Designated Places')?.BASENAME ??
+    first('County Subdivisions')?.BASENAME ??
+    null;
+  const state = first('States')?.STUSAB ?? null;
+  return { town: town && town.trim() ? town.trim() : null, state };
 }
 
 /** County FIPS → what the engine needs. Pure; tested without the network. */
@@ -150,17 +178,18 @@ export async function handleSite(params: URLSearchParams, fetcher: Fetcher): Pro
   url.searchParams.set('y', String(c.lat));
   url.searchParams.set('benchmark', 'Public_AR_Current');
   url.searchParams.set('vintage', 'Current_Current');
-  url.searchParams.set('layers', 'Counties');
+  url.searchParams.set('layers', 'Counties,Incorporated Places,Census Designated Places,County Subdivisions,States');
   url.searchParams.set('format', 'json');
   try {
     const response = await fetcher(url.toString());
     if (!response.ok) return problem(502, `The county lookup returned ${response.status}. Try again shortly.`);
-    const json = (await response.json()) as { result?: { geographies?: { Counties?: { GEOID?: string }[] } } };
-    const fips = json.result?.geographies?.Counties?.[0]?.GEOID;
+    const json = (await response.json()) as { result?: { geographies?: Record<string, CensusFeature[] | undefined> } };
+    const geographies = json.result?.geographies ?? {};
+    const fips = geographies['Counties']?.[0]?.GEOID;
     if (!fips) return problem(422, 'That point is not in a U.S. county. This tool covers the United States only.');
     const site = siteForCounty(fips);
     if (!site) return problem(422, `County ${fips} has no climate zone or grid region in this tool's tables (Hawaii and Alaska grids are not in Cambium).`);
-    return { status: 200, body: site, cacheSeconds: CACHE.site };
+    return { status: 200, body: { ...site, ...placeNames(geographies) }, cacheSeconds: CACHE.site };
   } catch {
     return problem(504, 'The county lookup could not be reached.');
   }
