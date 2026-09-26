@@ -39,7 +39,7 @@ function Facts({ facts }: { facts: readonly Fact[] }) {
   return (
     <ul className="learn__facts">
       {facts.map((f) => (
-        <li key={f.text}>
+        <li key={f.text} id={f.id} tabIndex={f.id ? -1 : undefined}>
           {f.text} <Refs refs={f.refs} />
         </li>
       ))}

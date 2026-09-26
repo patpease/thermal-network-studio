@@ -157,7 +157,11 @@ export function normaliseElements(elements: readonly OverpassElement[], boundary
 export const MAX_BOUNDARY_M2 = 4_000_000;
 
 /** How far beyond the boundary to look for sources, water and barriers, m. */
-export const SOURCE_SEARCH_M = 500;
+/**
+ * How far outside the boundary a heat source is looked for: a quarter mile,
+ * the reach VCTN gives for recirculating waste heat (Moving Heat).
+ */
+export const SOURCE_SEARCH_M = 402;
 
 /**
  * The Overpass query for a boundary: buildings, POIs and land use inside it;

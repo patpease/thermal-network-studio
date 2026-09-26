@@ -150,6 +150,12 @@ export const LEARN_COPY = {
   references: 'References',
 } as const;
 
+export const GLYCOL_COPY = {
+  flag: (coldest: string, limit: string, year: number) =>
+    year <= 1 ? `Needs glycol. The loop reaches ${coldest}, below ${limit}.` : `Needs glycol from year ${year}. The bore field drifts to ${coldest}, below ${limit}.`,
+  learn: 'About glycol',
+} as const;
+
 export const BALANCE_COPY = {
   heading: 'Balancing the loop',
   taken: 'Buildings take from the loop',
@@ -160,8 +166,9 @@ export const BALANCE_COPY = {
   perYear: 'a year',
   netTaken: (x: string) => `The buildings take ${x} a year more than they give. The plant adds the difference.`,
   netGiven: (x: string) => `The buildings give ${x} a year more than they take. The plant removes the difference.`,
-  peakAdd: 'Heat to add, worst hour',
-  peakRemove: 'Heat to remove, worst hour',
+  peakAdd: 'Heat to add, design',
+  peakRemove: 'Heat to remove, design',
+  sizedAt: (pct: string, worst: string) => `${pct} of the worst hour (${worst}), as HEET reports for networks where loads cancel.`,
   connected: (x: string, pct: string) => `Connected: ${x} (${pct})`,
   addsHeat: 'Adds heat: bore field, air-source heat pump, waste heat, water.',
   removesHeat: 'Removes heat: bore field, cooling tower, water.',

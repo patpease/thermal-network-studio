@@ -53,3 +53,11 @@ describe('balancing the loop', () => {
     expect(b.removeCapacityW).toBe(100 * BOREHOLE_PEAK_W + 2e6 + 5e5);
   });
 });
+
+describe('design diversity', () => {
+  it('sizes plant at 80% of the worst hour, as HEET reports', () => {
+    const b = balanceOf(run(EMPTY_DESIGN), EMPTY_DESIGN);
+    expect(b.designAddW).toBeCloseTo(0.8 * b.peakAddW, 6);
+    expect(b.designRemoveW).toBeCloseTo(0.8 * b.peakRemoveW, 6);
+  });
+});

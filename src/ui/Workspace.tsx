@@ -61,6 +61,18 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
 
   const { state } = site;
 
+  // Open the Learn tab at a fact, and bring it into view once drawn.
+  const openLearn = (anchor: string) => {
+    setTab('learn');
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        const el = document.getElementById(anchor);
+        el?.scrollIntoView({ block: 'center' });
+        el?.focus({ preventScroll: true });
+      }),
+    );
+  };
+
   const finish = () => {
     site.finishDrawing();
     if (phone) setTab('site');
@@ -281,6 +293,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
                 if (phone && id) setTab('map');
               }}
               onSuggest={site.suggest}
+              onLearn={openLearn}
             />
             {state.site && (
               <div className="panel-body panel-body--bottom">

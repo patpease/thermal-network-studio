@@ -37,7 +37,39 @@ export interface LoopBand {
   readonly max: number;
 }
 
-export const DEFAULT_BAND: LoopBand = { min: 2, max: 30 };
+/**
+ * 40–90 °F, the range HEET gives for a networked geothermal loop (Definition
+ * of Geothermal Networks, 2023), in °C.
+ */
+export const DEFAULT_BAND: LoopBand = { min: (40 - 32) / 1.8, max: (90 - 32) / 1.8 };
+
+/**
+ * Below 40 °F (4.4 °C) a loop needs antifreeze (glycol). HEET's checklist
+ * advises avoiding glycol: it adds installation and maintenance cost.
+ */
+export const GLYCOL_BELOW_C = (40 - 32) / 1.8;
+
+/**
+ * The coldest the loop fluid gets, °C, and the year it first goes below the
+ * glycol line (1 = this year; later years from the 25-year drift). A field
+ * that holds 40 °F this year can drift below it later.
+ */
+export function coldestLoop(result: { loopTemperature: ArrayLike<number>; drift: readonly { year: number; minFluid: number }[] | null }): {
+  readonly temperature: number;
+  readonly firstBelowYear: number | null;
+} {
+  let min = Infinity;
+  for (let h = 0; h < result.loopTemperature.length; h++) min = Math.min(min, Number(result.loopTemperature[h]));
+  let firstBelowYear: number | null = min < GLYCOL_BELOW_C - 1e-6 ? 1 : null;
+  // Year 1 is the hour-by-hour simulation; the projection's own year 1 works
+  // in daily means and reads ~0.5 K colder, so it is not used here.
+  for (const d of result.drift ?? []) {
+    if (d.year === 1) continue;
+    min = Math.min(min, d.minFluid);
+    if (firstBelowYear === null && d.minFluid < GLYCOL_BELOW_C - 1e-6) firstBelowYear = d.year;
+  }
+  return { temperature: min, firstBelowYear };
+}
 
 /**
  * Distribution pumping, per W of thermal energy delivered to buildings. No

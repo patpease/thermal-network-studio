@@ -269,10 +269,22 @@ export const SOURCE_DEFAULTS: Record<SourceKindFound, { exchange: SourceCandidat
   wastewater: { exchange: 'water', capacityW: 2_000_000, temperature: null },
   lake: { exchange: 'water', capacityW: 2_000_000, temperature: null },
   river: { exchange: 'water', capacityW: 2_000_000, temperature: null },
+  // Inside the boundary its refrigeration is in its own load. Outside it, its
+  // condenser heat is a source (see SUPERMARKET_HOMES).
   supermarket: { exchange: 'in-load', capacityW: 0, temperature: null },
 };
 
 const DATA_CENTRE_W_PER_M2 = 250;
+
+/**
+ * A supermarket outside the boundary is counted as heat for 25 homes: VCTN
+ * gives 15–30 for one large supermarket's refrigeration (Moving Heat). One
+ * home is this tool's own single-family home (180 m², zone 5A): 27,900 kWh a
+ * year of heating and hot water, 3.2 kW on average. 25 × 3.2 kW = 80 kW,
+ * available every hour.
+ */
+export const SUPERMARKET_HOMES = 25;
+export const HOME_AVERAGE_HEAT_W = 3_200;
 
 const ICE_SPORTS = new Set(['ice_hockey', 'ice_skating', 'skating', 'curling']);
 
@@ -355,9 +367,9 @@ export function classifySite(data: SiteData): Site {
       name: f.tags['name'] ?? null,
       at,
       distanceM: Math.round(distanceM),
-      exchange: d.exchange,
-      estimatedCapacityW: capacity,
-      temperature: d.temperature,
+      ...(kind === 'supermarket' && distanceM > 0
+        ? { exchange: 'waste-heat' as const, estimatedCapacityW: SUPERMARKET_HOMES * HOME_AVERAGE_HEAT_W, temperature: 30 }
+        : { exchange: d.exchange, estimatedCapacityW: capacity, temperature: d.temperature }),
     });
   };
 

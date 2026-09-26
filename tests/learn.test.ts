@@ -79,8 +79,8 @@ describe('facts about the drawn site', () => {
   it('puts the right fact beside each challenge', () => {
     expect(challengeSiteFact(challengeById('ground-balance')!, site, metrics, ft)).toMatch(/^This site: open space for about/);
     expect(challengeSiteFact(challengeById('off-the-air')!, site, metrics, ft)).toMatch(/^This site: open space for about/);
-    expect(challengeSiteFact(challengeById('waste-not')!, site, metrics, ft)).toMatch(/^This site: \d+ waste heat or water sources? within 1,640 ft\.$/);
-    expect(challengeSiteFact(challengeById('waste-not')!, site, metrics, m)).toMatch(/within 500 m\.$/);
+    expect(challengeSiteFact(challengeById('waste-not')!, site, metrics, ft)).toMatch(/^This site: \d+ waste heat or water sources? within 1,320 ft\.$/);
+    expect(challengeSiteFact(challengeById('waste-not')!, site, metrics, m)).toMatch(/within 402 m\.$/);
     expect(challengeSiteFact(challengeById('half-carbon')!, site, metrics, ft)).toBeNull();
   });
 });

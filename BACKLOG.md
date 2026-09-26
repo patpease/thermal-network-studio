@@ -83,6 +83,29 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       fixture mode and on the production build in `wrangler dev` against
       live services: no CSP refusals.
 
+## Phases 08–10 (from the BDC/HEET/VCTN review)
+
+- [x] **08 Loop and sizing** — default loop 40–90 °F (HEET); a "Needs
+      glycol" flag whenever the loop goes below 40 °F, this year or in the
+      25-year projection, linking to the Learn fact; balancing plant sized at
+      80% of the worst hour (HEET); nearby sources within a quarter mile
+      (VCTN); a supermarket outside the boundary counted as 25 homes of heat;
+      Learn notes on the street loop and what the tool does not see.
+- [ ] **09 Scale** — shared load in tons against HEET's 300-ton
+      economies-of-scale point, on the Site and Design tabs, guiding a
+      player below it to connect more buildings.
+- [ ] **10 Grid impact** — the network's winter electric peak against the
+      same buildings on building-level electrification (air-source heat pumps,
+      BLE); an indicator on Results and a new challenge.
+- **v2: building readiness** (steam heat, electrical panels) — deferred.
+
+Found in 08, not yet fixed:
+
+- **The drift chart's year 1 is the projection's**, which works in daily
+  means and reads about 0.5 K colder than the hour-by-hour year. The Design
+  tab's text and the glycol flag use the simulated year; the chart does not
+  yet.
+
 ## After 07
 
 - [x] Distances in IP (ft) as well as SI; a test holds the context panel to it.

@@ -8,10 +8,11 @@
 import { BOREHOLE_PEAK_W } from '../engine/design';
 import type { SiteMetrics } from '../engine/demand';
 import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
-import { DEFAULT_BAND } from '../engine/network';
+import { DEFAULT_BAND, GLYCOL_BELOW_C } from '../engine/network';
 import { TOWER_APPROACH } from '../engine/sources';
 import type { Challenge } from '../challenges/challenges';
-import { boreholeRoom } from '../site/classify';
+import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/classify';
+import { DESIGN_DIVERSITY } from '../engine/balance';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
@@ -68,6 +69,8 @@ export interface Formatters {
 export interface Fact {
   readonly text: string;
   readonly refs: readonly RefId[];
+  /** An anchor other screens link to (the glycol flag links to 'learn-glycol'). */
+  readonly id?: string;
 }
 
 export interface Section {
@@ -119,11 +122,14 @@ export function sections(f: Formatters): Section[] {
         { text: `Bore field fluid is held between ${f.temperature(FLUID_LIMITS.min)} and ${f.temperature(FLUID_LIMITS.max)} in this tool.`, refs: ['tool'] },
         { text: `At about ${f.power(BOREHOLE_PEAK_W)} per borehole at peak, a field of 100 boreholes gives about ${f.power(100 * BOREHOLE_PEAK_W)}.`, refs: ['tool'] },
         { text: `Boreholes run about ${f.length(61)} to ${f.length(213)} deep, as close as ${f.length(6.1)} apart, and can sit in streets or parking lots.`, refs: ['heet'] },
-        { text: 'Glycol in the loop adds installation and maintenance cost. Plain-water systems operate in Canada.', refs: ['heet'] },
+        { id: 'learn-glycol', text: `A loop colder than ${f.temperature(GLYCOL_BELOW_C)} needs antifreeze (glycol). Glycol adds installation and maintenance cost. Plain-water systems operate in Canada.`, refs: ['heet'] },
+        { text: `HEET’s horizontal loop runs in the street below the frost line, where the ground is typically ${f.temperature(10)} to ${f.temperature(15)}. This tool does not model the pipes or their exchange with the ground.`, refs: ['heet', 'tool'] },
         { text: `A bore field needs open ground. This tool counts parks, pitches and surface parking from OpenStreetMap at one borehole per ${f.area(BORE_DEFAULTS.spacing ** 2)}.`, refs: ['tool', 'osm'] },
         { text: `An air-source heat pump warms the loop from outdoor air. In this tool it stops below ${f.temperature(-20)}.`, refs: ['tool'] },
         { text: `A cooling tower cools water to ${f.delta(TOWER_APPROACH)} above the wet-bulb temperature.`, refs: ['stull', 'tool'] },
         { text: 'Waste heat gives heat only, while it is warmer than the loop.', refs: ['tool'] },
+        { text: `This tool counts a supermarket outside the boundary as heat for ${SUPERMARKET_HOMES} homes: ${f.power(SUPERMARKET_HOMES * HOME_AVERAGE_HEAT_W)}, every hour. Inside the boundary its refrigeration is part of its own load.`, refs: ['vctn', 'tool'] },
+        { text: `This tool sizes balancing plant at ${Math.round(DESIGN_DIVERSITY * 100)}% of the worst hour’s net heat to add or remove.`, refs: ['heet', 'tool'] },
         { text: 'A Vancouver ice rink supplies heat and hot water equal to 43 homes from its refrigeration.', refs: ['vctn'] },
         { text: `Residential wastewater leaves buildings at about ${f.temperature(21)}. A wastewater system can be a heat source or a heat sink.`, refs: ['vctn'] },
         { text: 'A Vancouver neighbourhood meets about 70% of its heating and cooling needs with heat recovered from wastewater.', refs: ['vctn'] },

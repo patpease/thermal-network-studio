@@ -6,11 +6,12 @@
  * of what is built sits under them. Every number with a unit goes through
  * format.ts or NumberField, so nothing here knows which system is shown.
  */
-import { BALANCE_COPY, DESIGN_COPY, SOURCE_COPY } from '../config/copy';
-import { balanceOf } from '../engine/balance';
+import { BALANCE_COPY, DESIGN_COPY, GLYCOL_COPY, SOURCE_COPY } from '../config/copy';
+import { balanceOf, DESIGN_DIVERSITY } from '../engine/balance';
 import { BOREHOLE_PEAK_W, boreFieldArea, defaultSpot, fromCandidate, nextId, RETROFITS } from '../engine/design';
 import type { Design, DesignSource, DesignSourceKind } from '../engine/design';
 import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
+import { coldestLoop, GLYCOL_BELOW_C } from '../engine/network';
 import type { ScenarioResult } from '../engine/scenario';
 import { boreholeRoom } from '../site/classify';
 import type { Site, SourceCandidate } from '../site/classify';
@@ -29,6 +30,8 @@ export interface DesignPanelProps {
   readonly onUpdate: (update: (d: Design) => Design) => void;
   readonly onPlace: (id: string | null) => void;
   readonly onSuggest: () => void;
+  /** Open the Learn tab at an anchor. */
+  readonly onLearn?: (anchor: string) => void;
 }
 
 const TITLES: Record<DesignSourceKind, string> = {
@@ -83,7 +86,7 @@ function Stat({ label, value, note }: { label: string; value: string; note?: str
 /** A signed reduction: "−42%" reads as worse, so a reduction prints plainly. */
 const reduction = (f: number) => (f >= 0 ? `${Math.round(f * 100)}% less` : `${Math.round(-f * 100)}% more`);
 
-function Results({ result, design, running, units }: { result: ScenarioResult | null; design: Design; running: boolean; units: UnitSystem }) {
+function Results({ result, design, running, units, onLearn }: { result: ScenarioResult | null; design: Design; running: boolean; units: UnitSystem; onLearn?: ((anchor: string) => void) | undefined }) {
   if (design.sources.length === 0) {
     return (
       <section className="card" aria-labelledby="results-heading">
@@ -97,7 +100,19 @@ function Results({ result, design, running, units }: { result: ScenarioResult | 
   if (!result) return <p className="message">{running ? 'Running the year…' : ''}</p>;
   const { score, network } = result;
   const last = network.drift?.[network.drift.length - 1];
-  const first = network.drift?.[0];
+  // Year one from the hour-by-hour simulation, not the projection's daily
+  // approximation of it (which reads ~0.5 K colder), so this agrees with the
+  // glycol flag.
+  const loopRange = (() => {
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (const t of network.loopTemperature) {
+      lo = Math.min(lo, t);
+      hi = Math.max(hi, t);
+    }
+    return { minFluid: lo, maxFluid: hi };
+  })();
+  const first = network.drift && network.drift.length > 0 ? loopRange : undefined;
   const outside = last ? last.minFluid < FLUID_LIMITS.min || last.maxFluid > FLUID_LIMITS.max : false;
 
   return (
@@ -113,6 +128,7 @@ function Results({ result, design, running, units }: { result: ScenarioResult | 
         <span className="score__label">score of 100</span>
       </div>
       <p className="card__note">{DESIGN_COPY.scoreNote}</p>
+      <GlycolFlag result={result} units={units} onLearn={onLearn} />
       <div className="stats">
         <Stat label="Site energy" value={reduction(score.energyReduction)} note={`${score.efficiencyPoints} points`} />
         <Stat label="Carbon" value={reduction(score.carbonReduction)} note={`${score.carbonPoints} points`} />
@@ -142,8 +158,29 @@ function Results({ result, design, running, units }: { result: ScenarioResult | 
   );
 }
 
+/** The loop gets colder than a water-only loop can run: it needs glycol. */
+function GlycolFlag({ result, units, onLearn }: { result: ScenarioResult; units: UnitSystem; onLearn?: ((anchor: string) => void) | undefined }) {
+  const coldest = coldestLoop(result.network);
+  if (coldest.firstBelowYear === null) return null;
+  return (
+    <p className="flag" role="note">
+      <span className="flag__mark" aria-hidden="true">
+        !
+      </span>
+      <span>
+        {GLYCOL_COPY.flag(withUnit('temperature', coldest.temperature, units), withUnit('temperature', GLYCOL_BELOW_C, units), coldest.firstBelowYear)}{' '}
+        {onLearn && (
+          <button type="button" className="link-button" onClick={() => onLearn('learn-glycol')}>
+            {GLYCOL_COPY.learn}
+          </button>
+        )}
+      </span>
+    </p>
+  );
+}
+
 /** A met share of a need, as a bar and words. The bar is decoration; the words carry it. */
-function Cover({ label, needW, haveW, role, units }: { label: string; needW: number; haveW: number; role: 'heat' | 'cool'; units: UnitSystem }) {
+function Cover({ label, needW, worstW, haveW, role, units }: { label: string; needW: number; worstW: number; haveW: number; role: 'heat' | 'cool'; units: UnitSystem }) {
   const share = needW > 0 ? haveW / needW : 1;
   const pct = `${Math.round(share * 100)}%`;
   return (
@@ -155,6 +192,7 @@ function Cover({ label, needW, haveW, role, units }: { label: string; needW: num
       <div className="cover__track" aria-hidden="true">
         <div className={`cover__bar cover__bar--${role}`} style={{ width: `${Math.min(100, share * 100)}%` }} />
       </div>
+      <span className="stat__note">{BALANCE_COPY.sizedAt(`${Math.round(DESIGN_DIVERSITY * 100)}%`, withUnit('powerLarge', worstW / 1e6, units))}</span>
       <span className="stat__note">{BALANCE_COPY.connected(withUnit('powerLarge', haveW / 1e6, units), pct)}</span>
     </div>
   );
@@ -175,8 +213,8 @@ function BalanceCard({ result, design, units }: { result: ScenarioResult; design
         <Stat label={BALANCE_COPY.overlap} value={`${Math.round(result.site.doc * 100)}%`} note={`${energy(b.sharedKWh)} ${BALANCE_COPY.shared.toLowerCase()}`} />
       </div>
       <p className="card__note">{b.netKWh >= 0 ? BALANCE_COPY.netTaken(energy(b.netKWh)) : BALANCE_COPY.netGiven(energy(b.netKWh))}</p>
-      <Cover label={BALANCE_COPY.peakAdd} needW={b.peakAddW} haveW={b.addCapacityW} role="heat" units={units} />
-      <Cover label={BALANCE_COPY.peakRemove} needW={b.peakRemoveW} haveW={b.removeCapacityW} role="cool" units={units} />
+      <Cover label={BALANCE_COPY.peakAdd} needW={b.designAddW} worstW={b.peakAddW} haveW={b.addCapacityW} role="heat" units={units} />
+      <Cover label={BALANCE_COPY.peakRemove} needW={b.designRemoveW} worstW={b.peakRemoveW} haveW={b.removeCapacityW} role="cool" units={units} />
       <ul className="card__note balance__facts">
         <li>{BALANCE_COPY.addsHeat}</li>
         <li>{BALANCE_COPY.removesHeat}</li>
@@ -290,7 +328,7 @@ export function DesignPanel(props: DesignPanelProps) {
 
   return (
     <div className="panel-body">
-      <Results result={props.result} design={design} running={props.running} units={units} />
+      <Results result={props.result} design={design} running={props.running} units={units} onLearn={props.onLearn} />
       {props.result && <BalanceCard result={props.result} design={design} units={units} />}
 
       <section className="card" aria-labelledby="add-heading">
@@ -387,6 +425,7 @@ export function DesignPanel(props: DesignPanelProps) {
           />
         </div>
         <p className="card__note">{DESIGN_COPY.bandNote}</p>
+        {props.result && design.sources.length > 0 && <GlycolFlag result={props.result} units={units} onLearn={props.onLearn} />}
         <label className="field-label" htmlFor="retrofit">
           {DESIGN_COPY.retrofitLabel}
         </label>

@@ -271,7 +271,7 @@ export function SitePanel(props: SitePanelProps) {
                       {s.name ?? s.kind.replace('-', ' ')} <span className="muted">— {s.kind.replace('-', ' ')}, {s.distanceM === 0 ? 'inside' : `${withUnit('length', s.distanceM, units, 2)} away`}</span>
                       {s.exchange === 'in-load' ? (
                         <span className="muted">
-                          {s.distanceM === 0 ? ' · its refrigeration is counted in its load' : ' · outside the boundary: draw it in to count its refrigeration'}
+                          {' · its refrigeration is counted in its load'}
                         </span>
                       ) : (
                         <span className="muted"> · about {withUnit('powerLarge', s.estimatedCapacityW / 1e6, units, 2)} (estimate)</span>

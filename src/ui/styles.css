@@ -1271,3 +1271,26 @@ a.button {
   flex-direction: column;
   gap: 0.2rem;
 }
+
+/* A flag: a fact about the design that has a cost (glycol). Warn ink, never
+   a series colour. */
+.flag {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 0.84rem;
+  color: var(--warn-ink);
+  border-left: 3px solid var(--warn-ink);
+  padding: 0.3rem 0 0.3rem 0.55rem;
+  margin: 0;
+}
+
+.flag__mark {
+  font-weight: 800;
+}
+
+.learn__facts li:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}

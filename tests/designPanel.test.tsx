@@ -91,7 +91,7 @@ describe('DesignPanel', () => {
   it('keeps the loop band in the displayed temperature unit', () => {
     render(<Harness units="ip" />);
     const low = screen.getByLabelText('Loop at least') as HTMLInputElement;
-    expect(low.value).toBe('35.6');
+    expect(low.value).toBe('40');
     fireEvent.change(low, { target: { value: '41' } });
     expect(last.band.min).toBeCloseTo(5, 6);
   });
