@@ -31,6 +31,7 @@ const C = {
   muted: '#5D6B7A',
   rule: '#D9DEE5',
   accent: '#0F5F52',
+  accentDeep: '#0A4239',
   seal: ICON_INK,
   building: '#8391AD',
 } as const;
@@ -118,27 +119,75 @@ function outlineMarkup(o: AwardOutline, x: number, y: number, w: number, h: numb
   const path = (ring: Ring) => ring.map((p, i) => `${i ? 'L' : 'M'}${at(p)[0].toFixed(1)} ${at(p)[1].toFixed(1)}`).join('') + 'Z';
   const colour = { heat: ICON_ORANGE, cool: ICON_BLUE, ground: ICON_GREEN } as const;
   return [
-    `<path d="${path(o.boundary)}" fill="none" stroke="${C.accent}" stroke-width="4" stroke-linejoin="round"/>`,
+    `<path d="${path(o.boundary)}" fill="none" stroke="${C.accent}" stroke-width="3" stroke-linejoin="round"/>`,
     `<g fill="none" stroke="${C.building}" stroke-width="1.6" stroke-linejoin="round">${o.buildings.map((b) => `<path d="${path(b)}"/>`).join('')}</g>`,
     ...o.sources.map((s) => {
       const [cx, cy] = at(s.at);
-      return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="9" fill="${colour[s.role]}" stroke="${C.paper}" stroke-width="3"/>`;
+      return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="7" fill="${colour[s.role]}" stroke="${C.paper}" stroke-width="2"/>`;
     }),
   ].join('');
 }
 
-/** The seal: two rings, a ring of dots, and the challenge's icon at badge size. */
-function seal(cx: number, cy: number, icon: string): string {
-  const dots = Array.from({ length: 36 }, (_, i) => {
-    const a = (i / 36) * Math.PI * 2;
-    return `<circle cx="${(cx + Math.cos(a) * 198).toFixed(1)}" cy="${(cy + Math.sin(a) * 198).toFixed(1)}" r="${i % 3 === 0 ? 4.5 : 2.6}" fill="${C.seal}"/>`;
+/**
+ * The medal: a notched outer rim, a ring of dots, an inner disc, and the
+ * challenge's icon at medal size. Line work in the icon's own ink, so the
+ * icon and the medal read as one drawing.
+ */
+function medal(cx: number, cy: number, icon: string): string {
+  const R = 272;
+  // A scalloped rim: 48 shallow notches, like a struck medal's edge.
+  const rim = Array.from({ length: 96 }, (_, i) => {
+    const a = (i / 96) * Math.PI * 2 - Math.PI / 2;
+    const r = i % 2 === 0 ? R : R - 9;
+    return `${i ? 'L' : 'M'}${(cx + Math.cos(a) * r).toFixed(1)} ${(cy + Math.sin(a) * r).toFixed(1)}`;
+  }).join('') + 'Z';
+  const dots = Array.from({ length: 40 }, (_, i) => {
+    const a = (i / 40) * Math.PI * 2;
+    return `<circle cx="${(cx + Math.cos(a) * 238).toFixed(1)}" cy="${(cy + Math.sin(a) * 238).toFixed(1)}" r="${i % 4 === 0 ? 5 : 3}" fill="${C.seal}"/>`;
   }).join('');
-  const scale = 5;
+  const scale = 6.4;
   return [
-    `<circle cx="${cx}" cy="${cy}" r="214" fill="none" stroke="${C.seal}" stroke-width="6"/>`,
+    `<path d="${rim}" fill="${C.paper}" stroke="${C.seal}" stroke-width="8" stroke-linejoin="round"/>`,
+    `<circle cx="${cx}" cy="${cy}" r="252" fill="none" stroke="${C.seal}" stroke-width="3"/>`,
     dots,
-    `<circle cx="${cx}" cy="${cy}" r="180" fill="${C.panel}" stroke="${C.accent}" stroke-width="3"/>`,
-    `<g transform="translate(${cx - 24 * scale} ${cy - 24 * scale}) scale(${scale})" fill="none" stroke-linecap="round" stroke-linejoin="round">${icon}</g>`,
+    `<circle cx="${cx}" cy="${cy}" r="218" fill="${C.panel}" stroke="${C.accent}" stroke-width="5"/>`,
+    `<g transform="translate(${cx - 24 * scale} ${cy - 24 * scale - 10}) scale(${scale})" fill="none" stroke-linecap="round" stroke-linejoin="round">${icon}</g>`,
+  ].join('');
+}
+
+/**
+ * The ribbon the medal hangs from: two straps meeting behind it, each in the
+ * accent with a stripe of heat (orange) or cooling (blue) — the two sides a
+ * network trades between.
+ */
+function ribbon(cx: number, top: number, meet: number): string {
+  const strap = (side: -1 | 1, stripe: string) => {
+    const x0 = cx + side * 250;
+    const x1 = cx + side * 40;
+    const w = 150;
+    const outer = `M${x0 - (w / 2) * side} ${top}L${x0 + (w / 2) * side} ${top}L${x1 + (w / 2) * side} ${meet}L${x1 - (w / 2) * side} ${meet}Z`;
+    const s0 = `M${x0 - 16} ${top}L${x0 + 16} ${top}L${x1 + 16} ${meet}L${x1 - 16} ${meet}Z`;
+    return `<path d="${outer}" fill="${C.accent}"/><path d="${s0}" fill="${stripe}"/>`;
+  };
+  return strap(-1, ICON_ORANGE) + strap(1, ICON_BLUE);
+}
+
+/** A swallowtail banner across the medal, carrying the challenge's title. */
+function banner(cx: number, cy: number, width: number, height: number): string {
+  const x0 = cx - width / 2;
+  const x1 = cx + width / 2;
+  const tail = 70;
+  const drop = 26;
+  const y0 = cy - height / 2;
+  const y1 = cy + height / 2;
+  const leftTail = `M${x0 + 30} ${y0 + drop}L${x0 - tail} ${y0 + drop}L${x0 - tail + 34} ${(y0 + y1) / 2 + drop}L${x0 - tail} ${y1 + drop}L${x0 + 30} ${y1 + drop}Z`;
+  const rightTail = `M${x1 - 30} ${y0 + drop}L${x1 + tail} ${y0 + drop}L${x1 + tail - 34} ${(y0 + y1) / 2 + drop}L${x1 + tail} ${y1 + drop}L${x1 - 30} ${y1 + drop}Z`;
+  return [
+    `<path d="${leftTail}" fill="${C.accentDeep}"/>`,
+    `<path d="${rightTail}" fill="${C.accentDeep}"/>`,
+    `<path d="M${x0} ${y1}L${x0 + 30} ${y1 + drop}L${x0 + 30} ${y1}Z" fill="${C.seal}"/>`,
+    `<path d="M${x1} ${y1}L${x1 - 30} ${y1 + drop}L${x1 - 30} ${y1}Z" fill="${C.seal}"/>`,
+    `<rect x="${x0}" y="${y0}" width="${width}" height="${height}" fill="${C.accent}"/>`,
   ].join('');
 }
 
@@ -168,39 +217,41 @@ export function awardSvg(input: AwardInput, fonts: AwardFonts = {}): string {
     `<text x="${x}" y="${y}" font-family="${escapeXml(opts.family ?? sans)}" font-size="${size}" font-weight="${opts.weight ?? 400}" fill="${opts.fill ?? C.ink}" text-anchor="${opts.anchor ?? 'start'}"${opts.spacing ? ` letter-spacing="${opts.spacing}"` : ''}>${escapeXml(text)}</text>`;
 
   const place = placeLines(input.place);
-  const title = wrapTitle(input.challenge.title, 22);
-  // One line at 68 px; a long title takes two at 54 so the panel keeps its room.
-  const titleSize = title.length > 1 ? 54 : 68;
-  const titleY = 694;
-  const afterTitle = titleY + (title.length - 1) * 60;
+  const title = wrapTitle(input.challenge.title, 20);
+  const titleSize = title.length > 1 ? 44 : 60;
 
-  const lowerTop = afterTitle + 136;
-  const outlineX = 540;
-  const outlineW = W - L - outlineX;
-  const lowerH = 1196 - lowerTop;
+  const medalY = 560;
+  const bannerY = 810;
+  const bannerH = title.length > 1 ? 124 : 104;
+  const stripTop = 1062;
+  const stripH = 146;
+  const thumbW = 250;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
 <style>${face}</style>
 <rect width="${W}" height="${H}" fill="${C.paper}"/>
-<rect x="0" y="0" width="${W}" height="10" fill="${C.accent}"/>
-${mark(L, 56, 64)}
-${t(L + 84, 80, 20, 'PEASE STUDIO', { weight: 600, fill: C.muted, family: mono, spacing: 3 })}
-${t(L + 84, 110, 30, 'Thermal Network Studio', { weight: 700 })}
-${t(W - L, 96, 22, monthYear(input.date).toUpperCase(), { weight: 500, fill: C.muted, family: mono, anchor: 'end', spacing: 2 })}
-${seal(W / 2, 372, ICONS[input.challenge.icon])}
-${t(W / 2, 628, 22, 'CHALLENGE MET', { weight: 600, fill: C.accent, family: mono, anchor: 'middle', spacing: 5 })}
-${title.map((line, i) => t(W / 2, titleY + i * 60, titleSize, line, { weight: 700, anchor: 'middle' })).join('\n')}
-${t(W / 2, afterTitle + 58, 38, place.main, { weight: 600, anchor: 'middle' })}
-${place.sub ? t(W / 2, afterTitle + 98, 30, place.sub, { fill: C.muted, anchor: 'middle' }) : ''}
-<rect x="${L}" y="${lowerTop}" width="${W - 2 * L}" height="${lowerH}" rx="18" fill="${C.panel}"/>
-${t(L + 36, lowerTop + 100, 88, pct(input.carbonReduction), { weight: 700, fill: C.accent })}
-${t(L + 36, lowerTop + 138, 28, `${direction(input.carbonReduction)} carbon`, { weight: 600 })}
-${t(L + 36, lowerTop + 222, 64, pct(input.energyReduction), { weight: 700 })}
-${t(L + 36, lowerTop + 258, 26, `${direction(input.energyReduction)} energy`, { weight: 600 })}
-${t(L + 36, lowerTop + 300, 20, 'than the same buildings today', { fill: C.muted })}
-${outlineMarkup(input.outline, outlineX, lowerTop, outlineW, lowerH)}
-<line x1="${L}" y1="1232" x2="${W - L}" y2="1232" stroke="${C.rule}" stroke-width="2"/>
-${t(L, 1278, 26, input.url, { weight: 500, fill: C.accent, family: mono })}
-${t(L, 1314, 19, 'Conveys an idea; does not predict a saving. Buildings © OpenStreetMap contributors.', { fill: C.muted })}
+${mark(L, 44, 56)}
+${t(L + 74, 66, 18, 'PEASE STUDIO', { weight: 600, fill: C.muted, family: mono, spacing: 3 })}
+${t(L + 74, 94, 26, 'Thermal Network Studio', { weight: 700 })}
+${t(W - L, 82, 20, monthYear(input.date).toUpperCase(), { weight: 500, fill: C.muted, family: mono, anchor: 'end', spacing: 2 })}
+${ribbon(W / 2, 128, medalY - 150)}
+${medal(W / 2, medalY, ICONS[input.challenge.icon])}
+${banner(W / 2, bannerY, 760, bannerH)}
+${title
+  .map((line, i) => t(W / 2, bannerY + (title.length > 1 ? -8 + i * 48 : 21) - (title.length > 1 ? 12 : 0), titleSize, line, { weight: 800, fill: C.paper, anchor: 'middle' }))
+  .join('\n')}
+${t(W / 2, bannerY + bannerH / 2 + 78, 22, 'CHALLENGE MET', { weight: 600, fill: C.accent, family: mono, anchor: 'middle', spacing: 6 })}
+${t(W / 2, bannerY + bannerH / 2 + 132, 42, place.main, { weight: 700, anchor: 'middle' })}
+${place.sub ? t(W / 2, bannerY + bannerH / 2 + 176, 30, place.sub, { fill: C.muted, anchor: 'middle' }) : ''}
+<rect x="${L}" y="${stripTop}" width="${W - 2 * L}" height="${stripH}" rx="16" fill="${C.panel}"/>
+${t(L + 32, stripTop + 78, 64, pct(input.carbonReduction), { weight: 800, fill: C.accent })}
+${t(L + 32, stripTop + 118, 24, `${direction(input.carbonReduction)} carbon`, { weight: 600 })}
+${t(L + 292, stripTop + 78, 64, pct(input.energyReduction), { weight: 800 })}
+${t(L + 292, stripTop + 118, 24, `${direction(input.energyReduction)} energy`, { weight: 600 })}
+${t(W - L - thumbW - 28, stripTop + 118, 18, 'than the buildings today', { fill: C.muted, anchor: 'end' })}
+${outlineMarkup(input.outline, W - L - thumbW, stripTop, thumbW, stripH)}
+<line x1="${L}" y1="1240" x2="${W - L}" y2="1240" stroke="${C.rule}" stroke-width="2"/>
+${t(L, 1282, 26, input.url, { weight: 500, fill: C.accent, family: mono })}
+${t(L, 1316, 19, 'Conveys an idea; does not predict a saving. Buildings © OpenStreetMap contributors.', { fill: C.muted })}
 </svg>`;
 }

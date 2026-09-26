@@ -62,6 +62,9 @@ sits on the page and is burned into every export.
 | D31 | **Score is year 1; the 25-year drift is shown, never scored** (decided after phase 03) | A design can score well while its ground overheats; the drift chart and the fluid limits say so. Challenges (D16) may still demand balance. |
 | D32 | **County decides zone and grid** (phase 03) | The relay turns a point into a county (Census geocoder), and the county into the ASHRAE zone the calibration used (NLR's own tract table) and the Cambium region. Both tables stay server-side. |
 | D33 | **MapLibre GL 5.x** (phase 03) | 6.x exists; staying on 5 until phase 07, where the upgrade is a backlog item. |
+| D34 | **An award for a met challenge, made to post on LinkedIn** (phase 06) | A 1080 × 1350 portrait medal graphic: the challenge's own icon (new, in Psychrometric Studio's line style) on a medal hung from a heat-and-cool ribbon, the challenge on a banner, the place (neighbourhood, town, state — editable), the carbon and energy reductions, the neighbourhood outline, the month, the link and the scope line. Challenges only; sandbox play earns none. Posting is download + copy + open LinkedIn's composer: LinkedIn will pre-fill text but not attach an image, and nothing is uploaded. The post text is shown in an editable box before copying. The link is a placeholder constant (`AWARD_LINK_BASE`) pointing at the live workers.dev route until the tool has its own address. |
+| D35 | **A bore field must fit the site's open space for any challenge** (phase 06) | Not a warning, a failed goal, on every challenge whenever the design has a bore field: an award for boreholes under buildings would be a fiction. Open space is OSM parks, pitches and surface parking at a 6 m grid — an undercount, stated. On downtown Mankato it leaves Off the air unwinnable; Alexandria, with room, wins it. |
+| D36 | **Four challenges** (phase 06) | Half the carbon; Ground in balance (the drift may be demanded here though never scored, D31); Waste not (15% of the loop's heat from waste heat or water, with a 100-hour backup cap so a data centre plus backup cannot earn it); Off the air. Every challenge caps backup hours. |
 
 ## Carried over from the sibling tools (copied, not a shared package)
 
@@ -199,4 +202,4 @@ Study* (Buro Happold et al., January 2026)**
 
 ## Open questions
 
-None blocking. Phases 04 and 05 are built; next is phase 06, challenges.
+None blocking. Phases 04–06 are built; next is phase 07, education, export, the phone pass and deploy.

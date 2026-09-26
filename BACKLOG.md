@@ -59,8 +59,31 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       fly-to when a place is picked before the map loads. 176 tests.
       Verified in Chromium: desk light and dark, phone width, no console
       errors.
-- [ ] **06 Challenges** — goal format, goal library, share links.
+- [x] **06 Challenges** — goals as data; four challenges (Half the carbon,
+      Ground in balance, Waste not, Off the air) with a live checklist in the
+      Design tab; every challenge fails a bore field that does not fit the
+      open space (D35). The award (D34): a bold medal graphic with four new
+      icons in Psychrometric Studio's style, downloaded as a 1080 × 1350 PNG
+      with its fonts embedded; place names from the Census (town, state) and
+      OSM (neighbourhood), editable; the post text editable before copying;
+      LinkedIn's composer opened with it. Share links carry the boundary,
+      the player's building changes, the design and the challenge;
+      `?challenge=` opens a challenge. Verified in Chromium in fixture mode
+      and on the production build in `wrangler dev` against live services:
+      no CSP refusals.
 - [ ] **07 Education, export, phone pass, deploy.**
+
+## Not done in 06, deliberately
+
+- **Hashtags per challenge.** Two fixed tags; the player can edit the text.
+- **The award is a PNG, not a link preview.** A LinkedIn link-preview card
+  would need the Worker to render images and a URL that encodes the award.
+- **Fixtures name no neighbourhood.** They were captured before the Overpass
+  query asked for `place` nodes; re-capture them through `wrangler dev`.
+- **Share links are not shortened.** About 1.3–1.5 k characters for a
+  realistic design — under the 2,000 that breaks in mail clients.
+- **The award link is a placeholder** (`AWARD_LINK_BASE`) until the tool has
+  its own domain.
 
 ## Not done in 05, deliberately
 

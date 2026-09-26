@@ -53,7 +53,9 @@ tests/        vitest. Node by default; a DOM test opts in with a docblock.
 `src/engine/design.ts` is the design as the player holds it (phase 04);
 `src/ui/DesignPanel.tsx` edits it. `src/charts/` is the results screen
 (phase 05): `data.ts` (pure) turns a result into what each chart draws, and
-each chart is hand-authored SVG — no chart library.
+each chart is hand-authored SVG — no chart library. `src/challenges/` holds
+the challenges as data (phase 06), `src/award/` the award graphic, its icons,
+its PNG export and the LinkedIn post, and `src/io/share.ts` share links.
 
 ## Rules
 
@@ -325,3 +327,45 @@ Things that looked right and were not:
   specific; it sits inside `@media (min-width: 861px)` for that reason.
 - **Column headers anchored at the node columns met in the middle** at phone
   width ("INTO THELOOP THE LOOP"). They anchor at the outer edges now.
+
+## Challenges and the award (phase 06)
+
+- **A challenge is data**: goals over numbers the engine already computes
+  (`challenges/challenges.ts`). A new challenge is a record, never code.
+- **Every challenge fails a bore field that does not fit** the open space
+  (D35). It is added to every challenge by `evaluate`, not listed per
+  challenge, so a new challenge cannot forget it. Every challenge also caps
+  backup hours — otherwise waste heat plus electric backup would earn "Waste
+  not".
+- **The award is a plain SVG string** (`award/graphic.ts`), not React: it is
+  rasterised through an `<img>`, which sees no stylesheet, no custom
+  properties and cannot fetch. Every colour is a literal (always the light
+  palette), and the fonts are read once and embedded as data URIs
+  (`award/raster.ts`). The preview IS that SVG, so what is seen is what is
+  posted.
+- **The award's icons follow Psychrometric Studio's icon rules** — 48 grid,
+  `#0B2B28` outline, three meaningful accents, stroke 3 / 2.4–2.8, no fills
+  but dots — and `tests/award.test.ts` holds them to it. On screen the ink
+  becomes `currentColor`, as that tool's icon build does, so the same drawing
+  serves the dark theme.
+- **Everything a player types into the award is escaped.**
+- **LinkedIn cannot receive an image from a site.** The flow is download,
+  copy (from an editable box), open the composer pre-filled; say so on the
+  card. Nothing is uploaded.
+- **Share links carry the player's changes, not the buildings**: the boundary,
+  exclusions, overrides, design and challenge, base64url in the fragment. A
+  future version is refused; anything malformed is null.
+- **The challenge survives a redraw**; place-name edits do not (a new site).
+
+Things that looked right and were not:
+
+- **The first challenges could only be won by boreholes under buildings.**
+  Mankato's winning designs used 3,000 bores where the open space holds
+  about 900. That is why D35 exists. With it, the levers that win are the
+  real ones: a colder loop (−3 °C, the fluid limit), river heat, a retrofit.
+- **The unmet hours that decide "Half the carbon" are the cold snap.** Below
+  −20 °C the air-source heat pump stops by design, and a field held at a
+  2 °C floor has nothing left. Doubling every piece of plant barely moved
+  them (144 → 122); lowering the floor did (→ 7). The challenge teaches it.
+- **The sandbox's own fixtures name no neighbourhood**, so the award falls
+  back to "Mankato, MN" there. That is the never-invent rule working.

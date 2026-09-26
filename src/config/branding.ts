@@ -23,6 +23,14 @@ export const BRAND = {
 } as const;
 
 /**
+ * PLACEHOLDER: the link every award and LinkedIn post carries, until the tool
+ * is published at its own address. It points at the live workers.dev route so
+ * that the link works in the meantime — a placeholder that 404s would be
+ * posted for ever. Change it here and every award follows.
+ */
+export const AWARD_LINK_BASE = `https://${BRAND.host}`;
+
+/**
  * The prose lives in copy.ts. Re-exported so an export path keeps one import
  * and there is never a second copy of the same sentence to drift.
  */

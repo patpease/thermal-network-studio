@@ -100,3 +100,34 @@ export const RESULTS_COPY = {
   shapeCaveat:
     'Annual loads are calibrated to NLR ComStock™ and ResStock™; the hour-by-hour shape is this tool’s own model and is not checked against them. The charts convey how the network behaves, not what a real one would save.',
 } as const;
+
+export const CHALLENGE_COPY = {
+  heading: 'Challenge',
+  label: 'Play',
+  sandbox: 'Sandbox — no goals',
+  sandboxNote: 'Build anything. Pick a challenge to play for an award.',
+  met: 'Challenge met',
+  notYet: 'Not yet',
+  award: 'Get your award',
+  runFirst: 'Build something to see where you stand.',
+  share: 'Copy a link to this design',
+  shared: 'Link copied. It holds the boundary, your changes and the design — the buildings are re-read from OpenStreetMap when it opens.',
+  shareFailed: 'Could not copy. Select the link below and copy it yourself.',
+} as const;
+
+export const AWARD_COPY = {
+  heading: 'Your award',
+  placeNote: 'Check the names before you post: they come from OpenStreetMap and the Census, and a neighbourhood is only named where OSM names one.',
+  neighbourhood: 'Neighbourhood',
+  town: 'Town or city',
+  state: 'State',
+  preview: 'Award preview',
+  download: 'Download the award (PNG)',
+  postLabel: 'Post text — edit it before you copy',
+  copy: 'Copy the text',
+  copied: 'Copied.',
+  copyFailed: 'Could not copy. Select the text and copy it yourself.',
+  openLinkedIn: 'Open LinkedIn',
+  steps: 'Download the award, copy the text, open LinkedIn, then drag the image into the post. LinkedIn does not let a site attach an image for you, and this tool uploads nothing.',
+  drawing: 'Drawing the award…',
+} as const;

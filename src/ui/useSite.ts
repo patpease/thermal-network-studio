@@ -33,6 +33,12 @@ import type { SiteData } from '../site/osm';
 
 export type Phase = 'idle' | 'drawing' | 'loading' | 'ready' | 'error';
 
+export interface PlaceEdits {
+  readonly neighbourhood?: string;
+  readonly town?: string;
+  readonly state?: string;
+}
+
 export interface SiteState {
   readonly phase: Phase;
   readonly draft: readonly LonLat[];
@@ -46,6 +52,10 @@ export interface SiteState {
   readonly placing: string | null;
   readonly result: ScenarioResult | null;
   readonly running: boolean;
+  /** The challenge being played, or null for the sandbox. Survives a redraw. */
+  readonly challengeId: string | null;
+  /** Place names as the player corrected them for the award. */
+  readonly placeEdits: PlaceEdits;
   readonly message: string | null;
 }
 
@@ -62,6 +72,8 @@ const INITIAL: SiteState = {
   result: null,
   running: false,
   message: null,
+  challengeId: null,
+  placeEdits: {},
 };
 
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -92,9 +104,10 @@ export function useSite() {
     return () => engine.current?.terminate();
   }, []);
 
+  // The challenge is the player's goal, not the site's: it survives a redraw.
   const startDrawing = useCallback(() => {
     generation.current++;
-    setState({ ...INITIAL, phase: 'drawing' });
+    setState((s) => ({ ...INITIAL, phase: 'drawing', challengeId: s.challengeId }));
   }, []);
 
   const addPoint = useCallback((p: LonLat) => {
@@ -107,13 +120,18 @@ export function useSite() {
 
   const clear = useCallback(() => {
     generation.current++;
-    setState(INITIAL);
+    setState((s) => ({ ...INITIAL, challengeId: s.challengeId }));
   }, []);
 
-  const load = useCallback(async (boundary: Ring) => {
+  /**
+   * Read a boundary's site, weather and buildings. `init` is what a share
+   * link carries — the player's building changes and design — applied once
+   * the buildings they refer to have arrived.
+   */
+  const load = useCallback(async (boundary: Ring, init?: { selection: Selection; design: Design }) => {
     const mine = ++generation.current;
     const stillMine = () => mine === generation.current;
-    setState({ ...INITIAL, phase: 'loading', boundary });
+    setState((s) => ({ ...INITIAL, phase: 'loading', boundary, challengeId: s.challengeId }));
 
     const [lon, lat] = centroid(boundary);
     try {
@@ -136,7 +154,7 @@ export function useSite() {
         attribution: weather.attribution,
         year: weather.year,
       };
-      setState((s) => ({ ...s, phase: 'ready', place, site, weather: w, selection: EMPTY_SELECTION }));
+      setState((s) => ({ ...s, phase: 'ready', place, site, weather: w, selection: init?.selection ?? EMPTY_SELECTION, design: init?.design ?? EMPTY_DESIGN }));
     } catch (error) {
       if (!stillMine()) return;
       setState((s) => ({ ...s, phase: 'error', message: error instanceof Error ? error.message : String(error) }));
@@ -167,6 +185,14 @@ export function useSite() {
       overrides.set(id, { ...overrides.get(id), ...override });
       return { ...s, selection: { ...s.selection, overrides } };
     });
+  }, []);
+
+  const setChallenge = useCallback((challengeId: string | null) => {
+    setState((s) => ({ ...s, challengeId }));
+  }, []);
+
+  const editPlace = useCallback((edits: PlaceEdits) => {
+    setState((s) => ({ ...s, placeEdits: { ...s.placeEdits, ...edits } }));
   }, []);
 
   const updateDesign = useCallback((update: (d: Design) => Design) => {
@@ -237,6 +263,8 @@ export function useSite() {
     startPlacing,
     placeAt,
     suggest,
+    setChallenge,
+    editPlace,
   };
 }
 

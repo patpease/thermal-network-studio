@@ -24,6 +24,12 @@ export type Goal =
   | { readonly kind: 'with'; readonly sources: readonly DesignSourceKind[] }
   /** The bore field's fluid inside its design limits for every one of 25 years. */
   | { readonly kind: 'ground-holds' }
+  /**
+   * Every bore field fits the site's open space (parks, pitches, surface
+   * parking at a 6 m grid). Applied to EVERY challenge, not listed per
+   * challenge: an award for boreholes under buildings would be a fiction.
+   */
+  | { readonly kind: 'bores-fit' }
   /** Share of all heat put into the loop that came from these kinds, at least. */
   | { readonly kind: 'heat-from'; readonly sources: readonly DesignSourceKind[]; readonly atLeast: number };
 
@@ -124,7 +130,13 @@ export function heatShareFrom(result: ScenarioResult, design: Design, kinds: rea
   return from / into;
 }
 
-export function evaluateGoal(goal: Goal, result: ScenarioResult, design: Design): GoalResult {
+/** What a challenge needs to know about the site, beyond the result. */
+export interface SiteLimits {
+  /** Boreholes the open space holds (`boreholeRoom`). */
+  readonly boreholeRoom: number;
+}
+
+export function evaluateGoal(goal: Goal, result: ScenarioResult, design: Design, limits: SiteLimits): GoalResult {
   const kinds = new Set(design.sources.map((s) => s.kind));
   switch (goal.kind) {
     case 'carbon-reduction': {
@@ -149,6 +161,15 @@ export function evaluateGoal(goal: Goal, result: ScenarioResult, design: Design)
       const bad = drift.find((d) => d.minFluid < FLUID_LIMITS.min || d.maxFluid > FLUID_LIMITS.max);
       return { goal, met: !bad, asks: 'Ground fluid inside its limits for 25 years', now: bad ? `leaves them in year ${bad.year}` : 'holds all 25' };
     }
+    case 'bores-fit': {
+      const n = design.sources.reduce((a, s) => a + (s.kind === 'bore-field' ? s.boreholes : 0), 0);
+      return {
+        goal,
+        met: n <= limits.boreholeRoom,
+        asks: `Boreholes fit the open space (about ${limits.boreholeRoom.toLocaleString('en-US')})`,
+        now: `${n.toLocaleString('en-US')} boreholes`,
+      };
+    }
     case 'heat-from': {
       const share = heatShareFrom(result, design, goal.sources);
       return { goal, met: share >= goal.atLeast, asks: `At least ${pct(goal.atLeast)} of the loop’s heat from ${list(goal.sources, ' or ')}`, now: pct(share) };
@@ -162,7 +183,12 @@ export interface ChallengeResult {
   readonly met: boolean;
 }
 
-export function evaluate(challenge: Challenge, result: ScenarioResult, design: Design): ChallengeResult {
-  const goals = challenge.goals.map((g) => evaluateGoal(g, result, design));
+/** Goals every challenge carries whenever the design makes them relevant. */
+function universalGoals(design: Design): Goal[] {
+  return design.sources.some((s) => s.kind === 'bore-field') ? [{ kind: 'bores-fit' }] : [];
+}
+
+export function evaluate(challenge: Challenge, result: ScenarioResult, design: Design, limits: SiteLimits): ChallengeResult {
+  const goals = [...challenge.goals, ...universalGoals(design)].map((g) => evaluateGoal(g, result, design, limits));
   return { challenge, goals, met: goals.every((g) => g.met) };
 }
