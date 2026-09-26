@@ -14,9 +14,11 @@ export interface ChallengeCardProps {
   readonly running: boolean;
   readonly onChange: (id: string | null) => void;
   readonly onAward: () => void;
+  /** A fact about the drawn site that bears on this challenge. */
+  readonly siteFact?: string | null;
 }
 
-export function ChallengeCard({ challengeId, evaluation, running, onChange, onAward }: ChallengeCardProps) {
+export function ChallengeCard({ challengeId, evaluation, running, onChange, onAward, siteFact }: ChallengeCardProps) {
   const challenge = CHALLENGES.find((c) => c.id === challengeId) ?? null;
   return (
     <section className={`card challenge${evaluation?.met ? ' challenge--met' : ''}`} aria-labelledby="challenge-heading">
@@ -43,6 +45,7 @@ export function ChallengeCard({ challengeId, evaluation, running, onChange, onAw
             <ChallengeIcon icon={challenge.icon} />
             <p className="card__note">{challenge.brief}</p>
           </div>
+          {siteFact && <p className="card__note challenge__site">{siteFact}</p>}
           {evaluation ? (
             <ul className="goals" aria-busy={running}>
               {evaluation.goals.map((g, i) => (

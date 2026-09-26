@@ -56,6 +56,7 @@ tests/        vitest. Node by default; a DOM test opts in with a docblock.
 each chart is hand-authored SVG — no chart library. `src/challenges/` holds
 the challenges as data (phase 06), `src/award/` the award graphic, its icons,
 its PNG export and the LinkedIn post, and `src/io/share.ts` share links.
+`src/education/learn.ts` is the Learn tab's content (phase 07).
 
 ## Rules
 
@@ -116,7 +117,8 @@ simulation budget is a sub-second re-run of a full 8760 (D6); measure it on
   200 with the HTML shell. It is `"none"` here.
 - **A box that measures 0 is desktop, not phone** (from phase 03). jsdom reports
   every width as 0, and an export's off-screen copy relies on measuring wide.
-- **An export must never be the phone layout** (from phase 07).
+- **An export must never be the phone layout** (phase 07: `ChartCard` mounts
+  a desk-width, light-theme copy off screen and shoots that).
 - **`pkill -f "wrangler dev"` from a shell whose own command line contains
   that string** kills the shell. Stop the dev server by PID.
 
@@ -369,3 +371,36 @@ Things that looked right and were not:
   them (144 → 122); lowering the floor did (→ 7). The challenge teaches it.
 - **The sandbox's own fixtures name no neighbourhood**, so the award falls
   back to "Mankato, MN" there. That is the never-invent rule working.
+
+## Learn, export and the phone (phase 07)
+
+- **Help is statements of fact with references** (D37). Every entry in
+  `education/learn.ts` names its source; a modelling choice cites "this
+  tool". `tests/learn.test.ts` rejects "because", "so that", "which is why"
+  and first person there. Keep it that way: short, factual, cited.
+- **Not every site suits a network, and the tool says so with figures**:
+  EPRI's 50–150 GWh/km²·yr, Minnesota's heating-share bands and criterion
+  weights, and — for the drawn site — its density, heating share, overlap,
+  open-space boreholes against what its peak would need, and resources
+  found. A challenge card shows the site fact that bears on it.
+- **Chart export** (`charts/exportChart.ts`): a desk-width, light-theme copy
+  off screen; computed styles copied onto its clone; fonts as data URIs;
+  scope line, sources, host and month printed on it; 2× resolution.
+- **The phone is one screen at a time** (D38). Map is a tab below 860 px;
+  the map's own toolbar (drawing, placing) is rendered only on a phone, so a
+  desk has one Finish button, not two. MapLibre only tracks window resizes;
+  a ResizeObserver tells it when its pane is shown.
+
+Things that looked right and were not:
+
+- **Chart export wrote `style` attributes, and the CSP refused every one.**
+  Fine in the dev server (no CSP), 116 refusals on the production build.
+  Moving the clone into a detached document did not help — it inherits the
+  page's policy. The export now writes SVG presentation attributes
+  (`fill="…"`), which CSP does not govern, and uppercases text itself where
+  `text-transform` applied. Check exports in `preview:worker`, never only in
+  `npm run dev`.
+- **A map pane sized to "the viewport minus a guess" ran under the tab bar**
+  and hid the drawing toolbar. The toolbar is now fixed just above the bar.
+- **`pgrep`/`kill` on a pattern that appears in your own command line kills
+  your shell** — again. Stop `wrangler dev` by the PIDs of `workerd`.

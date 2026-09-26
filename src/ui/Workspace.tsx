@@ -12,27 +12,39 @@ import { readPalette } from '../map/style';
 import type { MapPalette } from '../map/style';
 import type { UnitSystem } from '../units/units';
 import { challengeById, evaluate } from '../challenges/challenges';
-import { CHALLENGE_COPY, DESIGN_COPY, RESULTS_COPY } from '../config/copy';
+import { CHALLENGE_COPY, DESIGN_COPY, LEARN_COPY, MAP_COPY, RESULTS_COPY } from '../config/copy';
+import { challengeSiteFact } from '../education/learn';
 import { readLocation, shareUrl } from '../io/share';
 import { boreholeRoom } from '../site/classify';
 import { centroid } from '../site/geometry';
 import { AwardCard } from './AwardCard';
 import { ChallengeCard } from './ChallengeCard';
 import { DesignPanel } from './DesignPanel';
+import { LearnPanel } from './LearnPanel';
 import { ResultsPanel } from './ResultsPanel';
 import { SitePanel } from './SitePanel';
 import type { ThemeChoice } from './theme';
+import { usePhone } from './usePhone';
 import { useSite } from './useSite';
+import { withUnit } from './format';
+import { draftArea } from './useSite';
 
-type Tab = 'site' | 'design' | 'results';
+type Tab = 'map' | 'site' | 'design' | 'results' | 'learn';
 
-const TAB_LABEL: Record<Tab, string> = { site: DESIGN_COPY.tabSite, design: DESIGN_COPY.tabDesign, results: RESULTS_COPY.tab };
+const TAB_LABEL: Record<Tab, string> = {
+  map: 'Map', site: DESIGN_COPY.tabSite, design: DESIGN_COPY.tabDesign, results: RESULTS_COPY.tab, learn: LEARN_COPY.tab };
 
 export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeChoice }) {
   const site = useSite();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ center: [number, number]; zoom: number; key: number } | null>(null);
-  const [tab, setTab] = useState<Tab>('site');
+  const [chosen, setTab] = useState<Tab>('site');
+  // Below 860 px the map is a tab of its own (one screen at a time, as the
+  // sibling tools do on a phone). On a desk it is always shown, so a 'map'
+  // choice left over from a narrower window means the site panel.
+  const phone = usePhone();
+  const tab: Tab = !phone && chosen === 'map' ? 'site' : chosen;
+  const tabs: readonly Tab[] = phone ? ['map', 'site', 'design', 'results', 'learn'] : ['site', 'design', 'results', 'learn'];
   const [palette, setPalette] = useState<MapPalette>(() => readPalette());
 
   // The theme attribute is applied in an effect (theme.ts); read the tokens
@@ -48,6 +60,11 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
   }, [theme]);
 
   const { state } = site;
+
+  const finish = () => {
+    site.finishDrawing();
+    if (phone) setTab('site');
+  };
 
   // Arrival: a full share link restores everything; a challenge link (what an
   // award's post carries) only picks the challenge. Read once.
@@ -104,16 +121,52 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
           selectedId={selectedId}
           flyTo={flyTo}
           onDraftPoint={site.addPoint}
-          onFinishDraft={site.finishDrawing}
+          onFinishDraft={finish}
           onSelectBuilding={setSelectedId}
           design={state.design}
           placing={state.placing !== null}
-          onPlace={site.placeAt}
+          onPlace={(p) => {
+            site.placeAt(p);
+            if (phone) setTab('design');
+          }}
         />
+        {/* The map's own controls, for the phone, where the panel is another screen. */}
+        {phone && state.phase === 'drawing' && (
+          <div className="map-toolbar" role="group" aria-label="Drawing">
+            <span className="numeric">
+              {state.draft.length} {state.draft.length === 1 ? 'corner' : 'corners'}
+              {state.draft.length >= 3 && ` · ${withUnit('area', draftArea(state.draft), units)}`}
+            </span>
+            <button type="button" className="button button--primary" disabled={state.draft.length < 3} onClick={finish}>
+              {MAP_COPY.finishButton}
+            </button>
+            <button type="button" className="button" disabled={state.draft.length === 0} onClick={site.undoPoint}>
+              {MAP_COPY.undoButton}
+            </button>
+            <button type="button" className="button" onClick={site.clear}>
+              {MAP_COPY.cancelButton}
+            </button>
+          </div>
+        )}
+        {phone && state.placing && (
+          <div className="map-toolbar" role="group" aria-label="Placing">
+            <span>{DESIGN_COPY.placing}</span>
+            <button
+              type="button"
+              className="button"
+              onClick={() => {
+                site.startPlacing(null);
+                if (phone) setTab('design');
+              }}
+            >
+              {DESIGN_COPY.cancelPlacing}
+            </button>
+          </div>
+        )}
       </div>
       <aside className="side-panel" aria-label="Neighbourhood and design">
         <div className="tabs" role="tablist" aria-label="Panel">
-          {(['site', 'design', 'results'] as const).map((t) => (
+          {tabs.map((t) => (
             <button
               key={t}
               type="button"
@@ -124,7 +177,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               className="tabs__tab"
               onClick={() => {
                 setTab(t);
-                if (t !== 'design') site.startPlacing(null);
+                if (t !== 'design' && t !== 'map') site.startPlacing(null);
               }}
             >
               {TAB_LABEL[t]}
@@ -132,7 +185,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
           ))}
         </div>
         <div role="tabpanel" id={`tabpanel-${tab}`} aria-labelledby={`tab-${tab}`}>
-          {tab === 'site' ? (
+          {tab === 'map' ? null : tab === 'site' ? (
             <SitePanel
               state={state}
               units={units}
@@ -141,13 +194,16 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               onDraw={() => {
                 setSelectedId(null);
                 site.startDrawing();
+                if (phone) setTab('map');
               }}
-              onFinish={site.finishDrawing}
+              onFinish={finish}
               onUndo={site.undoPoint}
               onCancel={site.clear}
               onToggle={site.toggleBuilding}
               onOverride={(id, archetype) => site.overrideBuilding(id, { archetype })}
             />
+          ) : tab === 'learn' ? (
+            <LearnPanel site={state.site} metrics={state.result?.site ?? null} units={units} />
           ) : tab === 'results' ? (
             <ResultsPanel
               result={state.result}
@@ -167,6 +223,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
                   running={state.running}
                   onChange={site.setChallenge}
                   onAward={() => setShowAward(true)}
+                  siteFact={challenge && state.result ? challengeSiteFact(challenge, state.site, state.result.site) : null}
                 />
                 {showAward && challenge && evaluation?.met && state.result && state.site && (
                   <AwardCard
@@ -190,7 +247,10 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               placing={state.placing}
               units={units}
               onUpdate={site.updateDesign}
-              onPlace={site.startPlacing}
+              onPlace={(id) => {
+                site.startPlacing(id);
+                if (phone && id) setTab('map');
+              }}
               onSuggest={site.suggest}
             />
             {state.site && (

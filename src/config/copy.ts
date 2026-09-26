@@ -131,3 +131,9 @@ export const AWARD_COPY = {
   steps: 'Download the award, copy the text, open LinkedIn, then drag the image into the post. LinkedIn does not let a site attach an image for you, and this tool uploads nothing.',
   drawing: 'Drawing the award…',
 } as const;
+
+export const LEARN_COPY = {
+  tab: 'Learn',
+  thisSite: 'This site',
+  references: 'References',
+} as const;

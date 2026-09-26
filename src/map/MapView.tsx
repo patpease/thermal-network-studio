@@ -359,6 +359,13 @@ export function MapView(props: MapViewProps) {
         }
       });
       map.current = instance;
+      // The phone shows the map as a tab of its own; MapLibre only tracks
+      // WINDOW resizes, so a pane going from hidden to shown needs telling.
+      if (typeof ResizeObserver !== 'undefined' && container.current) {
+        const observer = new ResizeObserver(() => instance?.resize());
+        observer.observe(container.current);
+        instance.once('remove', () => observer.disconnect());
+      }
       // A place picked while MapLibre was still loading: its fly-to fired
       // against no map and was lost, leaving the player looking at the whole
       // metro. Land there now instead.

@@ -10,10 +10,11 @@
  * the CSP has no 'unsafe-inline'. The tooltip's position is set through the
  * CSSOM (React's style prop on the client), which CSP does not govern.
  */
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import type { Role } from './data';
+import { EXPORT_PLOT, exportChart } from './exportChart';
 import { useWidth } from './useWidth';
 
 export interface LegendItem {
@@ -34,6 +35,25 @@ export function ChartCard(props: {
   const box = useRef<HTMLDivElement>(null);
   // 0 means not measured (jsdom, first frame): draw at the desk width.
   const { width } = useWidth(box, 0);
+
+  // Export: mount a desk-width, light-theme copy off screen, shoot it, unmount.
+  // Never the live copy, which may be the phone layout or the dark theme.
+  const stage = useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!exporting || !stage.current) return;
+    let done = false;
+    exportChart({ stage: stage.current, title: props.title, subtitle: props.subtitle, legend: props.legend, filename: `thermal-network-${props.id}.png` })
+      .catch((e: unknown) => setExportError(e instanceof Error ? e.message : String(e)))
+      .finally(() => {
+        if (!done) setExporting(false);
+      });
+    return () => {
+      done = true;
+    };
+  }, [exporting, props.id, props.title, props.subtitle, props.legend]);
+
   return (
     <figure className="chart card" aria-labelledby={`${props.id}-title`}>
       <h3 id={`${props.id}-title`} className="chart__title">
@@ -60,6 +80,25 @@ export function ChartCard(props: {
         {props.children(width || 640)}
       </div>
       {props.note && <figcaption className="card__note">{props.note}</figcaption>}
+      <div className="chart__actions">
+        <button
+          type="button"
+          className="button button--small"
+          disabled={exporting}
+          onClick={() => {
+            setExportError(null);
+            setExporting(true);
+          }}
+        >
+          {exporting ? 'Saving…' : 'Save as PNG'}
+        </button>
+        {exportError && <span className="message message--error">{exportError}</span>}
+      </div>
+      {exporting && (
+        <div className="chart-export-stage" data-theme="light" aria-hidden="true" ref={stage}>
+          {props.children(EXPORT_PLOT)}
+        </div>
+      )}
       <div className="visually-hidden">
         <table>
           <caption>{props.table.caption}</caption>

@@ -89,13 +89,23 @@ In `preview:worker`, check by hand — none of this is covered by the suite:
 - the console is clean of "Refused to …" CSP errors with the map loaded
 - search a place, draw a boundary, and the panel fills — this is the only
   end-to-end check of Overpass, Open-Meteo and the Census geocoder together
+- the Census lookup fills the town and state on the award card
+- a chart's "Save as PNG" and the award's download both save a styled PNG
+  with **no** "Refused to apply inline style" in the console. Both work only
+  because they avoid `style` attributes (presentation attributes on the
+  chart clone; a `<style>` element inside the award SVG). The dev server has
+  no CSP and cannot show this failure.
+- a share link opened in a new tab restores the boundary, design and
+  challenge
+- at 390 px wide: the tab bar reads Map · Site · Design · Results · Learn,
+  drawing works by tap, and the page does not scroll sideways
 
-All five were checked on the production build in `wrangler dev` on
+All nine were checked on the production build in `wrangler dev` on
 26 Sep 2026, against the live services.
 
 ## After the first deploy
 
-Repeat the five checks against `https://thermal-network-studio.patpease0.workers.dev`,
+Repeat the nine checks against `https://thermal-network-studio.patpease0.workers.dev`,
 then:
 
 - **Hard-refresh twice** after any later deploy and look for a blank page.
@@ -105,6 +115,12 @@ then:
   to connect" names the origin to add — and the change belongs in
   `worker/handler.ts` with a test in `tests/worker.test.ts`, never only in
   the dashboard.
+
+## When the tool has its own address
+
+Every award and LinkedIn post carries `AWARD_LINK_BASE`
+(`src/config/branding.ts`), which is `https://` + `BRAND.host`. Change the
+host in the same commit as the route (D18), and awards follow.
 
 ## A custom domain, later
 

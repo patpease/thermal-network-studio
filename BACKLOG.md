@@ -71,7 +71,26 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       `?challenge=` opens a challenge. Verified in Chromium in fixture mode
       and on the production build in `wrangler dev` against live services:
       no CSP refusals.
-- [ ] **07 Education, export, phone pass, deploy.**
+- [x] **07 Education, export, phone pass, deploy prep** — a Learn tab of
+      short statements of fact with references (D37), including where a
+      network does not suit a site; facts about the drawn site, and one
+      beside each challenge; "Save as PNG" on every results chart, drawn at
+      desk width in the light theme with the scope line, sources, host and
+      month printed on it; the phone tab bar with Map as a screen of its own
+      (D38); deploy checks extended to nine. Verified in Chromium in
+      fixture mode and on the production build in `wrangler dev` against
+      live services: no CSP refusals.
+
+## Not done in 07, deliberately
+
+- **Older copy is unchanged.** Phase 07's wording rule (facts and
+  references) applies to the Learn tab and site facts; panel notes written
+  in phases 03–06 still carry some explanation.
+- **MapLibre 6** (D33).
+- **Drag to move a placed source.** Placing and moving are by tap.
+- **Per-chart hashtags, link previews, a report.** An exported chart and the
+  award are the two things this tool hands out.
+- **The mark is still a placeholder** (`BRAND.markIsPlaceholder`).
 
 ## Not done in 06, deliberately
 
@@ -114,8 +133,6 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
 - **Microsoft US building footprints** where OSM has none. Residential
   blocks in Mankato return one building. A second footprint source would
   need its own relay and its own attribution.
-- **Phone layout is stacked, not tabbed.** Map, then panel, scrolling. The
-  sibling tools' tab bar is the phase 07 phone pass.
 - **Levels cannot be overridden** in the UI yet — archetype and inclusion
   can. `BuildingOverride` already carries `levels`.
 - **Minnesota fixtures cover three sites.** The report's data centres

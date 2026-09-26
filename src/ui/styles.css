@@ -1084,3 +1084,148 @@ a.button {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   font-size: 0.75rem;
 }
+
+/* ------------------------------------------------------------ phase 07 */
+
+.learn__facts {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.learn__refs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: 0.15rem;
+}
+
+.learn__ref {
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.learn__references {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.learn__references li:target {
+  color: var(--ink);
+}
+
+.challenge__site {
+  border-left: 3px solid var(--border-strong);
+  padding-left: 0.5rem;
+}
+
+.chart__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* The export's desk-width, light-theme copy: laid out, never seen. */
+.chart-export-stage {
+  position: fixed;
+  left: -20000px;
+  top: 0;
+  width: 1104px;
+  background: var(--surface);
+  color: var(--ink);
+  pointer-events: none;
+}
+
+/* The map's own toolbar: the phone's drawing and placing controls. On a desk
+   the panel beside the map carries them. */
+.map-toolbar {
+  display: none;
+}
+
+/* The phone: one screen at a time, a tab bar at the foot. Declared AFTER the
+   stacked-layout phone rules above, which these override (Psychrometric
+   Studio's trap: a phone rule before the rule it overrides loses). */
+@media (max-width: 860px) {
+  .workspace-map {
+    padding-bottom: calc(3.4rem + env(safe-area-inset-bottom));
+  }
+
+  .workspace-map:not([data-tab='map']) .map-pane {
+    display: none;
+  }
+
+  /* What is left of the screen under the header and the scope line (which
+     stays: it is permanent page furniture) and above the tab bar. */
+  .workspace-map[data-tab='map'] .map-pane {
+    height: calc(100dvh - 17rem - env(safe-area-inset-bottom));
+    min-height: 20rem;
+    border-bottom: 0;
+  }
+
+  .tabs {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    padding: 0 0 env(safe-area-inset-bottom);
+    border-bottom: 0;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .tabs__tab {
+    flex: 1;
+    min-height: 3.4rem;
+    padding: 0.4rem 0.2rem;
+    font-size: 0.8rem;
+    border-bottom: 0;
+    border-top: 3px solid transparent;
+  }
+
+  .tabs__tab[aria-selected='true'] {
+    border-top-color: var(--accent);
+  }
+
+  /* Pinned just above the tab bar, so it is on screen however the page sits. */
+  .map-toolbar {
+    position: fixed;
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: calc(3.4rem + env(safe-area-inset-bottom) + 0.5rem);
+    z-index: 21;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.65rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    font-size: 0.85rem;
+  }
+
+  .map-toolbar > span {
+    flex: 1 1 100%;
+  }
+
+  .map-toolbar .button {
+    min-height: 44px;
+  }
+}
