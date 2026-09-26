@@ -11,6 +11,7 @@ import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
 import { DEFAULT_BAND, GLYCOL_BELOW_C } from '../engine/network';
 import { TOWER_APPROACH } from '../engine/sources';
 import type { Challenge } from '../challenges/challenges';
+import { SCOPE_STATEMENT } from '../config/copy';
 import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/classify';
 import { DESIGN_DIVERSITY } from '../engine/balance';
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
@@ -149,7 +150,7 @@ export function sections(f: Formatters): Section[] {
         { text: 'HEET shows networked geothermal giving a lower winter electric peak than air-source heat pumps or electric resistance heat.', refs: ['heet'] },
         { text: 'The ground over 25 years is shown and not scored. A challenge may require it.', refs: ['tool'] },
         { text: 'Annual loads match NLR’s building stock data. The hour-by-hour shape is this tool’s model.', refs: ['nlr', 'tool'] },
-        { text: 'The tool conveys an idea. It does not predict a saving.', refs: ['tool'] },
+        { text: `${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, refs: ['tool'] },
       ],
     },
   ];

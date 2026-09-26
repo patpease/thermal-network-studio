@@ -31,7 +31,7 @@ export const MAP_ATTRIBUTION = '© OpenStreetMap contributors';
 /** The map screen. */
 export const MAP_COPY = {
   searchLabel: 'Find a place',
-  searchPlaceholder: 'Mankato, Minnesota',
+  searchPlaceholder: 'Boston, Massachusetts',
   drawButton: 'Draw a neighbourhood',
   redrawButton: 'Draw again',
   finishButton: 'Finish',
@@ -110,7 +110,7 @@ export const RESULTS_COPY = {
   updating: 'Updating…',
   noField: 'No bore field in this design.',
   shapeCaveat:
-    'Annual loads are calibrated to NLR ComStock™ and ResStock™. The hour-by-hour shape is this tool’s model and is not checked against them. The tool conveys an idea. It does not predict a saving.',
+    'Annual loads are calibrated to NLR ComStock™ and ResStock™. The hour-by-hour shape is this tool’s model and is not checked against them. Not for a full feasibility study, to learn more find an expert and start a dialog.',
 } as const;
 
 export const CHALLENGE_COPY = {

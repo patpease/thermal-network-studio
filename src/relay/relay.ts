@@ -93,7 +93,7 @@ export interface Place {
 
 export async function handlePlace(params: URLSearchParams, fetcher: Fetcher): Promise<RelayResult> {
   const q = (params.get('q') ?? '').trim();
-  if (q.length < 2) return problem(400, 'Type a place — "Mankato, Minnesota".');
+  if (q.length < 2) return problem(400, 'Type a place — "Boston, Massachusetts".');
   const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
   url.searchParams.set('name', q);
   url.searchParams.set('count', '6');

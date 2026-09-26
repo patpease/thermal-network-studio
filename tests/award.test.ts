@@ -60,7 +60,10 @@ describe('the award graphic', () => {
 
   it('carries the scope line and the link, and draws no NaN', () => {
     const svg = awardSvg(input());
-    expect(svg).toContain('does not predict a saving');
+    // The scope statement wraps over lines; read the drawn text in order.
+    const drawn = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' ');
+    expect(drawn).toContain('Not for a full feasibility study, to learn more find an expert and start a dialog.');
+    expect(drawn).toContain('OpenStreetMap contributors');
     expect(svg).toContain('example.test');
     expect(svg).not.toMatch(/NaN|undefined|Infinity/);
   });
@@ -95,8 +98,8 @@ describe('the LinkedIn post', () => {
     expect(challengeLink(c)).toBe(`${AWARD_LINK_BASE}/?challenge=half-carbon`);
   });
 
-  it('keeps the scope: an idea, not a predicted saving', () => {
-    expect(text).toContain('not a predicted saving');
+  it('keeps the scope: an idea, not a full feasibility study', () => {
+    expect(text).toContain('not a full feasibility study');
   });
 
   it('opens LinkedIn’s composer with the text encoded', () => {

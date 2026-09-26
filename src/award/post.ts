@@ -32,7 +32,7 @@ export function postText(input: {
   return [
     `I earned the “${input.challenge.title}” award in Thermal Network Studio. I designed a shared thermal energy network for ${where} — ${pct(input.carbonReduction)} carbon and ${pct(input.energyReduction)} energy than the same buildings today.`,
     input.challenge.idea,
-    `It conveys an idea, not a predicted saving. Try the challenge on your own neighbourhood: ${challengeLink(input.challenge)}`,
+    `Thermal Network Studio uses first-principle physics and publicly accessible building data to convey an idea. It is not a full feasibility study; to learn more, find an expert and start a dialog. Try the challenge on your own neighbourhood: ${challengeLink(input.challenge)}`,
     '#ThermalEnergyNetworks #Decarbonization',
   ].join('\n\n');
 }

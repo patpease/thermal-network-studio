@@ -338,7 +338,8 @@ export function MapView(props: MapViewProps) {
       instance = new maplibre.Map({
         container: container.current,
         style: withOverlays(latest.current.palette),
-        center: [-93.2, 44.95],
+        // Boston, MA: the suite's shared starting point.
+        center: [-71.0589, 42.3601],
         zoom: 11,
         attributionControl: { compact: true },
       });

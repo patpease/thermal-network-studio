@@ -12,8 +12,11 @@ Part of [Pease Studio](https://peasestudio.com): free, lightweight tools for
 building performance. Everything runs in your browser. No account, no upload,
 nothing kept.
 
-**It conveys an idea; it does not predict a saving.** Not for feasibility
-studies, utility filings or design submissions.
+Use to explore how a shared thermal network could work in a neighborhood.
+Uses first-principle physics and publicly accessible building data. Use it to
+convey an idea, learn about thermal energy networks and your neighborhood.
+**Not for a full feasibility study, to learn more find an expert and start a
+dialog.**
 
 Status: **phases 00–07 built** — map, loads, design, results, challenges and
 awards, Learn, phone layout. See `PLAN.md` and `BACKLOG.md`.

@@ -19,8 +19,13 @@ the figures taken from each and their page numbers.
 
 ## The framing is load-bearing
 
-The tool **conveys an idea; it does not predict a saving** — ZEEL's rule, for
-ZEEL's reason. The scope statement is permanent page furniture, never a
+The scope statement (`SCOPE_STATEMENT` in `copy.ts`) is the one wording used
+everywhere — header, chart exports, award, Learn, README: "Use to explore how
+a shared thermal network could work in a neighborhood. Uses first-principle
+physics and publicly accessible building data. Use it to convey an idea, learn
+about thermal energy networks and your neighborhood. Not for a full
+feasibility study, to learn more find an expert and start a dialog." The map
+opens on Boston, MA, the suite's shared starting point. The scope statement is permanent page furniture, never a
 dismissible modal, and from phase 07 it is burned into every export. Never state
 a ± tolerance. A score is not a saving.
 

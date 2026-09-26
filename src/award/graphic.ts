@@ -19,6 +19,7 @@ import type { Challenge } from '../challenges/challenges';
 import type { LonLat, Ring } from '../site/geometry';
 import { metresPerDegree } from '../site/geometry';
 import { MARK_STANDARD, markInner } from '../brand/mark';
+import { SCOPE_STATEMENT } from '../config/copy';
 import { ICON_BLUE, ICON_GREEN, ICON_INK, ICON_ORANGE, ICONS } from './icons';
 
 export const AWARD_WIDTH = 1080;
@@ -94,6 +95,17 @@ function wrapTitle(text: string, chars: number): string[] {
   let first = '';
   while (words.length && (first + ' ' + words[0]).trim().length <= chars) first = `${first} ${words.shift()}`.trim();
   return [first, words.join(' ')];
+}
+
+/** Wrap text onto lines of about `chars` characters. */
+function wrapLines(text: string, chars: number): string[] {
+  const lines: string[] = [''];
+  for (const w of text.split(' ')) {
+    const line = lines[lines.length - 1]!;
+    if (line && line.length + 1 + w.length > chars) lines.push(w);
+    else lines[lines.length - 1] = line ? `${line} ${w}` : w;
+  }
+  return lines;
 }
 
 /** The neighbourhood, fitted into a box, as line art. */
@@ -244,8 +256,10 @@ ${t(L + 292, stripTop + 78, 64, pct(input.energyReduction), { weight: 800 })}
 ${t(L + 292, stripTop + 118, 24, `${direction(input.energyReduction)} energy`, { weight: 600 })}
 ${t(W - L - thumbW - 28, stripTop + 118, 18, 'than the buildings today', { fill: C.muted, anchor: 'end' })}
 ${outlineMarkup(input.outline, W - L - thumbW, stripTop, thumbW, stripH)}
-<line x1="${L}" y1="1240" x2="${W - L}" y2="1240" stroke="${C.rule}" stroke-width="2"/>
-${t(L, 1282, 26, input.url, { weight: 500, fill: C.accent, family: mono })}
-${t(L, 1316, 19, 'Conveys an idea; does not predict a saving. Buildings © OpenStreetMap contributors.', { fill: C.muted })}
+<line x1="${L}" y1="1222" x2="${W - L}" y2="1222" stroke="${C.rule}" stroke-width="2"/>
+${t(L, 1258, 26, input.url, { weight: 500, fill: C.accent, family: mono })}
+${wrapLines(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis} Buildings © OpenStreetMap contributors.`, 128)
+  .map((line, i) => t(L, 1284 + i * 19, 15, line, { fill: C.muted }))
+  .join('\n')}
 </svg>`;
 }
