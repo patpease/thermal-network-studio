@@ -25,7 +25,7 @@ export interface Shared {
 }
 
 const r6 = (x: number) => Math.round(x * 1e6) / 1e6;
-const pt = (p: LonLat): [number, number] => [r6(p[0]), r6(p[1])];
+export const pt = (p: LonLat): [number, number] => [r6(p[0]), r6(p[1])];
 
 function toBase64Url(text: string): string {
   const bytes = new TextEncoder().encode(text);
@@ -56,8 +56,8 @@ export function encodeShare(s: Shared): string {
   return toBase64Url(JSON.stringify(body));
 }
 
-const isNum = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
-const isPoint = (x: unknown): x is [number, number] => Array.isArray(x) && x.length === 2 && isNum(x[0]) && isNum(x[1]);
+export const isNum = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
+export const isPoint = (x: unknown): x is [number, number] => Array.isArray(x) && x.length === 2 && isNum(x[0]) && isNum(x[1]);
 const KINDS = new Set(['bore-field', 'air-source', 'cooling-tower', 'waste-heat', 'water']);
 
 function source(x: unknown): DesignSource | null {
@@ -71,6 +71,25 @@ function source(x: unknown): DesignSource | null {
   return o as unknown as DesignSource;
 }
 
+/** A design's sources, or null if any one is malformed. Shared with the project file. */
+export function parseSources(list: unknown): DesignSource[] | null {
+  if (!Array.isArray(list)) return null;
+  const sources = list.map(source);
+  return sources.some((x) => x === null) ? null : (sources as DesignSource[]);
+}
+
+/** The player's building changes, keeping only well-formed entries. Shared with the project file. */
+export function parseSelection(excludedIn: unknown, overridesIn: unknown): Selection {
+  const excluded = Array.isArray(excludedIn) ? excludedIn.filter((x): x is string => typeof x === 'string') : [];
+  const overrides = Array.isArray(overridesIn)
+    ? overridesIn.filter((e): e is [string, BuildingOverride] => Array.isArray(e) && typeof e[0] === 'string' && typeof e[1] === 'object' && e[1] !== null)
+    : [];
+  return {
+    excluded: new Set(excluded),
+    overrides: new Map(overrides.map(([id, ov]) => [id, { ...(ov.archetype !== undefined ? { archetype: ov.archetype as ArchetypeId | null } : {}), ...(isNum(ov.levels) ? { levels: ov.levels } : {}) }])),
+  };
+}
+
 export function decodeShare(text: string): Shared | null {
   try {
     const o = JSON.parse(fromBase64Url(text)) as Record<string, unknown>;
@@ -78,19 +97,12 @@ export function decodeShare(text: string): Shared | null {
     if (!Array.isArray(o.b) || o.b.length < 4 || !o.b.every(isPoint)) return null;
     const d = o.d as Record<string, unknown> | undefined;
     if (!d || !Array.isArray(d.s) || !Array.isArray(d.b) || !isNum(d.b[0]) || !isNum(d.b[1]) || !isNum(d.r)) return null;
-    const sources = d.s.map(source);
-    if (sources.some((x) => x === null)) return null;
-    const excluded = Array.isArray(o.x) ? o.x.filter((x): x is string => typeof x === 'string') : [];
-    const overrides = Array.isArray(o.o)
-      ? o.o.filter((e): e is [string, BuildingOverride] => Array.isArray(e) && typeof e[0] === 'string' && typeof e[1] === 'object' && e[1] !== null)
-      : [];
+    const sources = parseSources(d.s);
+    if (!sources) return null;
     return {
       boundary: o.b as [number, number][],
-      selection: {
-        excluded: new Set(excluded),
-        overrides: new Map(overrides.map(([id, ov]) => [id, { ...(ov.archetype !== undefined ? { archetype: ov.archetype as ArchetypeId | null } : {}), ...(isNum(ov.levels) ? { levels: ov.levels } : {}) }])),
-      },
-      design: { sources: sources as DesignSource[], band: { min: d.b[0], max: d.b[1] }, retrofit: d.r },
+      selection: parseSelection(o.x, o.o),
+      design: { sources, band: { min: d.b[0], max: d.b[1] }, retrofit: d.r },
       challenge: typeof o.c === 'string' ? o.c : null,
     };
   } catch {

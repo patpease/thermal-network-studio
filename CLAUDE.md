@@ -515,3 +515,21 @@ Things that looked right and were not:
   resistance backup, and in that hour the network draws about as much as
   resistance heat. The suggestion comes in 7% under BLE on Mankato; a −3 °C
   loop floor gets 26%. "Easy on the grid" (25%) teaches exactly this.
+
+## Save and open (phase 11)
+
+- **`src/io/project.ts` is the file; `schema/project.schema.json` its
+  contract**, and `tests/project.test.ts` fails if the writer and the schema
+  name different fields. A new field is a version bump and a `MIGRATIONS`
+  step, never a silent addition.
+- **The file carries a snapshot** — the place, the RAW OSM buildings and the
+  weather year, exactly as the relay returned them (`SiteState.snapshot`).
+  Opening makes no network call; the raw buildings are re-classified, so a
+  file picks up classifier fixes. Re-read OpenStreetMap (`useSite.reread`)
+  refreshes it and keeps the player's work.
+- **The share link and the file validate through the same functions**
+  (`parseSources`, `parseSelection` in `share.ts`).
+- **Compact JSON.** Pretty-printed, the 26,280 weather hours take a line
+  each and the file doubles (790 KB → 346 KB for a Highland Park block).
+- Verified in the browser with `/api/**` blocked: same score, same peak,
+  units restored, zero relay calls.

@@ -30,6 +30,7 @@ import { connected, EMPTY_SELECTION, toNeighbourhood } from '../site/neighbourho
 import type { BuildingOverride, Selection } from '../site/neighbourhood';
 import { boundaryProblem } from '../site/osm';
 import type { SiteData } from '../site/osm';
+import type { Project } from '../io/project';
 
 export type Phase = 'idle' | 'drawing' | 'editing' | 'loading' | 'ready' | 'error';
 
@@ -57,6 +58,10 @@ export interface SiteState {
   /** Place names as the player corrected them for the award. */
   readonly placeEdits: PlaceEdits;
   readonly message: string | null;
+  /** What the relay returned, kept as it came, for a project file (phase 11). */
+  readonly snapshot: { readonly place: SitePayload; readonly buildings: SiteData; readonly weather: WeatherPayload } | null;
+  /** When the open project was saved, if it came from a file and has not been re-read. */
+  readonly openedFrom: string | null;
 }
 
 const INITIAL: SiteState = {
@@ -74,7 +79,22 @@ const INITIAL: SiteState = {
   message: null,
   challengeId: null,
   placeEdits: {},
+  snapshot: null,
+  openedFrom: null,
 };
+
+type Init = { selection: Selection; design: Design; placeEdits?: PlaceEdits };
+
+function weatherYear(weather: WeatherPayload): NonNullable<SiteState['weather']> {
+  return {
+    temperature: Float64Array.from(weather.temperature),
+    ghi: Float64Array.from(weather.ghi),
+    relativeHumidity: Float64Array.from(weather.relativeHumidity),
+    firstWeekday: weather.firstWeekday,
+    attribution: weather.attribution,
+    year: weather.year,
+  };
+}
 
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
@@ -130,9 +150,9 @@ export function useSite() {
    */
   // The last load asked for, so a failed one can be tried again as it was —
   // with the design and building changes an edit carried.
-  const lastLoad = useRef<{ boundary: Ring; init?: { selection: Selection; design: Design } } | null>(null);
+  const lastLoad = useRef<{ boundary: Ring; init?: Init } | null>(null);
 
-  const load = useCallback(async (boundary: Ring, init?: { selection: Selection; design: Design }) => {
+  const load = useCallback(async (boundary: Ring, init?: Init) => {
     lastLoad.current = init ? { boundary, init } : { boundary };
     const mine = ++generation.current;
     const stillMine = () => mine === generation.current;
@@ -151,15 +171,17 @@ export function useSite() {
       ]);
       if (!stillMine()) return;
       const site = classifySite({ ...buildings.site, boundary });
-      const w = {
-        temperature: Float64Array.from(weather.temperature),
-        ghi: Float64Array.from(weather.ghi),
-        relativeHumidity: Float64Array.from(weather.relativeHumidity),
-        firstWeekday: weather.firstWeekday,
-        attribution: weather.attribution,
-        year: weather.year,
-      };
-      setState((s) => ({ ...s, phase: 'ready', place, site, weather: w, selection: init?.selection ?? EMPTY_SELECTION, design: init?.design ?? EMPTY_DESIGN }));
+      setState((s) => ({
+        ...s,
+        phase: 'ready',
+        place,
+        site,
+        weather: weatherYear(weather),
+        selection: init?.selection ?? EMPTY_SELECTION,
+        design: init?.design ?? EMPTY_DESIGN,
+        placeEdits: init?.placeEdits ?? {},
+        snapshot: { place, buildings: buildings.site, weather },
+      }));
     } catch (error) {
       if (!stillMine()) return;
       setState((s) => ({ ...s, phase: 'error', message: error instanceof Error ? error.message : String(error) }));
@@ -210,6 +232,39 @@ export function useSite() {
     }
     beforeEdit.current = null;
     void load(ring, { selection: s.selection, design: s.design });
+  }, [load]);
+
+  /**
+   * Open a project file: the saved snapshot, re-classified, with no network
+   * call. The challenge comes from the file, not from what was open.
+   */
+  const open = useCallback((p: Project) => {
+    generation.current++;
+    beforeEdit.current = null;
+    const init: Init = { selection: p.selection, design: p.design, placeEdits: p.placeEdits };
+    lastLoad.current = { boundary: p.boundary, init };
+    const { place, buildings, weather } = p.snapshot;
+    setState({
+      ...INITIAL,
+      phase: 'ready',
+      boundary: p.boundary,
+      place,
+      site: classifySite({ ...buildings, boundary: p.boundary }),
+      weather: weatherYear(weather),
+      selection: p.selection,
+      design: p.design,
+      challengeId: p.challenge,
+      placeEdits: p.placeEdits,
+      snapshot: p.snapshot,
+      openedFrom: p.saved,
+    });
+  }, []);
+
+  /** Re-read OpenStreetMap and the weather for the same boundary, keeping the player's work. */
+  const reread = useCallback(() => {
+    const s = current.current;
+    if (!s.boundary) return;
+    void load(s.boundary, { selection: s.selection, design: s.design, placeEdits: s.placeEdits });
   }, [load]);
 
   /** Try the last load again, after a service failure. */
@@ -321,6 +376,8 @@ export function useSite() {
     toggleBuilding,
     overrideBuilding,
     load,
+    open,
+    reread,
     updateDesign,
     startPlacing,
     placeAt,

@@ -120,6 +120,24 @@ export const GRID_COPY = {
   statNote: (network: string, ble: string) => `${network} against ${ble} with a heat pump in every building`,
 } as const;
 
+/** Save, open and share (phase 11). */
+export const PROJECT_COPY = {
+  heading: 'Save and share',
+  save: 'Save file',
+  open: 'Open file',
+  saved: (name: string) => `Saved ${name}. Nothing is uploaded. The file is the only copy.`,
+  saveNote: 'A file holds the boundary, buildings, weather, building changes, design and challenge. It opens without a connection.',
+  openedFrom: (date: string) => `Opened from a file saved ${date}. Buildings and weather are as saved.`,
+  reread: 'Re-read OpenStreetMap',
+  replace: 'Open this file? The neighbourhood and design on screen will be replaced.',
+  refused: {
+    format: 'This is not a Thermal Network Studio file.',
+    newer: 'This file was saved by a newer version of the tool. Reload the page and try again.',
+    malformed: 'This file is damaged or incomplete, and was not opened.',
+  },
+  unreadable: 'The file could not be read.',
+} as const;
+
 export const RESULTS_COPY = {
   tab: 'Results',
   needSite: 'Draw a neighbourhood first.',

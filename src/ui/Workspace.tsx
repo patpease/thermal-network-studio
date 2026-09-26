@@ -12,8 +12,10 @@ import { readPalette } from '../map/style';
 import type { MapPalette } from '../map/style';
 import type { UnitSystem } from '../units/units';
 import { challengeById, evaluate } from '../challenges/challenges';
-import { CHALLENGE_COPY, DESIGN_COPY, LEARN_COPY, MAP_COPY, RESULTS_COPY } from '../config/copy';
+import { CHALLENGE_COPY, DESIGN_COPY, LEARN_COPY, MAP_COPY, PROJECT_COPY, RESULTS_COPY } from '../config/copy';
 import { challengeSiteFact } from '../education/learn';
+import { download } from '../award/raster';
+import { openProject, projectFilename, projectJson } from '../io/project';
 import { readLocation, shareUrl } from '../io/share';
 import { boreholeRoom } from '../site/classify';
 import { centroid } from '../site/geometry';
@@ -22,6 +24,7 @@ import { AwardCard } from './AwardCard';
 import { ChallengeCard } from './ChallengeCard';
 import { DesignPanel } from './DesignPanel';
 import { LearnPanel } from './LearnPanel';
+import { ProjectCard } from './ProjectCard';
 import { ResultsPanel } from './ResultsPanel';
 import { SitePanel } from './SitePanel';
 import type { ThemeChoice } from './theme';
@@ -35,7 +38,7 @@ type Tab = 'map' | 'site' | 'design' | 'results' | 'learn';
 const TAB_LABEL: Record<Tab, string> = {
   map: 'Map', site: DESIGN_COPY.tabSite, design: DESIGN_COPY.tabDesign, results: RESULTS_COPY.tab, learn: LEARN_COPY.tab };
 
-export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeChoice }) {
+export function Workspace({ units, theme, onUnits }: { units: UnitSystem; theme: ThemeChoice; onUnits: (u: UnitSystem) => void }) {
   const site = useSite();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ center: [number, number]; zoom: number; key: number } | null>(null);
@@ -134,6 +137,82 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
     }
   };
 
+  // Save and open (phase 11).
+  const [fileMessage, setFileMessage] = useState<string | null>(null);
+  const canSave = state.phase === 'ready' && state.snapshot !== null && state.boundary !== null;
+  const save = () => {
+    const s = site.state;
+    if (!s.snapshot || !s.boundary) return;
+    const name = projectFilename([
+      s.placeEdits.neighbourhood ?? s.site?.placeName,
+      s.placeEdits.town ?? s.place?.town,
+      s.placeEdits.state ?? s.place?.state,
+    ]);
+    const text = projectJson({
+      saved: new Date().toISOString(),
+      boundary: s.boundary,
+      selection: s.selection,
+      design: s.design,
+      challenge: s.challengeId,
+      placeEdits: s.placeEdits,
+      units,
+      snapshot: s.snapshot,
+    });
+    download(new Blob([text], { type: 'application/json' }), name);
+    setFileMessage(PROJECT_COPY.saved(name));
+  };
+  const openFile = async (file: File) => {
+    let text: string;
+    try {
+      text = await file.text();
+    } catch {
+      setFileMessage(PROJECT_COPY.unreadable);
+      return;
+    }
+    const opened = openProject(text);
+    if (!opened.ok) {
+      setFileMessage(PROJECT_COPY.refused[opened.reason]);
+      return;
+    }
+    if (site.state.site && !window.confirm(PROJECT_COPY.replace)) return;
+    const p = opened.project;
+    setSelectedId(null);
+    setShareStatus(null);
+    setFileMessage(null);
+    site.open(p);
+    onUnits(p.units);
+    const [lon, lat] = centroid(p.boundary);
+    setFlyTo({ center: [lon, lat], zoom: 15, key: Date.now() });
+    setTab('design');
+  };
+  // Ctrl/⌘+S saves, as it does everywhere else.
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        saveRef.current();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  const projectCard = (
+    <div className="panel-body panel-body--bottom">
+      <ProjectCard
+        canSave={canSave}
+        openedFrom={state.openedFrom}
+        message={fileMessage}
+        shareStatus={shareStatus}
+        onSave={save}
+        onOpen={(f) => void openFile(f)}
+        onShare={() => void share()}
+        onReread={site.reread}
+      />
+    </div>
+  );
+
   return (
     <div className="workspace-map" data-tab={tab}>
       <div className="map-pane">
@@ -225,6 +304,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
         </div>
         <div role="tabpanel" id={`tabpanel-${tab}`} aria-labelledby={`tab-${tab}`}>
           {tab === 'map' ? null : tab === 'site' ? (
+            <>
             <SitePanel
               state={state}
               units={units}
@@ -245,6 +325,8 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               onToggle={site.toggleBuilding}
               onOverride={(id, archetype) => site.overrideBuilding(id, { archetype })}
             />
+            {projectCard}
+            </>
           ) : tab === 'learn' ? (
             <LearnPanel site={state.site} metrics={state.result?.site ?? null} units={units} />
           ) : tab === 'results' ? (
@@ -302,23 +384,7 @@ export function Workspace({ units, theme }: { units: UnitSystem; theme: ThemeCho
               }}
               connectedCount={state.site ? connected(state.site, state.selection).length : 0}
             />
-            {state.site && (
-              <div className="panel-body panel-body--bottom">
-                <section className="card">
-                  <button type="button" className="button" onClick={() => void share()}>
-                    {CHALLENGE_COPY.share}
-                  </button>
-                  {shareStatus && (
-                    <>
-                      <p className="message" role="status">
-                        {shareStatus.text}
-                      </p>
-                      <input className="share-url" readOnly value={shareStatus.url} aria-label="Share link" onFocus={(e) => e.currentTarget.select()} />
-                    </>
-                  )}
-                </section>
-              </div>
-            )}
+            {state.site && projectCard}
             </>
           )}
         </div>

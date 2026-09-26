@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thermal-network-studio/project.schema.json",
+  "title": "Thermal Network Studio project file",
+  "description": "A saved neighbourhood and design. Canonical SI throughout: W, °C, m². `units` is only the display the player left. Written by src/io/project.ts; tests/project.test.ts holds the writer to this schema.",
+  "type": "object",
+  "required": ["format", "version", "saved", "place", "units", "challenge", "boundary", "selection", "design", "snapshot"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": "thermal-network-studio" },
+    "version": { "const": 1 },
+    "saved": { "type": "string", "format": "date-time" },
+    "place": {
+      "description": "Place names as the player corrected them for the award.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "neighbourhood": { "type": "string" }, "town": { "type": "string" }, "state": { "type": "string" } }
+    },
+    "units": { "enum": ["ip", "si"] },
+    "challenge": { "type": ["string", "null"] },
+    "boundary": {
+      "description": "A closed ring of [longitude, latitude], first point repeated last.",
+      "type": "array",
+      "minItems": 4,
+      "items": { "$ref": "#/$defs/point" }
+    },
+    "selection": {
+      "type": "object",
+      "required": ["excluded", "overrides"],
+      "additionalProperties": false,
+      "properties": {
+        "excluded": { "type": "array", "items": { "type": "string" } },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "string" },
+              { "type": "object", "properties": { "archetype": { "type": ["string", "null"] }, "levels": { "type": "number" } } }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "design": {
+      "type": "object",
+      "required": ["sources", "band", "retrofit"],
+      "additionalProperties": false,
+      "properties": {
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/source" } },
+        "band": {
+          "description": "°C.",
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+        },
+        "retrofit": { "type": "number" }
+      }
+    },
+    "snapshot": {
+      "description": "What the relay returned when the site was read: opens with no network call.",
+      "type": "object",
+      "required": ["place", "buildings", "weather"],
+      "properties": {
+        "place": { "type": "object", "required": ["countyFips", "zone", "region"] },
+        "buildings": { "type": "object", "required": ["version", "boundary", "features"], "properties": { "version": { "const": 1 } } },
+        "weather": {
+          "type": "object",
+          "required": ["year", "temperature", "relativeHumidity", "ghi", "firstWeekday"],
+          "properties": {
+            "temperature": { "$ref": "#/$defs/hours" },
+            "relativeHumidity": { "$ref": "#/$defs/hours" },
+            "ghi": { "$ref": "#/$defs/hours" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "point": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2, "maxItems": 2 },
+    "hours": { "type": "array", "items": { "type": "number" }, "minItems": 8760, "maxItems": 8760 },
+    "source": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "enum": ["bore-field", "air-source", "cooling-tower", "waste-heat", "water"] },
+        "at": { "$ref": "#/$defs/point" },
+        "boreholes": { "type": "number" },
+        "capacityW": { "type": "number" },
+        "temperature": { "type": "number" },
+        "label": { "type": "string" },
+        "water": { "enum": ["sewer", "surface"] }
+      }
+    }
+  }
+}

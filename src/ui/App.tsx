@@ -81,7 +81,7 @@ export function App() {
       </p>
 
       <main className="workspace">
-        <Workspace units={units} theme={theme.resolved} />
+        <Workspace units={units} theme={theme.resolved} onUnits={setUnits} />
       </main>
 
       <SiteFooter />

@@ -101,8 +101,11 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       BLE): a Results chart (winter peak, summer peak, the year; today as a
       rule), a Design tab stat, Learn facts, and the "Easy on the grid"
       challenge (winter peak ≥ 25% below BLE, ≤ 100 backup hours).
-- [ ] **11 Save and open** — a project file, as Psychrometric Studio has.
-      See below.
+- [x] **11 Save and open** — a project file, as Psychrometric Studio has:
+      Save file, Open file and Copy a link in one card on the Site and
+      Design tabs; Ctrl/⌘+S; the building and weather snapshot opens with no
+      network call; Re-read OpenStreetMap refreshes it. Not built: the
+      localStorage rescue (item 5 below).
 - **v2: building readiness** (steam heat, electrical panels) — deferred.
 
 ## Phase 11 plan: save and open a project file
@@ -139,9 +142,8 @@ only copy. Modelled on Psychrometric Studio's project file (its
    v1 migration fixture, refusal cases, overrides that name a building
    missing after a re-read.
 
-Open question for the owner: include the building snapshot (bigger file, opens
-offline, frozen study) or only the boundary (small, always current OSM)? The
-plan above assumes the snapshot with a re-read button.
+Built with the snapshot and a re-read button (about 350 KB for a Highland
+Park block; the weather year is most of it).
 
 Found in 08, not yet fixed:
 
