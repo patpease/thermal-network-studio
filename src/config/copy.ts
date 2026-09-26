@@ -49,9 +49,9 @@ export const MAP_COPY = {
   tooMany: (n: number, max: number) =>
     `${n.toLocaleString('en-US')} heated buildings. A network in this tool connects at most ${max}. Draw a smaller area or remove buildings.`,
   none: 'No heated buildings inside that boundary.',
-  contextHeading: 'Site context',
+  contextHeading: 'Site features',
   contextNote:
-    'Minnesota’s site-suitability criteria, for information. Rows this tool cannot determine are blank. None of these rows affect the score.',
+    'What this tool finds about the site. None of it affects the score.',
   notKnown: 'Not known to this tool',
   sourcesHeading: 'Heat sources nearby',
   sourcesNote: 'Capacities are estimates. Change them on the Design tab.',
@@ -148,4 +148,23 @@ export const LEARN_COPY = {
   tab: 'Learn',
   thisSite: 'This site',
   references: 'References',
+} as const;
+
+export const BALANCE_COPY = {
+  heading: 'Balancing the loop',
+  taken: 'Buildings take from the loop',
+  given: 'Buildings put into the loop',
+  shared: 'Shared between buildings',
+  heatingShare: 'Heating share of demand',
+  overlap: 'Demand overlap',
+  perYear: 'a year',
+  netTaken: (x: string) => `The buildings take ${x} a year more than they give. The plant adds the difference.`,
+  netGiven: (x: string) => `The buildings give ${x} a year more than they take. The plant removes the difference.`,
+  peakAdd: 'Heat to add, worst hour',
+  peakRemove: 'Heat to remove, worst hour',
+  connected: (x: string, pct: string) => `Connected: ${x} (${pct})`,
+  addsHeat: 'Adds heat: bore field, air-source heat pump, waste heat, water.',
+  removesHeat: 'Removes heat: bore field, cooling tower, water.',
+  boreBalance: 'A bore field keeps its temperature over the years when the heat it gives and takes in a year are close.',
+  boreRate: (x: string) => `Bore fields are counted at ${x} per borehole.`,
 } as const;

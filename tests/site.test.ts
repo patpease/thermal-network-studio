@@ -199,15 +199,13 @@ describe('the Minnesota sites (D28): what OSM lets us check', () => {
     expect(share(highland)).toBeGreaterThan(share(mankato));
   });
 
-  it('the context panel fills what it knows and leaves the rest blank', () => {
+  it('the site features panel lists only what the tool can find, and names no study', () => {
     const rows = siteContext(alexandria, null);
     const byKey = Object.fromEntries(rows.map((r) => [r.key, r]));
     expect(byKey['anchors']!.known).toBe(true);
     expect(byKey['anchors']!.finding).toMatch(/City Hall/);
-    for (const k of ['geology', 'hvac', 'grid', 'environment', 'priority', 'ownership']) {
-      expect(byKey[k]!.known).toBe(false);
-      expect(byKey[k]!.finding).toBe('');
-    }
+    for (const k of ['geology', 'hvac', 'grid', 'environment', 'priority', 'ownership']) expect(byKey[k]).toBeUndefined();
+    expect(JSON.stringify(rows)).not.toMatch(/Minnesota/);
     // No weights and no total, anywhere in it.
     expect(JSON.stringify(rows)).not.toMatch(/weight|score/i);
   });

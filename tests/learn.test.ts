@@ -58,11 +58,14 @@ describe('Learn content', () => {
     expect(ip + si).not.toMatch(/NaN|undefined|Infinity/);
   });
 
-  it('says plainly that not every site suits a network, with EPRI’s and Minnesota’s figures', () => {
+  it('names no study but EPRI, NLR and the others in the app (Minnesota lives in the README)', () => {
+    expect(all('si').map((f) => f.text).join(' ')).not.toMatch(/Minnesota/);
+  });
+
+  it('says plainly that not every site suits a network, with EPRI’s figures', () => {
     const s = sections(fmt('si')).find((x) => x.id === 'suitability')!;
     const text = s.facts.map((f) => f.text).join(' ');
     expect(text).toContain('50–150 GWh/km²·yr');
-    expect(text).toContain('80% or less');
     expect(text).toMatch(/challenge can be impossible/);
   });
 });

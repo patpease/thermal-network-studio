@@ -421,3 +421,13 @@ Things that looked right and were not:
   click that ends it, so a drag never also adds a corner. Done re-reads the
   site and carries the design and building changes over; Cancel restores the
   state from before the edit exactly, with no fetch.
+
+- **The Design tab carries the balancing numbers** (`engine/balance.ts`):
+  heat the buildings take from and put into the loop over a year, the net,
+  and the worst hour's NET heat to add and to remove against the plant
+  connected on each side. The worst-hour figures are net (extracted −
+  rejected, per hour), which is what balancing plant is sized against —
+  not the buildings' gross peak.
+- **The app names no Minnesota study.** It is cited in the README; the Site
+  panel lists what the tool finds ("Site features") and nothing it cannot
+  see. `tests/learn.test.ts` and `tests/site.test.ts` check the app text.

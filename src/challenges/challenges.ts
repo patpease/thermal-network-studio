@@ -75,7 +75,7 @@ export const CHALLENGES: readonly Challenge[] = [
     id: 'waste-not',
     title: 'Waste not',
     brief: 'At least 15% of the loop’s heat from waste heat or water, with no more than 100 hours to backup.',
-    idea: 'Minnesota’s site-suitability study lists data centres, ice rinks, breweries, wastewater plants, lakes and rivers as thermal resources for networks.',
+    idea: 'Data centres, ice rinks, breweries, sewers, lakes and rivers can supply heat to a thermal energy network.',
     icon: 'waste-not',
     goals: [
       { kind: 'heat-from', sources: ['waste-heat', 'water'], atLeast: 0.15 },

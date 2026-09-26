@@ -10,7 +10,6 @@ import { useState } from 'react';
 import { MAP_COPY } from '../config/copy';
 import { ARCHETYPES } from '../loads/archetypes';
 import type { ArchetypeId } from '../loads/archetypes';
-import { minnesotaBalanceBand } from '../engine/bands';
 import type { Place } from '../relay/relay';
 import { MAX_BUILDINGS } from '../site/classify';
 import { SOURCE_SEARCH_M } from '../site/osm';
@@ -143,7 +142,6 @@ export function SitePanel(props: SitePanelProps) {
   const floor = buildings.reduce((s, b) => s + b.floorArea, 0);
   const selected = site && props.selectedId ? site.buildings.find((b) => b.id === props.selectedId) : undefined;
   const metrics = result?.site ?? null;
-  const band = metrics ? minnesotaBalanceBand(metrics.heatingShare) : null;
 
   return (
     <div className="panel-body">
@@ -239,13 +237,13 @@ export function SitePanel(props: SitePanelProps) {
                 <Stat
                   label="Heating share"
                   value={percent(metrics.heatingShare)}
-                  note={band === 'balanced' ? 'Minnesota: 80% or less — balanced' : band === 'typical' ? 'Minnesota: 80–90% — typical' : 'Minnesota: over 90% — heating-dominant'}
+                  note="of heating plus cooling demand"
                 />
                 <Stat label="Demand overlap (DOC)" value={percent(metrics.doc)} note="share of demand in the same hours" />
                 <Stat
                   label="Density"
                   value={withUnit('density', metrics.densityGWhPerKm2, units)}
-                  note={`EPRI: ${rangeWithUnit('density', 50, 150, units)} typical of networks`}
+                  note={`${rangeWithUnit('density', 50, 150, units)} is typical of networks`}
                 />
                 <Stat label="Peak heating" value={withUnit('powerLarge', metrics.peakHeatingW / 1e6, units)} />
               </div>

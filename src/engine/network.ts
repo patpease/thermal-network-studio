@@ -86,6 +86,13 @@ export interface NetworkResult {
   /** Heat the buildings took from, and put into, the loop, kWh/yr. */
   readonly extractedKWh: number;
   readonly rejectedKWh: number;
+  /**
+   * The worst hour's NET need, W: the most heat the plant must add in any
+   * hour (buildings drawing more than others reject), and the most it must
+   * remove. What balancing plant is sized against.
+   */
+  readonly peakHeatToAddW: number;
+  readonly peakHeatToRemoveW: number;
   /** Heat shared building to building, kWh/yr: Σ min(extracted, rejected). */
   readonly sharedKWh: number;
   readonly sharedByMonth: readonly number[];
@@ -144,6 +151,8 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
   let unmetWh = 0;
   let deliveredWh = 0;
   let extractedWh = 0;
+  let peakAdd = 0;
+  let peakRemove = 0;
   let rejectedWh = 0;
 
   let T = field ? field.groundTemperature : (band.min + band.max) / 2;
@@ -168,6 +177,8 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
     const rejected = cool * (1 + 1 / copCool) + proc * (1 + 1 / copRef);
     extractedWh += extracted;
     rejectedWh += rejected;
+    peakAdd = Math.max(peakAdd, extracted - rejected);
+    peakRemove = Math.max(peakRemove, rejected - extracted);
     extractedMonthly[month] += extracted;
     rejectedMonthly[month] += rejected;
     const shared = Math.min(extracted, rejected);
@@ -279,6 +290,8 @@ export function simulateNetwork(demand: Demand, design: NetworkDesign, weather: 
     sourceInKWh: Object.fromEntries(Object.entries(inWh).map(([k, v]) => [k, v / 1000])),
     sourceOutKWh: Object.fromEntries(Object.entries(outWh).map(([k, v]) => [k, v / 1000])),
     extractedKWh: extractedWh / 1000,
+    peakHeatToAddW: peakAdd,
+    peakHeatToRemoveW: peakRemove,
     rejectedKWh: rejectedWh / 1000,
     sharedKWh: sharedWh / 1000,
     sharedByMonth: sharedMonthly.map((v) => v / 1000),

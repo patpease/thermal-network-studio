@@ -6,8 +6,9 @@
  * of what is built sits under them. Every number with a unit goes through
  * format.ts or NumberField, so nothing here knows which system is shown.
  */
-import { DESIGN_COPY, SOURCE_COPY } from '../config/copy';
-import { boreFieldArea, defaultSpot, fromCandidate, nextId, RETROFITS } from '../engine/design';
+import { BALANCE_COPY, DESIGN_COPY, SOURCE_COPY } from '../config/copy';
+import { balanceOf } from '../engine/balance';
+import { BOREHOLE_PEAK_W, boreFieldArea, defaultSpot, fromCandidate, nextId, RETROFITS } from '../engine/design';
 import type { Design, DesignSource, DesignSourceKind } from '../engine/design';
 import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
 import type { ScenarioResult } from '../engine/scenario';
@@ -141,6 +142,51 @@ function Results({ result, design, running, units }: { result: ScenarioResult | 
   );
 }
 
+/** A met share of a need, as a bar and words. The bar is decoration; the words carry it. */
+function Cover({ label, needW, haveW, role, units }: { label: string; needW: number; haveW: number; role: 'heat' | 'cool'; units: UnitSystem }) {
+  const share = needW > 0 ? haveW / needW : 1;
+  const pct = `${Math.round(share * 100)}%`;
+  return (
+    <div className="cover">
+      <div className="cover__head">
+        <span className="stat__label">{label}</span>
+        <span className="numeric">{withUnit('powerLarge', needW / 1e6, units)}</span>
+      </div>
+      <div className="cover__track" aria-hidden="true">
+        <div className={`cover__bar cover__bar--${role}`} style={{ width: `${Math.min(100, share * 100)}%` }} />
+      </div>
+      <span className="stat__note">{BALANCE_COPY.connected(withUnit('powerLarge', haveW / 1e6, units), pct)}</span>
+    </div>
+  );
+}
+
+function BalanceCard({ result, design, units }: { result: ScenarioResult; design: Design; units: UnitSystem }) {
+  const b = balanceOf(result, design);
+  const energy = (kWh: number) => withUnit('energyLarge', Math.abs(kWh) / 1000, units);
+  return (
+    <section className="card" aria-labelledby="balance-heading">
+      <h2 id="balance-heading" className="card__heading">
+        {BALANCE_COPY.heading}
+      </h2>
+      <div className="stats">
+        <Stat label={BALANCE_COPY.taken} value={energy(b.takenKWh)} note={BALANCE_COPY.perYear} />
+        <Stat label={BALANCE_COPY.given} value={energy(b.givenKWh)} note={BALANCE_COPY.perYear} />
+        <Stat label={BALANCE_COPY.heatingShare} value={`${Math.round(result.site.heatingShare * 100)}%`} />
+        <Stat label={BALANCE_COPY.overlap} value={`${Math.round(result.site.doc * 100)}%`} note={`${energy(b.sharedKWh)} ${BALANCE_COPY.shared.toLowerCase()}`} />
+      </div>
+      <p className="card__note">{b.netKWh >= 0 ? BALANCE_COPY.netTaken(energy(b.netKWh)) : BALANCE_COPY.netGiven(energy(b.netKWh))}</p>
+      <Cover label={BALANCE_COPY.peakAdd} needW={b.peakAddW} haveW={b.addCapacityW} role="heat" units={units} />
+      <Cover label={BALANCE_COPY.peakRemove} needW={b.peakRemoveW} haveW={b.removeCapacityW} role="cool" units={units} />
+      <ul className="card__note balance__facts">
+        <li>{BALANCE_COPY.addsHeat}</li>
+        <li>{BALANCE_COPY.removesHeat}</li>
+        <li>{BALANCE_COPY.boreBalance}</li>
+        <li>{BALANCE_COPY.boreRate(withUnit('power', BOREHOLE_PEAK_W, units, 2))}</li>
+      </ul>
+    </section>
+  );
+}
+
 function SourceCard(props: {
   s: DesignSource;
   units: UnitSystem;
@@ -245,6 +291,7 @@ export function DesignPanel(props: DesignPanelProps) {
   return (
     <div className="panel-body">
       <Results result={props.result} design={design} running={props.running} units={units} />
+      {props.result && <BalanceCard result={props.result} design={design} units={units} />}
 
       <section className="card" aria-labelledby="add-heading">
         <p className="card__note">{DESIGN_COPY.intro}</p>

@@ -86,6 +86,10 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
 ## After 07
 
 - [x] Distances in IP (ft) as well as SI; a test holds the context panel to it.
+- [x] Balancing card on the Design tab: annual take/give/net and the worst
+      hour's net heat to add and remove against the plant connected.
+- [x] The Minnesota study cited in the README only; the Site panel shows
+      only what the tool finds.
 - [x] Edit a drawn boundary: press and drag a corner (mouse or touch), Done
       re-reads the site and keeps the design; also works while drawing.
 

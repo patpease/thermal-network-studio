@@ -11,7 +11,6 @@
  * Suitability Study (Jan 2026), Table 3-1 and Table D-1.
  */
 import type { SiteMetrics } from '../engine/demand.ts';
-import { minnesotaBalanceBand } from '../engine/bands.ts';
 import { boreholeRoom } from './classify.ts';
 import { SOURCE_SEARCH_M } from './osm.ts';
 import type { AnchorKind, Site } from './classify.ts';
@@ -58,15 +57,13 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
   const opportunistic = site.sources.filter((s) => s.exchange !== 'in-load' || s.kind === 'supermarket');
   const room = boreholeRoom(site.openSpaceM2);
 
-  const band = metrics ? minnesotaBalanceBand(metrics.heatingShare) : null;
-  const bandWords = { balanced: '80% or less heating', typical: '80–90% heating', 'heating-dominant': 'over 90% heating' } as const;
 
   return [
     {
       key: 'load-balance',
       criterion: 'Load balance',
       known: metrics !== null,
-      finding: metrics && band ? `${pct(metrics.heatingShare)} of thermal demand is heating — ${bandWords[band]}` : '',
+      finding: metrics ? `${pct(metrics.heatingShare)} of thermal demand is heating` : '',
     },
     {
       key: 'load-density',
@@ -113,12 +110,5 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
               .map((a) => a.name ?? a.anchor)
               .join(', ')}${anchors.length > 4 ? '…' : ''}`,
     },
-    // The rest are Minnesota criteria this tool cannot see. Blank, on purpose.
-    { key: 'geology', criterion: 'Bedrock and thermal conductivity', known: false, finding: '' },
-    { key: 'hvac', criterion: 'Existing HVAC systems', known: false, finding: '' },
-    { key: 'grid', criterion: 'Capacity for electrical demand', known: false, finding: '' },
-    { key: 'environment', criterion: 'Wetlands and contamination', known: false, finding: '' },
-    { key: 'priority', criterion: 'Priority community', known: false, finding: '' },
-    { key: 'ownership', criterion: 'Ownership and coordination', known: false, finding: '' },
   ];
 }

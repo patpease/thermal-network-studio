@@ -7,7 +7,6 @@
  */
 import { BOREHOLE_PEAK_W } from '../engine/design';
 import type { SiteMetrics } from '../engine/demand';
-import { minnesotaBalanceBand } from '../engine/bands';
 import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
 import { DEFAULT_BAND } from '../engine/network';
 import { TOWER_APPROACH } from '../engine/sources';
@@ -16,18 +15,13 @@ import { boreholeRoom } from '../site/classify';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
-export type RefId = 'epri' | 'mn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'tool';
+export type RefId = 'epri' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'tool';
 
 export const REFERENCES: Record<RefId, { short: string; full: string; url?: string }> = {
   epri: {
     short: 'EPRI 2024',
     full: 'EPRI. Mapping Heating and Cooling Loads to Assess the Potential of Thermal Energy Networks. Technical Update 3002029431, 2024.',
     url: 'https://restservice.epri.com/publicdownload/000000003002029431/0/Product',
-  },
-  mn: {
-    short: 'Minnesota 2026',
-    full: 'Minnesota Department of Commerce. Thermal Energy Network Site Suitability Study. Buro Happold et al., January 2026.',
-    url: 'https://www.lrl.mn.gov/docs/2026/mandated/260051.pdf',
   },
   nlr: {
     short: 'NLR ComStock/ResStock',
@@ -73,7 +67,7 @@ export function sections(f: Formatters): Section[] {
       id: 'network',
       title: 'A thermal energy network',
       facts: [
-        { text: 'A thermal energy network connects buildings to a shared water loop. Each building has a heat pump.', refs: ['epri', 'mn'] },
+        { text: 'A thermal energy network connects buildings to a shared water loop. Each building has a heat pump.', refs: ['epri'] },
         { text: 'A building that heats takes heat from the loop. A building that cools puts heat into it.', refs: ['epri'] },
         { text: `This tool models an ambient loop held between two temperatures you set. The default is ${f.temperature(DEFAULT_BAND.min)} to ${f.temperature(DEFAULT_BAND.max)}.`, refs: ['tool'] },
         { text: 'Heat the loop cannot supply or remove goes to electric backup and is counted as unmet hours.', refs: ['tool'] },
@@ -84,11 +78,9 @@ export function sections(f: Formatters): Section[] {
       title: 'Not every location suits a network',
       facts: [
         { text: `Existing networks typically serve ${f.densityRange(50, 150)} of thermal demand.`, refs: ['epri'] },
-        { text: 'Minnesota’s study scores a site highest when heating is 80% or less of its thermal demand, and lowest when heating is over 90%.', refs: ['mn'] },
         { text: 'Heat moves between buildings only in hours when some heat and others cool. EPRI’s Framingham study found 1.5% overlap with space conditioning alone.', refs: ['epri'] },
         { text: 'Hot water, data centres, ice rinks and supermarkets add demand in hours that space heating and cooling do not.', refs: ['epri'] },
-        { text: 'Bore field access is 15% of Minnesota’s site-suitability weighting, and geology 10%.', refs: ['mn'] },
-        { text: 'Data centres, ice rinks, breweries, manufacturing, wastewater plants, supermarkets, lakes, rivers and aquifers are listed as opportunistic thermal resources.', refs: ['mn'] },
+        { text: `This tool looks for data centres, ice rinks, breweries, food processing, wastewater plants, supermarkets, lakes and rivers within ${f.length(SOURCE_SEARCH_M)} of the boundary.`, refs: ['tool', 'osm'] },
         { text: 'A challenge can be impossible at a given site. A dense downtown may lack open ground for a bore field; a site with no waste heat or water nearby cannot take heat from them.', refs: ['tool'] },
       ],
     },
@@ -125,7 +117,6 @@ export function sections(f: Formatters): Section[] {
 export function siteFacts(site: Site, metrics: SiteMetrics, f: Formatters): Fact[] {
   const room = boreholeRoom(site.openSpaceM2);
   const needFull = Math.ceil((metrics.peakHeatingW * 0.72) / BOREHOLE_PEAK_W);
-  const band = minnesotaBalanceBand(metrics.heatingShare);
   const found = site.sources.filter((s) => s.exchange !== 'in-load');
   return [
     {
@@ -133,8 +124,8 @@ export function siteFacts(site: Site, metrics: SiteMetrics, f: Formatters): Fact
       refs: ['epri'],
     },
     {
-      text: `Heating is ${Math.round(metrics.heatingShare * 100)}% of thermal demand here. ${band === 'balanced' ? 'That is in Minnesota’s highest band (80% or less).' : band === 'typical' ? 'That is in Minnesota’s middle band (80–90%).' : 'That is in Minnesota’s lowest band (over 90%).'}`,
-      refs: ['mn'],
+      text: `Heating is ${Math.round(metrics.heatingShare * 100)}% of heating plus cooling demand here.`,
+      refs: ['epri'],
     },
     { text: `Demand overlap here is ${Math.round(metrics.doc * 100)}%.`, refs: ['epri'] },
     {
@@ -145,7 +136,7 @@ export function siteFacts(site: Site, metrics: SiteMetrics, f: Formatters): Fact
       text: found.length
         ? `${found.length} waste heat or water ${found.length === 1 ? 'source was' : 'sources were'} found within ${f.length(SOURCE_SEARCH_M)}.`
         : `No waste heat or water source was found within ${f.length(SOURCE_SEARCH_M)}.`,
-      refs: ['osm', 'mn'],
+      refs: ['osm', 'tool'],
     },
   ];
 }

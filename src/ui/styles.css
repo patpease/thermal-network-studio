@@ -1229,3 +1229,45 @@ a.button {
     min-height: 44px;
   }
 }
+
+/* The Design tab's balancing card. */
+.cover {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cover__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.cover__track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.cover__bar {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.cover__bar--heat {
+  background: var(--chart-heat);
+}
+
+.cover__bar--cool {
+  background: var(--chart-cool);
+}
+
+.balance__facts {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
