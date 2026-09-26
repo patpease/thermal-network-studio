@@ -23,8 +23,10 @@ const compose = (over: Partial<Parameters<typeof composeChartSvg>[0]> = {}) =>
 describe('an exported chart', () => {
   it('burns in the scope line, the sources, the host and the month', () => {
     const { svg } = compose();
-    expect(svg).toContain(SCOPE_STATEMENT.body);
-    expect(svg).toContain(SCOPE_STATEMENT.emphasis);
+    // Wrapped over lines: every word of the statement is there, in order.
+    const text = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' ');
+    expect(text).toContain('Use to explore how a shared thermal network could work in a neighborhood.');
+    expect(text.replace(/\s+/g, ' ')).toContain(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`);
     expect(svg).toContain('OpenStreetMap contributors');
     expect(svg).toContain('ComStock™');
     expect(svg).toContain(BRAND.host);

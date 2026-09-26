@@ -1171,7 +1171,7 @@ a.button {
   /* What is left of the screen under the header and the scope line (which
      stays: it is permanent page furniture) and above the tab bar. */
   .workspace-map[data-tab='map'] .map-pane {
-    height: calc(100dvh - 17rem - env(safe-area-inset-bottom));
+    height: calc(100dvh - 19.5rem - env(safe-area-inset-bottom));
     min-height: 20rem;
     border-bottom: 0;
   }

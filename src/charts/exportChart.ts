@@ -138,13 +138,17 @@ export function composeChartSvg(input: {
   y += 24;
   const chartTop = y;
   y += input.chartHeight + 36;
+  // The scope statement wraps: it is longer than one line of the export.
+  const scope = wrap(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, 128);
+  const scopeLines = scope.map((line, i) => t(L, y + 30 + i * 21, 15, line, input.ink));
+  const after = y + 30 + (scope.length - 1) * 21;
   const footer = [
     `<line x1="${L}" y1="${y}" x2="${EXPORT_WIDTH - L}" y2="${y}" stroke="#D9DEE5" stroke-width="1.5"/>`,
-    t(L, y + 30, 15, `${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, input.ink),
-    t(L, y + 54, 13, 'Loads calibrated to NLR ComStock™ and ResStock™ · grid carbon NLR Cambium 2023 · buildings © OpenStreetMap contributors.', input.muted),
-    t(L, y + 78, 13, `${BRAND.appName} · ${BRAND.host} · ${monthYear(input.date)}`, input.muted),
+    ...scopeLines,
+    t(L, after + 24, 13, 'Loads calibrated to NLR ComStock™ and ResStock™ · grid carbon NLR Cambium 2023 · buildings © OpenStreetMap contributors.', input.muted),
+    t(L, after + 48, 13, `${BRAND.appName} · ${BRAND.host} · ${monthYear(input.date)}`, input.muted),
   ];
-  const height = y + 100;
+  const height = after + 70;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${EXPORT_WIDTH}" height="${height}" viewBox="0 0 ${EXPORT_WIDTH} ${height}">
 <style>${face}</style>
 <rect width="${EXPORT_WIDTH}" height="${height}" fill="#FFFFFF"/>

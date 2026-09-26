@@ -13,8 +13,8 @@
  */
 export const SCOPE_STATEMENT = {
   lead: 'Scope',
-  body: 'Explores how a shared thermal network could work. It conveys an idea; it does not predict a saving.',
-  emphasis: 'Not for feasibility studies, utility filings or design submissions.',
+  body: 'Use to explore how a shared thermal network could work in a neighborhood. Uses first-principle physics and publicly accessible building data. Use it to convey an idea, learn about thermal energy networks and your neighborhood.',
+  emphasis: 'Not for a full feasibility study, to learn more find an expert and start a dialog.',
 } as const;
 
 /** The five steps of play, in order. */
