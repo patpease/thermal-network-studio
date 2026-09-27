@@ -104,6 +104,16 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
 - [ ] **12 More building data** — FEMA USA Structures fills footprints OSM
       lacks; USACE NSI fills storeys, floor area and unit counts. Reviewed
       and measured in `docs/building-data.md`; not built.
+- [ ] **Validate the hourly load shape against ORNL AutoBEM** (offline, a
+      test, nothing in the running tool). The annual loads are calibrated to
+      ComStock/ResStock; the hour-by-hour shape is this tool's model and
+      unchecked. AutoBEM publishes per-building EnergyPlus results for a few
+      regions as CSV on Zenodo — Arizona (baseline TMY, and summer 2020 for
+      2.56 M buildings), Chattanooga EPB, Clark County NV, Los Angeles County.
+      Compare, per archetype and zone (2B/3B), the daily profile shape and the
+      peak-to-mean ratio; record the gap rather than tune to it. The national
+      Model America set (OpenStudio/EnergyPlus files per county, Globus only,
+      no attribute table) is not usable live — see `docs/building-data.md`.
 - [x] **11 Save and open** — a project file, as Psychrometric Studio has:
       Save file, Open file and Copy a link in one card on the Site and
       Design tabs; Ctrl/⌘+S; the building and weather snapshot opens with no

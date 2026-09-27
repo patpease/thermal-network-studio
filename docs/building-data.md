@@ -17,6 +17,21 @@ Not checked: Google Open Buildings (no US coverage), county assessor parcels
 (year built and use codes, but one source per county; Regrid's national set is
 paid).
 
+Also reviewed, not measured:
+
+- **ORNL AutoBEM / Model America** — an EnergyPlus model of 122.9 M US
+  buildings, as per-county model files through Globus only; the attribute
+  table it was built from is not published with it, and results exist only
+  for a few regions. Not usable live. Its regional results are a validation
+  set for the hourly shape (BACKLOG).
+- **OSM-derived building classification for the US** (de Arruda et al.,
+  *Scientific Data* 11, 1210, 2024) — 67.7 M footprints labelled residential
+  or non-residential from OSM tags and land use. Two classes, from the same OSM
+  data this tool already reads and classifies more finely (tags → land use →
+  footprint). USA Structures' occupancy (single-family, multifamily, school…)
+  and NSI's Hazus codes say more, and answer per site. Useful at most as a
+  cross-check of the classifier's residential share on a county.
+
 ## What each is good for
 
 - **USA Structures fills the gap.** Polygons, so they draw and measure like
