@@ -28,6 +28,12 @@ describe('the shell', () => {
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(BRAND.appName);
   });
 
+  it('labels the release stage beside the name', () => {
+    render(<App />);
+    expect(BRAND.stage).toBe('Beta');
+    expect(screen.getByText('Beta').className).toBe('brand-stage');
+  });
+
   it('carries the scope statement as page furniture, not a dismissible notice', () => {
     render(<App />);
     expect(screen.getByText(SCOPE_STATEMENT.emphasis)).toBeTruthy();

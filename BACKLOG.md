@@ -222,8 +222,8 @@ Found in 08, fixed after 11:
   query asked for `place` nodes; re-capture them through `wrangler dev`.
 - **Share links are not shortened.** About 1.3–1.5 k characters for a
   realistic design — under the 2,000 that breaks in mail clients.
-- **The award link is a placeholder** (`AWARD_LINK_BASE`) until the tool has
-  its own domain.
+- ~~**The award link is a placeholder**~~ — done: `AWARD_LINK_BASE` is
+  `https://thermalnetwork.peasestudio.com` since 27 Sep 2026.
 
 ## Not done in 05, deliberately
 
