@@ -107,16 +107,15 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       file), flagged by source, attributed on the panel and every export.
       Verified through `preview:worker`: 1 OSM feature, 92 FEMA, 81 NSI on
       the Mankato block.
-- [ ] **Validate the hourly load shape against ORNL AutoBEM** (offline, a
-      test, nothing in the running tool). The annual loads are calibrated to
-      ComStock/ResStock; the hour-by-hour shape is this tool's model and
-      unchecked. AutoBEM publishes per-building EnergyPlus results for a few
-      regions as CSV on Zenodo — Arizona (baseline TMY, and summer 2020 for
-      2.56 M buildings), Chattanooga EPB, Clark County NV, Los Angeles County.
-      Compare, per archetype and zone (2B/3B), the daily profile shape and the
-      peak-to-mean ratio; record the gap rather than tune to it. The national
-      Model America set (OpenStudio/EnergyPlus files per county, Globus only,
-      no attribute table) is not usable live — see `docs/building-data.md`.
+- [x] **Validate against ORNL AutoBEM** — `npm run validate:autobem`, a
+      back-end check outside the app and `npm test`; report in
+      `docs/validation/autobem.md`. ANNUAL heating and cooling demand, not
+      hourly: no AutoBEM release carries hourly profiles. First run (Arizona,
+      527 archetypes, TMY3): heating −9%, cooling +8% overall, but 57% and
+      48% type by type with nothing cancelling; the tool is within 2% of its
+      NLR calibration there, so most of the gap is NLR against AutoBEM.
+- [ ] **Hourly shape** — still unchecked. Needs a public hourly reference
+      (AutoBEM's Chattanooga EPB work is not published hourly).
 - [x] **11 Save and open** — a project file, as Psychrometric Studio has:
       Save file, Open file and Copy a link in one card on the Site and
       Design tabs; Ctrl/⌘+S; the building and weather snapshot opens with no

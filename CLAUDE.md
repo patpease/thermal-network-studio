@@ -566,3 +566,19 @@ Things that looked right and were not:
   National Structure Inventory" — is on the Site panel, chart exports and the
   award. They are data licences, like NLR's, and so appear outside Learn;
   Learn cites them as sources too.
+
+## Checking the loads against AutoBEM
+
+- **`npm run validate:autobem` is a back-end check, never the app's and
+  never `npm test`'s.** It downloads ORNL's Arizona archetype results
+  (Zenodo 10393563) and four TMY3 years into `data/validation/cache/`
+  (gitignored), runs the tool's load model on every archetype, and writes
+  `docs/validation/autobem.md` and `.json`. The pure half is
+  `scripts/validate/autobem-lib.ts`, tested by `tests/validate.test.ts`.
+- **Annual, not hourly.** AutoBEM publishes annual end-use ENERGY; demand
+  is derived at stated efficiencies (gas 0.80, electric 1.0, DX 3.0,
+  chillers 5.5). The hourly shape is still unchecked, and the report says so.
+- **Read the absolute gap, not the total.** The first run agreed within
+  10% overall and disagreed by about half type by type; the tool sat within
+  2% of NLR, so the two reference sets disagree. Record the gap; never tune
+  the calibration to it.

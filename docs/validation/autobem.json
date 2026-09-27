@@ -1,0 +1,1469 @@
+{
+ "generated": "2026-09-27",
+ "source": "ORNL AutoBEM, Zenodo 10393563",
+ "units": "kWh/m2/yr; stockArea m2",
+ "summary": [
+  {
+   "zone": "2B",
+   "stockArea": 577191696.1961778,
+   "autobem": {
+    "heating": 8.407417129748616,
+    "cooling": 156.61627837654137
+   },
+   "tool": {
+    "heating": 6.356136981418735,
+    "cooling": 171.853131568302
+   },
+   "absoluteGap": {
+    "heating": 0.7954740980983798,
+    "cooling": 0.4807766797953674
+   },
+   "nlr": {
+    "heating": 6.895496896065473,
+    "cooling": 165.77941706303395
+   }
+  },
+  {
+   "zone": "3B",
+   "stockArea": 59148548.142637596,
+   "autobem": {
+    "heating": 21.553505976420517,
+    "cooling": 90.75262964748018
+   },
+   "tool": {
+    "heating": 23.745388470283274,
+    "cooling": 88.33345779496884
+   },
+   "absoluteGap": {
+    "heating": 0.5157255300729423,
+    "cooling": 0.5216513622380278
+   },
+   "nlr": {
+    "heating": 22.46933880714703,
+    "cooling": 84.76962060747506
+   }
+  },
+  {
+   "zone": "4B",
+   "stockArea": 48206671.03968332,
+   "autobem": {
+    "heating": 54.32486260546618,
+    "cooling": 76.79987767175996
+   },
+   "tool": {
+    "heating": 63.6991873836141,
+    "cooling": 59.67751123027071
+   },
+   "absoluteGap": {
+    "heating": 0.5893971202226237,
+    "cooling": 0.3828687032631508
+   },
+   "nlr": {
+    "heating": 63.386459304858974,
+    "cooling": 75.91657122396668
+   }
+  },
+  {
+   "zone": "5B",
+   "stockArea": 35833258.33097165,
+   "autobem": {
+    "heating": 92.95109305080116,
+    "cooling": 33.362535243394106
+   },
+   "tool": {
+    "heating": 79.34468202591943,
+    "cooling": 31.53493886628455
+   },
+   "absoluteGap": {
+    "heating": 0.24947762345918414,
+    "cooling": 0.5949456102605997
+   },
+   "nlr": {
+    "heating": 76.67771253021746,
+    "cooling": 49.7932172665316
+   }
+  },
+  {
+   "zone": "all",
+   "stockArea": 720380173.7094707,
+   "autobem": {
+    "heating": 16.76491343144777,
+    "cooling": 139.73629495697958
+   },
+   "tool": {
+    "heating": 15.25183423914194,
+    "cooling": 150.50920889786104
+   },
+   "absoluteGap": {
+    "heating": 0.570677698795583,
+    "cooling": 0.4807112821220763
+   },
+   "nlr": {
+    "heating": 15.42562551923833,
+    "cooling": 147.34503416561938
+   }
+  }
+ ],
+ "rows": [
+  {
+   "zone": "2B",
+   "type": "IECC",
+   "archetype": "single-family",
+   "stockArea": 358404644.9888927,
+   "autobem": {
+    "heating": 3.2978753628171966,
+    "cooling": 99.09628590238341,
+    "heatingEnergy": 4.122344203521495,
+    "coolingEnergy": 33.032095300794474
+   },
+   "tool": {
+    "heating": 6.603424395710663,
+    "cooling": 142.85166526468888
+   },
+   "nlr": {
+    "heating": 7.546,
+    "cooling": 138.4
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "Warehouse",
+   "archetype": "warehouse",
+   "stockArea": 42245571.471449584,
+   "autobem": {
+    "heating": 0.000998157312299315,
+    "cooling": 0.0000068595809320331455,
+    "heatingEnergy": 0.0012476966403741439,
+    "coolingEnergy": 0.0000022865269773443815
+   },
+   "tool": {
+    "heating": 1.8268705612604672,
+    "cooling": 79.90352008396023
+   },
+   "nlr": {
+    "heating": 1.559,
+    "cooling": 76.37
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "RetailStandalone",
+   "archetype": "retail-standalone",
+   "stockArea": 27341001.973401938,
+   "autobem": {
+    "heating": 19.63976848220482,
+    "cooling": 194.8286097494282,
+    "heatingEnergy": 24.549710602756022,
+    "coolingEnergy": 64.94286991647608
+   },
+   "tool": {
+    "heating": 5.13959150453829,
+    "cooling": 280.9837066020342
+   },
+   "nlr": {
+    "heating": 5.253,
+    "cooling": 272.1
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "SmallOffice",
+   "archetype": "office-small",
+   "stockArea": 26280336.68636566,
+   "autobem": {
+    "heating": 7.31176755837045,
+    "cooling": 144.68601120759303,
+    "heatingEnergy": 9.135801145376648,
+    "coolingEnergy": 48.22867040253101
+   },
+   "tool": {
+    "heating": 4.557540672573193,
+    "cooling": 209.93897238203542
+   },
+   "nlr": {
+    "heating": 4.153,
+    "cooling": 201.9
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "SecondarySchool",
+   "archetype": "school-secondary",
+   "stockArea": 20978402.315497007,
+   "autobem": {
+    "heating": 21.77624985112021,
+    "cooling": 223.39904458710197,
+    "heatingEnergy": 27.220312313900266,
+    "coolingEnergy": 74.46634819570066
+   },
+   "tool": {
+    "heating": 7.055170984500994,
+    "cooling": 246.19073593397863
+   },
+   "nlr": {
+    "heating": 6.803,
+    "cooling": 236.1
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "LargeHotel",
+   "archetype": "hotel",
+   "stockArea": 19106473.05298606,
+   "autobem": {
+    "heating": 18.520673219652586,
+    "cooling": 667.9638357358361,
+    "heatingEnergy": 23.15084152456573,
+    "coolingEnergy": 121.44797013378844
+   },
+   "tool": {
+    "heating": 12.442672937985552,
+    "cooling": 210.50514506394688
+   },
+   "nlr": {
+    "heating": 11.67,
+    "cooling": 199
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "PrimarySchool",
+   "archetype": "school-primary",
+   "stockArea": 15220593.25581744,
+   "autobem": {
+    "heating": 14.677456338778239,
+    "cooling": 237.56475443070005,
+    "heatingEnergy": 18.346820423472796,
+    "coolingEnergy": 79.18825147689999
+   },
+   "tool": {
+    "heating": 4.622073186725347,
+    "cooling": 242.26438544674468
+   },
+   "nlr": {
+    "heating": 4.47,
+    "cooling": 233.3
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "RetailStripmall",
+   "archetype": "retail-stripmall",
+   "stockArea": 13833703.804492693,
+   "autobem": {
+    "heating": 23.65015450525058,
+    "cooling": 215.0667461157417,
+    "heatingEnergy": 29.562693131563215,
+    "coolingEnergy": 71.6889153719139
+   },
+   "tool": {
+    "heating": 10.603113751979027,
+    "cooling": 331.40403585403084
+   },
+   "nlr": {
+    "heating": 12.57,
+    "cooling": 321.9
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "Hospital",
+   "archetype": "hospital",
+   "stockArea": 10485288.359363167,
+   "autobem": {
+    "heating": 10.007176663288638,
+    "cooling": 347.80611465881924,
+    "heatingEnergy": 12.508970829110797,
+    "coolingEnergy": 63.23747539251258
+   },
+   "tool": {
+    "heating": 12.853267988476617,
+    "cooling": 393.8723056572109
+   },
+   "nlr": {
+    "heating": 12.36,
+    "cooling": 374.7
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "MediumOffice",
+   "archetype": "office-large",
+   "stockArea": 10269034.060772138,
+   "autobem": {
+    "heating": 30.327330448060284,
+    "cooling": 339.3342446079061,
+    "heatingEnergy": 31.4501546297288,
+    "coolingEnergy": 113.11141486930205
+   },
+   "tool": {
+    "heating": 4.205185528292063,
+    "cooling": 232.41404101141003
+   },
+   "nlr": {
+    "heating": 4.666,
+    "cooling": 223.9
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "Outpatient",
+   "archetype": "outpatient",
+   "stockArea": 8818636.780607974,
+   "autobem": {
+    "heating": 97.87093314239348,
+    "cooling": 585.4027442853903,
+    "heatingEnergy": 122.33866642799184,
+    "coolingEnergy": 195.13424809513012
+   },
+   "tool": {
+    "heating": 5.32856000295127,
+    "cooling": 268.2554818538623
+   },
+   "nlr": {
+    "heating": 4.498,
+    "cooling": 256.3
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "HighriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 8347508.625813618,
+   "autobem": {
+    "heating": 0.931483616475098,
+    "cooling": 211.10927088282102,
+    "heatingEnergy": 1.0380579775475371,
+    "coolingEnergy": 70.36975696094034
+   },
+   "tool": {
+    "heating": 3.705655954892778,
+    "cooling": 87.22242823460006
+   },
+   "nlr": {
+    "heating": 3.094,
+    "cooling": 82.4
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "LargeOffice",
+   "archetype": "office-large",
+   "stockArea": 5893845.422821252,
+   "autobem": {
+    "heating": 33.56585100541258,
+    "cooling": 605.7982818822439,
+    "heatingEnergy": 41.95731375676574,
+    "coolingEnergy": 110.14514216040796
+   },
+   "tool": {
+    "heating": 4.205834423795053,
+    "cooling": 232.41489564308813
+   },
+   "nlr": {
+    "heating": 4.666,
+    "cooling": 223.9
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "MidriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 4555745.989543951,
+   "autobem": {
+    "heating": 11.697116916087781,
+    "cooling": 346.0378060097052,
+    "heatingEnergy": 14.621396145109724,
+    "coolingEnergy": 115.34593533656837
+   },
+   "tool": {
+    "heating": 3.4936597294981286,
+    "cooling": 86.87800855080344
+   },
+   "nlr": {
+    "heating": 3.094,
+    "cooling": 82.4
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "FullServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 2259707.0960296113,
+   "autobem": {
+    "heating": 9.77854588000368,
+    "cooling": 461.99027836981236,
+    "heatingEnergy": 12.223182350004603,
+    "coolingEnergy": 153.99675945660414
+   },
+   "tool": {
+    "heating": 11.951074532414415,
+    "cooling": 563.6174443615948
+   },
+   "nlr": {
+    "heating": 12.04,
+    "cooling": 542.2
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "QuickServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 1832293.3287956577,
+   "autobem": {
+    "heating": 9.534979041293187,
+    "cooling": 493.64998366513123,
+    "heatingEnergy": 11.918723801616485,
+    "coolingEnergy": 164.54999455504372
+   },
+   "tool": {
+    "heating": 11.87588239670376,
+    "cooling": 563.4985355286151
+   },
+   "nlr": {
+    "heating": 12.04,
+    "cooling": 542.2
+   }
+  },
+  {
+   "zone": "2B",
+   "type": "SmallHotel",
+   "archetype": "hotel",
+   "stockArea": 1318908.983527419,
+   "autobem": {
+    "heating": 1.7979379750260032,
+    "cooling": 424.75727023357143,
+    "heatingEnergy": 1.7979379750260032,
+    "coolingEnergy": 141.58575674452382
+   },
+   "tool": {
+    "heating": 12.448436623337155,
+    "cooling": 210.51383584117178
+   },
+   "nlr": {
+    "heating": 11.67,
+    "cooling": 199
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "IECC",
+   "archetype": "single-family",
+   "stockArea": 40958583.925535925,
+   "autobem": {
+    "heating": 14.03005232534704,
+    "cooling": 48.200096879261075,
+    "heatingEnergy": 17.537565406683797,
+    "coolingEnergy": 16.066698959753694
+   },
+   "tool": {
+    "heating": 22.081326317926177,
+    "cooling": 71.09174955190468
+   },
+   "nlr": {
+    "heating": 21.48,
+    "cooling": 67.8
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "Warehouse",
+   "archetype": "warehouse",
+   "stockArea": 3463761.6138691586,
+   "autobem": {
+    "heating": 0.10143077662493523,
+    "cooling": 0,
+    "heatingEnergy": 0.12678847078116903,
+    "coolingEnergy": 0
+   },
+   "tool": {
+    "heating": 5.045006858383701,
+    "cooling": 8.414651049945885
+   },
+   "nlr": {
+    "heating": 4.281,
+    "cooling": 7.367
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "MidriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 2397409.427437451,
+   "autobem": {
+    "heating": 72.74517084453353,
+    "cooling": 324.8936992488516,
+    "heatingEnergy": 90.93146355566691,
+    "coolingEnergy": 108.29789974961717
+   },
+   "tool": {
+    "heating": 6.741877677068384,
+    "cooling": 46.86695620654518
+   },
+   "nlr": {
+    "heating": 5.052,
+    "cooling": 44.55
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "SmallOffice",
+   "archetype": "office-small",
+   "stockArea": 1952563.2767867644,
+   "autobem": {
+    "heating": 21.887649265055718,
+    "cooling": 144.62321325102684,
+    "heatingEnergy": 27.284831889246263,
+    "coolingEnergy": 48.2077377503423
+   },
+   "tool": {
+    "heating": 39.65216208361321,
+    "cooling": 146.65648220860183
+   },
+   "nlr": {
+    "heating": 34.93,
+    "cooling": 142
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "RetailStandalone",
+   "archetype": "retail-standalone",
+   "stockArea": 1890923.4982111643,
+   "autobem": {
+    "heating": 57.049194005466866,
+    "cooling": 163.7285569449335,
+    "heatingEnergy": 71.31149250683357,
+    "coolingEnergy": 54.57618564831117
+   },
+   "tool": {
+    "heating": 42.15800498775725,
+    "cooling": 212.88278660922265
+   },
+   "nlr": {
+    "heating": 37.95,
+    "cooling": 208.9
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "SecondarySchool",
+   "archetype": "school-secondary",
+   "stockArea": 1600924.187380155,
+   "autobem": {
+    "heating": 52.248467197812374,
+    "cooling": 157.57823513719276,
+    "heatingEnergy": 65.31058399726547,
+    "coolingEnergy": 52.52607837906425
+   },
+   "tool": {
+    "heating": 38.53926252315891,
+    "cooling": 174.16175874970622
+   },
+   "nlr": {
+    "heating": 34.02,
+    "cooling": 165.5
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "MediumOffice",
+   "archetype": "office-large",
+   "stockArea": 1420640.927554968,
+   "autobem": {
+    "heating": 74.76735201886652,
+    "cooling": 240.0292824896843,
+    "heatingEnergy": 77.3975993489204,
+    "coolingEnergy": 80.00976082989477
+   },
+   "tool": {
+    "heating": 72.47841558590873,
+    "cooling": 181.40694108867817
+   },
+   "nlr": {
+    "heating": 69.98,
+    "cooling": 174
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "HighriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 1346719.7387864285,
+   "autobem": {
+    "heating": 3.7065173466730506,
+    "cooling": 225.9019522778852,
+    "heatingEnergy": 4.231170743549535,
+    "coolingEnergy": 75.30065075929505
+   },
+   "tool": {
+    "heating": 7.043401246919366,
+    "cooling": 46.85903295612744
+   },
+   "nlr": {
+    "heating": 5.052,
+    "cooling": 44.55
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "RetailStripmall",
+   "archetype": "retail-stripmall",
+   "stockArea": 940729.4372025583,
+   "autobem": {
+    "heating": 41.8155849240055,
+    "cooling": 125.3950784462018,
+    "heatingEnergy": 52.269481155006865,
+    "coolingEnergy": 41.79835948206726
+   },
+   "tool": {
+    "heating": 31.98396585162727,
+    "cooling": 239.9741275990999
+   },
+   "nlr": {
+    "heating": 31.75,
+    "cooling": 237.8
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "PrimarySchool",
+   "archetype": "school-primary",
+   "stockArea": 912871.6729380115,
+   "autobem": {
+    "heating": 39.57915343887914,
+    "cooling": 154.50848912786537,
+    "heatingEnergy": 49.473941798598915,
+    "coolingEnergy": 51.50282970928845
+   },
+   "tool": {
+    "heating": 36.84352518497349,
+    "cooling": 183.77828185899688
+   },
+   "nlr": {
+    "heating": 31.99,
+    "cooling": 176
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "LargeHotel",
+   "archetype": "hotel",
+   "stockArea": 594109.0238509615,
+   "autobem": {
+    "heating": 21.003162676331502,
+    "cooling": 457.21766041336747,
+    "heatingEnergy": 26.253953345414374,
+    "coolingEnergy": 83.13048371152136
+   },
+   "tool": {
+    "heating": 27.784900772803798,
+    "cooling": 112.4560307857997
+   },
+   "nlr": {
+    "heating": 22.87,
+    "cooling": 106.1
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "Outpatient",
+   "archetype": "outpatient",
+   "stockArea": 524673.1029395405,
+   "autobem": {
+    "heating": 93.75697761339559,
+    "cooling": 349.3730392174052,
+    "heatingEnergy": 117.19622201674449,
+    "coolingEnergy": 116.45767973913512
+   },
+   "tool": {
+    "heating": 30.773782652708057,
+    "cooling": 156.45703364089164
+   },
+   "nlr": {
+    "heating": 25.05,
+    "cooling": 147.7
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "SmallHotel",
+   "archetype": "hotel",
+   "stockArea": 312820.5405770648,
+   "autobem": {
+    "heating": 16.756210990519115,
+    "cooling": 341.7367806716083,
+    "heatingEnergy": 16.756210990519115,
+    "coolingEnergy": 113.91226022386942
+   },
+   "tool": {
+    "heating": 27.81836315207154,
+    "cooling": 112.46013079902687
+   },
+   "nlr": {
+    "heating": 22.87,
+    "cooling": 106.1
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "QuickServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 238034.36331622192,
+   "autobem": {
+    "heating": 31.815815401999497,
+    "cooling": 296.47859943443507,
+    "heatingEnergy": 39.76976925249937,
+    "coolingEnergy": 98.82619981147836
+   },
+   "tool": {
+    "heating": 27.495766081424257,
+    "cooling": 515.4725666656935
+   },
+   "nlr": {
+    "heating": 25.31,
+    "cooling": 514.7
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "LargeOffice",
+   "archetype": "office-large",
+   "stockArea": 210884.3157811978,
+   "autobem": {
+    "heating": 93.38094435720674,
+    "cooling": 597.1539810879912,
+    "heatingEnergy": 116.72618044650847,
+    "coolingEnergy": 108.57345110690748
+   },
+   "tool": {
+    "heating": 70.75713242685673,
+    "cooling": 181.149777707589
+   },
+   "nlr": {
+    "heating": 69.98,
+    "cooling": 174
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "FullServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 201863.60177419832,
+   "autobem": {
+    "heating": 32.27906105728661,
+    "cooling": 258.85465966743106,
+    "heatingEnergy": 40.348826321608264,
+    "coolingEnergy": 86.28488655581035
+   },
+   "tool": {
+    "heating": 28.455198654045475,
+    "cooling": 514.868348560641
+   },
+   "nlr": {
+    "heating": 25.31,
+    "cooling": 514.7
+   }
+  },
+  {
+   "zone": "3B",
+   "type": "Hospital",
+   "archetype": "hospital",
+   "stockArea": 181035.48869581765,
+   "autobem": {
+    "heating": 21.140837884388645,
+    "cooling": 307.6037362215845,
+    "heatingEnergy": 26.426047355485803,
+    "coolingEnergy": 55.92795204028809
+   },
+   "tool": {
+    "heating": 15.848668540964852,
+    "cooling": 223.714439463929
+   },
+   "nlr": {
+    "heating": 15.49,
+    "cooling": 215.8
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "IECC",
+   "archetype": "single-family",
+   "stockArea": 30944409.742061142,
+   "autobem": {
+    "heating": 43.63812181034949,
+    "cooling": 50.164537994858,
+    "heatingEnergy": 54.54765226293685,
+    "coolingEnergy": 16.72151266495267
+   },
+   "tool": {
+    "heating": 71.88079597926995,
+    "cooling": 45.151584261267715
+   },
+   "nlr": {
+    "heating": 71.99,
+    "cooling": 59.62
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "MediumOffice",
+   "archetype": "office-large",
+   "stockArea": 3449649.7557324874,
+   "autobem": {
+    "heating": 95.13632052228749,
+    "cooling": 117.43159465486671,
+    "heatingEnergy": 102.08616142480508,
+    "coolingEnergy": 39.14386488495557
+   },
+   "tool": {
+    "heating": 60.460077998202124,
+    "cooling": 102.85534812703752
+   },
+   "nlr": {
+    "heating": 62.85,
+    "cooling": 124
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "MidriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 2837575.901272133,
+   "autobem": {
+    "heating": 122.70218277617175,
+    "cooling": 155.68516647708867,
+    "heatingEnergy": 153.3777284702147,
+    "coolingEnergy": 51.895055492362886
+   },
+   "tool": {
+    "heating": 22.240448139602897,
+    "cooling": 34.32959396936483
+   },
+   "nlr": {
+    "heating": 22.07,
+    "cooling": 45.03
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "SmallHotel",
+   "archetype": "hotel",
+   "stockArea": 2607708.1076440224,
+   "autobem": {
+    "heating": 43.59421132748157,
+    "cooling": 154.00144792118138,
+    "heatingEnergy": 43.59421132748157,
+    "coolingEnergy": 51.33381597372713
+   },
+   "tool": {
+    "heating": 47.27949274965963,
+    "cooling": 79.57383202454142
+   },
+   "nlr": {
+    "heating": 44.51,
+    "cooling": 102.6
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "SmallOffice",
+   "archetype": "office-small",
+   "stockArea": 1571000.5337803797,
+   "autobem": {
+    "heating": 33.61303207313983,
+    "cooling": 50.893329638613686,
+    "heatingEnergy": 41.87100232757573,
+    "coolingEnergy": 16.96444321287123
+   },
+   "tool": {
+    "heating": 56.446143813490494,
+    "cooling": 79.73806548404065
+   },
+   "nlr": {
+    "heating": 52.14,
+    "cooling": 97.98
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "RetailStandalone",
+   "archetype": "retail-standalone",
+   "stockArea": 1399654.7433774667,
+   "autobem": {
+    "heating": 75.1962120964089,
+    "cooling": 49.56616691052041,
+    "heatingEnergy": 93.9952651205111,
+    "coolingEnergy": 16.52205563684014
+   },
+   "tool": {
+    "heating": 52.45461129702802,
+    "cooling": 116.30769576091863
+   },
+   "nlr": {
+    "heating": 47.42,
+    "cooling": 136.9
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "SecondarySchool",
+   "archetype": "school-secondary",
+   "stockArea": 1142148.8738841396,
+   "autobem": {
+    "heating": 50.91319794276104,
+    "cooling": 69.51461092400379,
+    "heatingEnergy": 63.64149742845128,
+    "coolingEnergy": 23.171536974667923
+   },
+   "tool": {
+    "heating": 84.16635813640141,
+    "cooling": 110.03980909853632
+   },
+   "nlr": {
+    "heating": 84.91,
+    "cooling": 136
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "Warehouse",
+   "archetype": "warehouse",
+   "stockArea": 916047.7239733624,
+   "autobem": {
+    "heating": 1.0932588209747016,
+    "cooling": 0,
+    "heatingEnergy": 1.366573526218377,
+    "coolingEnergy": 0
+   },
+   "tool": {
+    "heating": 26.10695301034592,
+    "cooling": 27.35221695354561
+   },
+   "nlr": {
+    "heating": 24.68,
+    "cooling": 35.85
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "HighriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 717486.1393344516,
+   "autobem": {
+    "heating": 17.325396443016604,
+    "cooling": 134.84858583963552,
+    "heatingEnergy": 20.33454967321407,
+    "coolingEnergy": 44.94952861321184
+   },
+   "tool": {
+    "heating": 22.02699939947112,
+    "cooling": 34.37062862926525
+   },
+   "nlr": {
+    "heating": 22.07,
+    "cooling": 45.03
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "LargeOffice",
+   "archetype": "office-large",
+   "stockArea": 638691.5687824026,
+   "autobem": {
+    "heating": 156.17663840061877,
+    "cooling": 359.03711701867525,
+    "heatingEnergy": 195.22079800077347,
+    "coolingEnergy": 65.27947582157731
+   },
+   "tool": {
+    "heating": 59.72025712889286,
+    "cooling": 103.01361655048325
+   },
+   "nlr": {
+    "heating": 62.85,
+    "cooling": 124
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "PrimarySchool",
+   "archetype": "school-primary",
+   "stockArea": 412380.3312878541,
+   "autobem": {
+    "heating": 84.11902824940509,
+    "cooling": 94.56316967566512,
+    "heatingEnergy": 105.14878531175634,
+    "coolingEnergy": 31.52105655855504
+   },
+   "tool": {
+    "heating": 66.72402289328778,
+    "cooling": 107.30825092433884
+   },
+   "nlr": {
+    "heating": 64.91,
+    "cooling": 131
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "Outpatient",
+   "archetype": "outpatient",
+   "stockArea": 374522.50392873114,
+   "autobem": {
+    "heating": 126.82314323829607,
+    "cooling": 241.25627117775582,
+    "heatingEnergy": 158.52892904787012,
+    "coolingEnergy": 80.41875705925194
+   },
+   "tool": {
+    "heating": 28.86442977300424,
+    "cooling": 124.98155329594687
+   },
+   "nlr": {
+    "heating": 29.6,
+    "cooling": 148.9
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "LargeHotel",
+   "archetype": "hotel",
+   "stockArea": 369603.87075603113,
+   "autobem": {
+    "heating": 24.37474669804325,
+    "cooling": 294.771902295018,
+    "heatingEnergy": 30.468433372554056,
+    "coolingEnergy": 53.594891326366906
+   },
+   "tool": {
+    "heating": 47.15793529107358,
+    "cooling": 79.59335630558769
+   },
+   "nlr": {
+    "heating": 44.51,
+    "cooling": 102.6
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "RetailStripmall",
+   "archetype": "retail-stripmall",
+   "stockArea": 281740.27739247784,
+   "autobem": {
+    "heating": 88.12280511396253,
+    "cooling": 60.995048550238124,
+    "heatingEnergy": 110.15350639245314,
+    "coolingEnergy": 20.33168285007938
+   },
+   "tool": {
+    "heating": 74.54944750362556,
+    "cooling": 145.4238331767376
+   },
+   "nlr": {
+    "heating": 72.03,
+    "cooling": 169.6
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "FullServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 198009.93147803875,
+   "autobem": {
+    "heating": 77.80970163723518,
+    "cooling": 137.63948776161095,
+    "heatingEnergy": 97.26212704654398,
+    "coolingEnergy": 45.87982925387031
+   },
+   "tool": {
+    "heating": 83.53405029312718,
+    "cooling": 272.024559736537
+   },
+   "nlr": {
+    "heating": 72.92,
+    "cooling": 315.4
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "QuickServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 188604.17627877777,
+   "autobem": {
+    "heating": 79.94412605384412,
+    "cooling": 111.94899815225806,
+    "heatingEnergy": 99.93015756730512,
+    "coolingEnergy": 37.31633271741936
+   },
+   "tool": {
+    "heating": 81.60819578450771,
+    "cooling": 272.65861410032477
+   },
+   "nlr": {
+    "heating": 72.92,
+    "cooling": 315.4
+   }
+  },
+  {
+   "zone": "4B",
+   "type": "Hospital",
+   "archetype": "hospital",
+   "stockArea": 157436.8587194128,
+   "autobem": {
+    "heating": 16.039204890302585,
+    "cooling": 272.1900581488378,
+    "heatingEnergy": 20.04900611287823,
+    "coolingEnergy": 49.48910148160688
+   },
+   "tool": {
+    "heating": 42.37447957004318,
+    "cooling": 152.07702457024516
+   },
+   "nlr": {
+    "heating": 36.96,
+    "cooling": 184.5
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "IECC",
+   "archetype": "single-family",
+   "stockArea": 22661126.89464118,
+   "autobem": {
+    "heating": 83.16597477824732,
+    "cooling": 17.032191479666817,
+    "heatingEnergy": 103.95746847280914,
+    "coolingEnergy": 5.677397159888939
+   },
+   "tool": {
+    "heating": 87.31561677199484,
+    "cooling": 19.661719669509363
+   },
+   "nlr": {
+    "heating": 85.61,
+    "cooling": 33.93
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "Warehouse",
+   "archetype": "warehouse",
+   "stockArea": 1941257.1900648198,
+   "autobem": {
+    "heating": 2.686527085665277,
+    "cooling": 0,
+    "heatingEnergy": 3.3581588570815963,
+    "coolingEnergy": 0
+   },
+   "tool": {
+    "heating": 30.24187275576678,
+    "cooling": 14.880807123956245
+   },
+   "nlr": {
+    "heating": 27.98,
+    "cooling": 24.85
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "HighriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 1625353.8603579437,
+   "autobem": {
+    "heating": 39.67389702281041,
+    "cooling": 103.22404607347781,
+    "heatingEnergy": 46.72130221797716,
+    "coolingEnergy": 34.40801535782594
+   },
+   "tool": {
+    "heating": 27.684023786705023,
+    "cooling": 14.898014654413508
+   },
+   "nlr": {
+    "heating": 29.54,
+    "cooling": 24.2
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "SecondarySchool",
+   "archetype": "school-secondary",
+   "stockArea": 1543230.112165566,
+   "autobem": {
+    "heating": 110.95652607963756,
+    "cooling": 31.66752244946321,
+    "heatingEnergy": 138.69565759954693,
+    "coolingEnergy": 10.555840816487734
+   },
+   "tool": {
+    "heating": 111.77083610189749,
+    "cooling": 58.649722190594176
+   },
+   "nlr": {
+    "heating": 103.6,
+    "cooling": 97.15
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "RetailStandalone",
+   "archetype": "retail-standalone",
+   "stockArea": 1482732.924115544,
+   "autobem": {
+    "heating": 102.10776681448932,
+    "cooling": 18.134953326322034,
+    "heatingEnergy": 127.63470851811165,
+    "coolingEnergy": 6.044984442107344
+   },
+   "tool": {
+    "heating": 84.31208046363847,
+    "cooling": 71.26498834278503
+   },
+   "nlr": {
+    "heating": 74.8,
+    "cooling": 100.1
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "SmallOffice",
+   "archetype": "office-small",
+   "stockArea": 1211278.74356225,
+   "autobem": {
+    "heating": 64.96255142816977,
+    "cooling": 23.447951148358445,
+    "heatingEnergy": 80.84142585149907,
+    "coolingEnergy": 7.815983716119483
+   },
+   "tool": {
+    "heating": 71.48782092493151,
+    "cooling": 50.02604691356593
+   },
+   "nlr": {
+    "heating": 63.56,
+    "cooling": 74.7
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "MidriseApartment",
+   "archetype": "large-multifamily",
+   "stockArea": 1059896.980397194,
+   "autobem": {
+    "heating": 253.45250015039122,
+    "cooling": 61.333013420467005,
+    "heatingEnergy": 316.815625187989,
+    "coolingEnergy": 20.444337806822336
+   },
+   "tool": {
+    "heating": 29.333916294257868,
+    "cooling": 14.405296629441382
+   },
+   "nlr": {
+    "heating": 29.54,
+    "cooling": 24.2
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "MediumOffice",
+   "archetype": "office-large",
+   "stockArea": 879666.6320185678,
+   "autobem": {
+    "heating": 194.10003377873738,
+    "cooling": 63.26571814739675,
+    "heatingEnergy": 209.85330764637186,
+    "coolingEnergy": 21.088572715798914
+   },
+   "tool": {
+    "heating": 95.75589501600554,
+    "cooling": 71.03967616958126
+   },
+   "nlr": {
+    "heating": 93.25,
+    "cooling": 105.4
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "PrimarySchool",
+   "archetype": "school-primary",
+   "stockArea": 658524.3424425661,
+   "autobem": {
+    "heating": 74.6813134223206,
+    "cooling": 30.131413335495637,
+    "heatingEnergy": 93.35164177790077,
+    "coolingEnergy": 10.043804445165211
+   },
+   "tool": {
+    "heating": 80.17876866353132,
+    "cooling": 56.455712040832545
+   },
+   "nlr": {
+    "heating": 74.53,
+    "cooling": 88.81
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "LargeOffice",
+   "archetype": "office-large",
+   "stockArea": 508461.53748320934,
+   "autobem": {
+    "heating": 485.33449201653065,
+    "cooling": 309.53234313581726,
+    "heatingEnergy": 606.6681150206632,
+    "coolingEnergy": 56.278607842875864
+   },
+   "tool": {
+    "heating": 93.59514204755395,
+    "cooling": 71.49188958134849
+   },
+   "nlr": {
+    "heating": 93.25,
+    "cooling": 105.4
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "Outpatient",
+   "archetype": "outpatient",
+   "stockArea": 503266.943124498,
+   "autobem": {
+    "heating": 154.1572556119011,
+    "cooling": 100.32797898525602,
+    "heatingEnergy": 192.6965695148763,
+    "coolingEnergy": 33.442659661752025
+   },
+   "tool": {
+    "heating": 57.88628692641045,
+    "cooling": 87.50369188385446
+   },
+   "nlr": {
+    "heating": 53.17,
+    "cooling": 126.6
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "LargeHotel",
+   "archetype": "hotel",
+   "stockArea": 480216.41591294785,
+   "autobem": {
+    "heating": 67.55728957972372,
+    "cooling": 183.8537097077348,
+    "heatingEnergy": 84.44661197465463,
+    "coolingEnergy": 33.42794721958815
+   },
+   "tool": {
+    "heating": 57.19538029692329,
+    "cooling": 75.17449494945193
+   },
+   "nlr": {
+    "heating": 54.38,
+    "cooling": 104.2
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "RetailStripmall",
+   "archetype": "retail-stripmall",
+   "stockArea": 391197.1329871757,
+   "autobem": {
+    "heating": 109.32952092547406,
+    "cooling": 21.601364895176104,
+    "heatingEnergy": 136.66190115684256,
+    "coolingEnergy": 7.200454965058702
+   },
+   "tool": {
+    "heating": 82.07745087151118,
+    "cooling": 94.5222301241656
+   },
+   "nlr": {
+    "heating": 77.97,
+    "cooling": 124.1
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "Hospital",
+   "archetype": "hospital",
+   "stockArea": 364152.3091311104,
+   "autobem": {
+    "heating": 30.931535959530716,
+    "cooling": 162.168668061218,
+    "heatingEnergy": 38.6644199494134,
+    "coolingEnergy": 29.485212374766906
+   },
+   "tool": {
+    "heating": 62.19104510791473,
+    "cooling": 119.90053431049402
+   },
+   "nlr": {
+    "heating": 56.68,
+    "cooling": 164
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "SmallHotel",
+   "archetype": "hotel",
+   "stockArea": 286483.9269237179,
+   "autobem": {
+    "heating": 119.32252249978336,
+    "cooling": 73.36219592777721,
+    "heatingEnergy": 119.32252249978336,
+    "coolingEnergy": 24.454065309259068
+   },
+   "tool": {
+    "heating": 57.84006618937905,
+    "cooling": 74.97826356513607
+   },
+   "nlr": {
+    "heating": 54.38,
+    "cooling": 104.2
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "FullServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 124556.04285274955,
+   "autobem": {
+    "heating": 181.00324310025633,
+    "cooling": 47.97906592565254,
+    "heatingEnergy": 226.2540538753205,
+    "coolingEnergy": 15.993021975217511
+   },
+   "tool": {
+    "heating": 139.05120178380452,
+    "cooling": 173.74611852968232
+   },
+   "nlr": {
+    "heating": 118.7,
+    "cooling": 239.6
+   }
+  },
+  {
+   "zone": "5B",
+   "type": "QuickServiceRestaurant",
+   "archetype": "restaurant",
+   "stockArea": 111856.34279061259,
+   "autobem": {
+    "heating": 169.6092185176391,
+    "cooling": 57.36426461111,
+    "heatingEnergy": 212.01152314704893,
+    "coolingEnergy": 19.12142153703666
+   },
+   "tool": {
+    "heating": 140.8532512981446,
+    "cooling": 173.28385005696526
+   },
+   "nlr": {
+    "heating": 118.7,
+    "cooling": 239.6
+   }
+  }
+ ]
+}
