@@ -21,6 +21,7 @@ function formatters(units: UnitSystem): Formatters {
     power: (w) => (w >= 1e6 ? withUnit('powerLarge', w / 1e6, units, 2) : withUnit('power', w, units, 2)),
     delta: (k) => withUnit('temperatureDelta', k, units, 2),
     size: (tons) => networkSize(tons, units),
+    distance: (m) => withUnit('distance', m, units, 2),
   };
 }
 

@@ -18,6 +18,7 @@ const fmt = (units: UnitSystem): Formatters => ({
   temperature: (c) => withUnit('temperature', c, units, 3),
   density: (d) => withUnit('density', d, units),
   densityRange: (lo, hi) => rangeWithUnit('density', lo, hi, units),
+  distance: (m) => withUnit('distance', m, units, 2),
   area: (m2) => withUnit('area', m2, units),
   length: (m) => withUnit('length', m, units, 3),
   power: (w) => withUnit('power', w, units, 2),

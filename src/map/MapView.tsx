@@ -16,6 +16,7 @@
  * tap is a vertex, not a zoom. Finishing is a button in the panel as well as
  * a tap on the first vertex, because a double-tap is not discoverable.
  */
+import { EXISTING_NETWORKS } from '../site/generated/networks';
 import { useEffect, useRef, useState } from 'react';
 import type { Feature, FeatureCollection } from 'geojson';
 import type { GeoJSONSource, Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
@@ -152,6 +153,15 @@ function designData(design: Design): FeatureCollection {
   return { type: 'FeatureCollection', features };
 }
 
+const NETWORKS_DATA: FeatureCollection = {
+  type: 'FeatureCollection',
+  features: EXISTING_NETWORKS.map((n) => ({
+    type: 'Feature',
+    properties: { name: n.placement === 'town' ? `${n.name} (town)` : n.name, town: n.placement === 'town' },
+    geometry: { type: 'Point', coordinates: [n.at[0], n.at[1]] },
+  })),
+};
+
 function withOverlays(p: MapPalette): StyleSpecification {
   const base = baseStyle(p);
   return {
@@ -163,6 +173,8 @@ function withOverlays(p: MapPalette): StyleSpecification {
       draft: { type: 'geojson', data: EMPTY },
       sources: { type: 'geojson', data: EMPTY },
       design: { type: 'geojson', data: EMPTY },
+      // Existing networks: static data, the same on every map.
+      networks: { type: 'geojson', data: NETWORKS_DATA },
     },
     layers: [
       ...base.layers,
@@ -289,6 +301,37 @@ function withOverlays(p: MapPalette): StyleSpecification {
           'text-size': 11,
           'text-offset': [0, -1.3],
           'text-anchor': 'bottom',
+          'text-optional': true,
+        },
+        paint: { 'text-color': p.ink, 'text-halo-color': p.surface, 'text-halo-width': 1.5 },
+      },
+      {
+        // Existing networks: a hollow ink ring, apart from the filled heat
+        // and cooling markers of sources a design can connect. A point that
+        // is only the town is drawn fainter.
+        id: 'network-points',
+        type: 'circle',
+        source: 'networks',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 3, 12, 7],
+          'circle-color': p.surface,
+          'circle-stroke-color': p.ink,
+          'circle-stroke-width': 2,
+          'circle-opacity': ['case', ['get', 'town'], 0.5, 1],
+          'circle-stroke-opacity': ['case', ['get', 'town'], 0.5, 1],
+        },
+      },
+      {
+        id: 'network-labels',
+        type: 'symbol',
+        source: 'networks',
+        minzoom: 10,
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 11,
+          'text-offset': [0, 1.1],
+          'text-anchor': 'top',
           'text-optional': true,
         },
         paint: { 'text-color': p.ink, 'text-halo-color': p.surface, 'text-halo-width': 1.5 },

@@ -125,11 +125,12 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       open and share. Key lessons: not every site suits a network; loads
       cancelling is the point; the cold snap sets the winter peak; the
       ground must balance over years.
-- [ ] **Existing networks nearby** — planned, awaiting a build-or-backlog
-      decision. Review and recommendation in `docs/existing-networks.md`:
-      NREL's geothermal district heating and cooling data (CC BY 4.0) as a
-      generated dataset in the repo; IDEA's map linked and cited on Learn
-      only, until IDEA grants permission.
+- [x] **Existing networks nearby** — 137 running networks from NREL's
+      geothermal district heating and cooling data (CC BY 4.0), drawn as
+      hollow rings on the map, listed within 25 miles on the Site tab (else
+      the nearest anywhere), cited in full on Learn with IDEA's map linked.
+      No prospective projects. More sources: a CSV in `data/networks/` and
+      `npm run import:networks` (see its README).
 - [x] **Validate against ORNL AutoBEM** — `npm run validate:autobem`, a
       back-end check outside the app and `npm test`; report in
       `docs/validation/autobem.md`. ANNUAL heating and cooling demand, not

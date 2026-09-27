@@ -582,3 +582,23 @@ Things that looked right and were not:
   10% overall and disagreed by about half type by type; the tool sat within
   2% of NLR, so the two reference sets disagree. Record the gap; never tune
   the calibration to it.
+
+## Existing networks
+
+- **`data/networks/` holds one CSV per source in shared columns, plus
+  `sources.json`** (citation, licence, retrieved, maintained).
+  `npm run import:networks` validates them all and writes
+  `src/site/generated/networks.ts` — GENERATED; a test fails if it drifts
+  from the CSVs. The importer refuses a row with no point, an unknown kind or
+  a point outside the US; notes (a label that disagrees with its point, a
+  possible duplicate across sources) are printed and kept, never corrected.
+- **A new source brings its own CSV.** `scripts/networks/from-nrel-gdr-1282.ts`
+  is the one-off record of how NREL's was made (not maintained upstream);
+  it is not a pipeline to re-run. `data/networks/README.md` has the rules.
+- **For learning, never connecting.** Hollow ink rings on the map, apart
+  from heat sources; the Site tab lists those within 25 miles (`distance`
+  prints miles or km), else the nearest anywhere. A `town` point is drawn
+  fainter and said to be the town. Prospective projects are not taken.
+- **Citation**: the NREL source's full citation (with DOI and CC BY 4.0) is
+  on Learn; its short name is the attribution line on the card. IDEA's map
+  has no licence: linked and cited on Learn only, and named nowhere else.

@@ -1,0 +1,12 @@
+[
+ {
+  "id": "nrel-gdr-1282",
+  "file": "nrel-gdr-1282.csv",
+  "short": "NREL Geothermal Data Repository (CC BY 4.0)",
+  "citation": "Kolker, A., Beckers, K., & Pauling, H. (2020). U.S. Geothermal District Heating and Cooling Systems Data. [Data set]. Geothermal Data Repository. National Renewable Energy Laboratory. https://doi.org/10.15121/1764506",
+  "licence": "CC BY 4.0",
+  "url": "https://gdr.openei.org/submissions/1282",
+  "retrieved": "2026-09-27",
+  "maintained": false
+ }
+]

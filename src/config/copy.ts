@@ -60,6 +60,16 @@ export const MAP_COPY = {
     levels: { osm: '', nsi: ' (National Structure Inventory)', fema: ' (from FEMA height)', default: ' (guessed)' },
     vintageMedian: (band: string) => `Built ${band}: the census block group’s median year, not this building’s own.`,
   },
+  /** Existing networks near the site. */
+  networks: {
+    heading: 'Existing networks nearby',
+    within: (d: string) => `Thermal networks already running within ${d}. For learning; none can be connected.`,
+    none: (d: string, name: string, away: string) => `None within ${d}. The nearest in this tool’s data: ${name}, ${away} away.`,
+    town: 'placed at its town',
+    opened: (y: number) => `opened ${y}`,
+    capacity: (c: string) => `${c} thermal`,
+    more: (n: number) => `and ${n} more`,
+  },
   contextHeading: 'Site features',
   contextNote:
     'What this tool finds about the site. None of it affects the score.',

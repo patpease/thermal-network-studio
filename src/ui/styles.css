@@ -460,6 +460,12 @@ select {
   background: var(--cool);
 }
 
+/* An existing network: a hollow ring in ink, drawn apart from the heat
+   sources a design can connect. */
+.dot--network {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
 .muted {
   color: var(--ink-muted);
 }

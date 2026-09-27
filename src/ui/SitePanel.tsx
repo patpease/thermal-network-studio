@@ -15,6 +15,10 @@ import { MAX_BUILDINGS } from '../site/classify';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site, SiteBuilding } from '../site/classify';
 import { STRUCTURES_ATTRIBUTION } from '../site/structures';
+import { NETWORK_KIND_LABEL, NETWORK_SOURCES } from '../site/generated/networks';
+import { NEARBY_NETWORK_M, nearestNetwork, networksNear } from '../site/networks';
+import { centroid } from '../site/geometry';
+import type { LonLat } from '../site/geometry';
 import { siteContext } from '../site/context';
 import { connected, effective } from '../site/neighbourhood';
 import type { UnitSystem } from '../units/units';
@@ -99,6 +103,63 @@ function Stat({ label, value, note }: { label: string; value: string; note?: str
       <span className="stat__value numeric">{value}</span>
       {note && <span className="stat__note">{note}</span>}
     </div>
+  );
+}
+
+const NETWORKS_SHOWN = 6;
+
+/** Thermal networks already running near the site: to learn from, not to connect. */
+function NetworksNearby({ at, units }: { at: LonLat; units: UnitSystem }) {
+  const near = networksNear(at);
+  const within = withUnit('distance', NEARBY_NETWORK_M, units, 2);
+  const nearest = near.length === 0 ? nearestNetwork(at) : null;
+  const sources = new Set(near.map((n) => n.network.source));
+  return (
+    <section className="card" aria-labelledby="networks-heading">
+      <h2 id="networks-heading" className="card__heading">
+        {MAP_COPY.networks.heading}
+      </h2>
+      {near.length === 0 ? (
+        <p className="card__note">
+          {nearest ? MAP_COPY.networks.none(within, nearest.network.name, withUnit('distance', nearest.distanceM, units, 2)) : null}
+        </p>
+      ) : (
+        <>
+          <p className="card__note">{MAP_COPY.networks.within(within)}</p>
+          <ul className="list">
+            {near.slice(0, NETWORKS_SHOWN).map(({ network: n, distanceM }) => {
+              const facts = [
+                NETWORK_KIND_LABEL[n.kind],
+                `${withUnit('distance', distanceM, units, 2)} away`,
+                n.yearOpened ? MAP_COPY.networks.opened(n.yearOpened) : null,
+                n.capacityMWt ? MAP_COPY.networks.capacity(withUnit('powerLarge', n.capacityMWt, units, 2)) : null,
+                n.placement === 'town' ? MAP_COPY.networks.town : null,
+              ].filter((x): x is string => x !== null);
+              return (
+                <li key={n.id}>
+                  <span className="dot dot--network" aria-hidden />
+                  {n.link ? (
+                    <a href={n.link} target="_blank" rel="noreferrer noopener">
+                      {n.name}
+                    </a>
+                  ) : (
+                    n.name
+                  )}{' '}
+                  <span className="muted">— {facts.join(' · ')}</span>
+                </li>
+              );
+            })}
+          </ul>
+          {near.length > NETWORKS_SHOWN && <p className="card__note">{MAP_COPY.networks.more(near.length - NETWORKS_SHOWN)}</p>}
+        </>
+      )}
+      <p className="attribution">
+        {[...(sources.size ? sources : new Set(nearest ? [nearest.network.source] : []))]
+          .map((id) => NETWORK_SOURCES.find((s) => s.id === id)?.short)
+          .filter(Boolean)
+          .join(' · ')}
+      </p>
+    </section>
   );
 }
 
@@ -323,6 +384,8 @@ export function SitePanel(props: SitePanelProps) {
               </>
             )}
           </section>
+
+          <NetworksNearby at={centroid(site.boundary)} units={units} />
 
           <section className="card" aria-labelledby="context-heading">
             <h2 id="context-heading" className="card__heading">

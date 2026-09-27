@@ -5,6 +5,8 @@
  * unit switch converts them like every other figure (rule 2). A statement
  * about how THIS tool works cites the tool ("tool") rather than a report.
  */
+import { EXISTING_NETWORKS, NETWORK_SOURCES } from '../site/generated/networks';
+import { NEARBY_NETWORK_M } from '../site/networks';
 import { BOREHOLE_PEAK_W } from '../engine/design';
 import type { SiteMetrics } from '../engine/demand';
 import { BORE_DEFAULTS, FLUID_LIMITS } from '../engine/ground';
@@ -20,7 +22,7 @@ import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
-export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'tool';
+export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'nrel-gdr' | 'idea' | 'tool';
 
 export const REFERENCES: Record<RefId, { short: string; full: string; url?: string }> = {
   epri: {
@@ -59,6 +61,16 @@ export const REFERENCES: Record<RefId, { short: string; full: string; url?: stri
   osm: { short: 'OpenStreetMap', full: 'OpenStreetMap contributors. Data under the Open Database Licence.', url: 'https://www.openstreetmap.org/copyright' },
   fema: { short: 'FEMA USA Structures', full: 'FEMA and Oak Ridge National Laboratory, USA Structures. CC BY 4.0.', url: 'https://gis-fema.hub.arcgis.com/datasets/fedmaps::usa-structures/about' },
   nsi: { short: 'National Structure Inventory', full: 'U.S. Army Corps of Engineers, National Structure Inventory.', url: 'https://www.hec.usace.army.mil/confluence/nsi' },
+  'nrel-gdr': {
+    short: 'NREL GDR 2020',
+    full: NETWORK_SOURCES.find((s) => s.id === 'nrel-gdr-1282')!.citation + ' CC BY 4.0.',
+    url: 'https://gdr.openei.org/submissions/1282',
+  },
+  idea: {
+    short: 'IDEA',
+    full: 'International District Energy Association. District Energy Systems Map: North America, United States and Canada, as of 2015. Linked here; its data is not part of this tool.',
+    url: 'https://www.districtenergy.org/resources/resources/system-maps',
+  },
   tool: { short: 'This tool', full: 'A modelling choice in this tool. See the source code (MIT).', url: 'https://github.com/patpease/thermal-network-studio' },
 };
 
@@ -72,6 +84,8 @@ export interface Formatters {
   readonly delta: (k: number) => string;
   /** A network size from tons (tons in IP, MW in SI). */
   readonly size: (tons: number) => string;
+  /** A distance between places: miles in IP, km in SI. */
+  readonly distance: (m: number) => string;
 }
 
 export interface Fact {
@@ -85,6 +99,22 @@ export interface Section {
   readonly id: string;
   readonly title: string;
   readonly facts: readonly Fact[];
+}
+
+function existingNetworkFacts(f: Formatters): Fact[] {
+  const count = (k: string) => EXISTING_NETWORKS.filter((n) => n.kind === k).length;
+  const towns = EXISTING_NETWORKS.filter((n) => n.placement === 'town').length;
+  const states = new Set(EXISTING_NETWORKS.map((n) => n.state).filter(Boolean)).size;
+  return [
+    {
+      text: `This tool shows ${count('geothermal-network')} geothermal heat pump networks and ${count('geothermal-district-heating')} geothermal district heating systems running in the United States, in ${states} states.`,
+      refs: ['nrel-gdr'],
+    },
+    { text: 'A geothermal heat pump network shares one ground loop between buildings, each with its own heat pump. Geothermal district heating pipes hot water from underground to buildings.', refs: ['nrel-gdr'] },
+    { text: `The Site tab lists those within ${f.distance(NEARBY_NETWORK_M)} of a drawn neighbourhood. They are for learning and cannot be connected.`, refs: ['tool'] },
+    { text: `${towns} of the district heating systems have no published location and are drawn at their town, fainter.`, refs: ['nrel-gdr', 'tool'] },
+    { text: 'District energy systems also run on steam, hot water and chilled water in many cities and campuses. IDEA maps them across North America.', refs: ['idea'] },
+  ];
 }
 
 export function sections(f: Formatters): Section[] {
@@ -144,6 +174,11 @@ export function sections(f: Formatters): Section[] {
         { text: 'A Vancouver neighbourhood meets about 70% of its heating and cooling needs with heat recovered from wastewater.', refs: ['vctn'] },
         { text: `Sewer water runs about ${f.temperature(12)} to ${f.temperature(22)} through the year. Lake and river water follow the air a month late and stay above ${f.temperature(4)}.`, refs: ['tool'] },
       ],
+    },
+    {
+      id: 'existing',
+      title: 'Networks already running',
+      facts: existingNetworkFacts(f),
     },
     {
       id: 'score',

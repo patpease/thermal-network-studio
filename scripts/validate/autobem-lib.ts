@@ -17,6 +17,10 @@
 import type { ArchetypeId } from '../../src/loads/archetypes.ts';
 import type { WeatherYear } from '../../src/loads/model.ts';
 import type { ClimateZone, VintageBand } from '../../src/loads/zones.ts';
+import { parseCsv } from '../lib/csv.ts';
+import { readZipEntry } from '../lib/zip.ts';
+
+export { parseCsv };
 
 export const ZONES_CHECKED = ['2B', '3B', '4B', '5B'] as const satisfies readonly ClimateZone[];
 export type CheckedZone = (typeof ZONES_CHECKED)[number];
@@ -89,41 +93,6 @@ export interface AutobemRow {
   readonly coolingElectric: number;
 }
 
-/** A quote-aware CSV parse: header → objects, keys trimmed. */
-export function parseCsv(text: string): Record<string, string>[] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = '';
-  let quoted = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i]!;
-    if (quoted) {
-      if (c === '"' && text[i + 1] === '"') {
-        field += '"';
-        i++;
-      } else if (c === '"') quoted = false;
-      else field += c;
-    } else if (c === '"') quoted = true;
-    else if (c === ',') {
-      row.push(field);
-      field = '';
-    } else if (c === '\n' || c === '\r') {
-      if (c === '\r' && text[i + 1] === '\n') i++;
-      row.push(field);
-      field = '';
-      if (row.some((x) => x !== '')) rows.push(row);
-      row = [];
-    } else field += c;
-  }
-  if (field !== '' || row.length) {
-    row.push(field);
-    rows.push(row);
-  }
-  const [head, ...body] = rows;
-  const keys = (head ?? []).map((k) => k.trim());
-  return body.map((r) => Object.fromEntries(keys.map((k, i) => [k, (r[i] ?? '').trim()])));
-}
-
 export function autobemRows(zone: CheckedZone, text: string): AutobemRow[] {
   const n = (x: string | undefined) => {
     const v = Number(x);
@@ -181,36 +150,7 @@ export function parseEpw(text: string): WeatherYear & { location: string } {
 
 /** The one file in a zip whose name ends with `suffix` (stored or deflated). */
 export async function unzipOne(zip: Uint8Array, suffix: string): Promise<Uint8Array> {
-  const { inflateRawSync } = await import('node:zlib');
-  const view = new DataView(zip.buffer, zip.byteOffset, zip.byteLength);
-  let eocd = -1;
-  for (let i = zip.length - 22; i >= 0; i--) {
-    if (view.getUint32(i, true) === 0x06054b50) {
-      eocd = i;
-      break;
-    }
-  }
-  if (eocd < 0) throw new Error('Not a zip file');
-  const entries = view.getUint16(eocd + 10, true);
-  let p = view.getUint32(eocd + 16, true);
-  for (let e = 0; e < entries; e++) {
-    const method = view.getUint16(p + 10, true);
-    const size = view.getUint32(p + 20, true);
-    const nameLen = view.getUint16(p + 28, true);
-    const extraLen = view.getUint16(p + 30, true);
-    const commentLen = view.getUint16(p + 32, true);
-    const local = view.getUint32(p + 42, true);
-    const name = new TextDecoder().decode(zip.subarray(p + 46, p + 46 + nameLen));
-    if (name.toLowerCase().endsWith(suffix)) {
-      const start = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
-      const data = zip.subarray(start, start + size);
-      if (method === 0) return data;
-      if (method === 8) return new Uint8Array(inflateRawSync(data));
-      throw new Error(`Unsupported zip compression ${method}`);
-    }
-    p += 46 + nameLen + extraLen + commentLen;
-  }
-  throw new Error(`No *${suffix} in the zip`);
+  return readZipEntry(zip, (name) => name.toLowerCase().endsWith(suffix));
 }
 
 export interface Compared {

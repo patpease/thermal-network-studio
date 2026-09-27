@@ -32,7 +32,7 @@ describe('wording', () => {
 });
 
 describe('organizations are named only on the Learn tab', () => {
-  const ORGS = /\b(HEET|EPRI|VCTN|BDC|Building Decarbonization|Vermont Community|Minnesota(?:’s)? (?:study|Department)|Home Energy Efficiency Team)\b/;
+  const ORGS = /\b(HEET|EPRI|VCTN|BDC|Building Decarbonization|Vermont Community|Minnesota(?:’s)? (?:study|Department)|Home Energy Efficiency Team|IDEA|International District Energy)\b/;
   const outsideLearn = strings(Object.fromEntries(Object.entries(COPY).filter(([k]) => k !== 'LEARN_COPY')));
 
   it('no string outside the Learn content names a report’s organization', () => {
