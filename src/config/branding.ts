@@ -22,8 +22,8 @@ export const BRAND = {
   markIsPlaceholder: false,
   /**
    * Where the tool lives. Stamped on every export, so it moves with the
-   * custom-domain route in wrangler.jsonc. The workers.dev address stays on
-   * so links posted before the domain was bound still resolve.
+   * custom-domain route in wrangler.jsonc, which is the only address:
+   * workers.dev is switched off.
    */
   host: 'thermalnetwork.peasestudio.com',
 } as const;

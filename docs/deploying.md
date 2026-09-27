@@ -6,9 +6,12 @@ nothing is kept, so there is nothing to configure beyond the Worker itself.
 
 Target: **`https://thermalnetwork.peasestudio.com`** — a custom-domain route
 in `wrangler.jsonc`. `BRAND.host` in `src/config/branding.ts` says the same
-thing; they move together. The Worker also still answers at
-`https://thermal-network-studio.patpease0.workers.dev`, where the first awards
-pointed.
+thing; they move together. The workers.dev address is switched off
+(`workers_dev: false`), so the custom domain is the only one.
+
+Branch builds deploy with `npx wrangler preview`, which refuses to run without
+a `previews` block in `wrangler.jsonc`. It is there and empty; do not remove
+it, or every non-production build fails after a green build step.
 
 ## Workers, not Pages
 
@@ -125,4 +128,4 @@ Every award and LinkedIn post carries `AWARD_LINK_BASE`
 chart export prints the host. Since 27 Sep 2026 that is
 `thermalnetwork.peasestudio.com`, bound as a custom-domain route in
 `wrangler.jsonc`. If it ever moves, change the route and `BRAND.host` in the
-same commit (D18), and keep `workers_dev` on so posted links still resolve.
+same commit (D18).
