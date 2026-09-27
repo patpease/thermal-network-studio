@@ -13,6 +13,11 @@ export const BRAND = {
   organisationUrl: 'https://peasestudio.com/',
   appName: 'Thermal Network Studio',
   tagline: 'Share heat across a neighbourhood',
+  /**
+   * Release stage, shown as a badge beside the name. Matches the tool's
+   * status on peasestudio.com/tools/. Set to null when it leaves beta.
+   */
+  stage: 'Beta' as 'Beta' | null,
   /** The mark is drawn in brand/mark.ts (option C, "Under the ground"). */
   markIsPlaceholder: false,
   /**

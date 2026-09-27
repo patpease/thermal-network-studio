@@ -28,7 +28,10 @@ export function App() {
             <a className="brand-org" href={BRAND.organisationUrl}>
               {BRAND.organisation}
             </a>
-            <h1>{BRAND.appName}</h1>
+            <div className="brand-name">
+              <h1>{BRAND.appName}</h1>
+              {BRAND.stage && <span className="brand-stage">{BRAND.stage}</span>}
+            </div>
             <span className="brand-tagline">{BRAND.tagline}</span>
           </div>
         </div>
