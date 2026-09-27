@@ -22,16 +22,15 @@ export const BRAND = {
   markIsPlaceholder: false,
   /**
    * Where the tool lives. Stamped on every export, so it moves with the
-   * deployed route in wrangler.jsonc — workers.dev until a domain is chosen.
+   * custom-domain route in wrangler.jsonc. The workers.dev address stays on
+   * so links posted before the domain was bound still resolve.
    */
-  host: 'thermal-network-studio.patpease0.workers.dev',
+  host: 'thermalnetwork.peasestudio.com',
 } as const;
 
 /**
- * PLACEHOLDER: the link every award and LinkedIn post carries, until the tool
- * is published at its own address. It points at the live workers.dev route so
- * that the link works in the meantime — a placeholder that 404s would be
- * posted for ever. Change it here and every award follows.
+ * The link every award and LinkedIn post carries: the tool's own address.
+ * A posted link lives for ever, so it follows BRAND.host and nothing else.
  */
 export const AWARD_LINK_BASE = `https://${BRAND.host}`;
 
