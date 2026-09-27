@@ -145,7 +145,7 @@ export function composeChartSvg(input: {
   const footer = [
     `<line x1="${L}" y1="${y}" x2="${EXPORT_WIDTH - L}" y2="${y}" stroke="#D9DEE5" stroke-width="1.5"/>`,
     ...scopeLines,
-    t(L, after + 24, 13, 'Loads calibrated to NLR ComStock™ and ResStock™ · grid carbon NLR Cambium 2023 · buildings © OpenStreetMap contributors.', input.muted),
+    t(L, after + 24, 13, 'Loads calibrated to NLR ComStock™ and ResStock™ · grid carbon NLR Cambium 2023 · buildings © OpenStreetMap contributors, FEMA USA Structures (CC BY 4.0), USACE NSI.', input.muted),
     t(L, after + 48, 13, `${BRAND.appName} · ${BRAND.host} · ${monthYear(input.date)}`, input.muted),
   ];
   const height = after + 70;

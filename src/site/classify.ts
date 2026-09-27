@@ -9,11 +9,16 @@
  *
  *   1. the building's own tags         building=house, shop=supermarket …
  *   2. a point of interest inside it   an amenity=restaurant node
- *   3. the land use it stands in       landuse=residential …
- *   4. its footprint                   small ones are homes
+ *   3. federal structure data          NSI's Hazus occupancy, else FEMA's
+ *                                      (phase 12; also replaces a guess
+ *                                      from a coarse tag like
+ *                                      building=residential)
+ *   4. the land use it stands in       landuse=residential …
+ *   5. its footprint                   small ones are homes
  *
- * Levels come from building:levels, else height ÷ 3.2 m, else an archetype
- * default (guessed). Floor area is footprint × levels × 0.9 — the conditioned
+ * Levels come from building:levels, else height ÷ 3.2 m, else NSI's storeys,
+ * else FEMA's height, else an archetype default (guessed). A FEMA footprint
+ * that no OSM building covers is added as a building of its own. Floor area is footprint × levels × 0.9 — the conditioned
  * share, as EPRI's synthetic stock does it (Table 3: 80–100% residential).
  */
 import type { ArchetypeId } from '../loads/archetypes.ts';
@@ -22,6 +27,7 @@ import { bbox, centroid, distance, lineCrossesRing, pointInRing, ringArea } from
 import type { LonLat, Ring } from './geometry.ts';
 import { SOURCE_SEARCH_M } from './osm.ts';
 import type { OsmFeature, SiteData } from './osm.ts';
+import type { FemaStructure, NsiStructure } from './structures.ts';
 
 /** D11: the most buildings a network may connect. */
 export const MAX_BUILDINGS = 500;
@@ -59,6 +65,12 @@ export interface SiteBuilding {
   readonly floorArea: number;
   readonly vintage: VintageBand | null;
   readonly anchor: AnchorKind | null;
+  /** Where the footprint came from: OSM, or a FEMA structure OSM does not have. */
+  readonly origin: 'osm' | 'fema';
+  /** Where the levels came from. Anything but 'osm' is guessed. */
+  readonly levelsSource: 'osm' | 'nsi' | 'fema' | 'default';
+  /** 'nsi-median' is the census block group's median year, not the building's. */
+  readonly vintageSource: 'osm' | 'nsi-median' | null;
 }
 
 export type SourceKindFound = 'data-centre' | 'ice-rink' | 'brewery' | 'food-processing' | 'wastewater' | 'lake' | 'river' | 'supermarket';
@@ -101,6 +113,11 @@ export interface Site {
    * within the search margin. Null when OSM names none — never guessed.
    */
   readonly placeName?: string | null;
+  /**
+   * Which federal structure sets answered (phase 12). Absent: the site was
+   * read without them (an older project file).
+   */
+  readonly structures?: { readonly fema: boolean; readonly nsi: boolean; readonly femaTruncated: boolean };
 }
 
 // --------------------------------------------------------------- archetypes
@@ -222,6 +239,136 @@ function sizeOffice(a: ArchetypeId, floorArea: number): ArchetypeId {
   return a;
 }
 
+// ------------------------------------------------------------- federal data
+
+/**
+ * A Hazus occupancy (NSI) → an archetype. RES3A–B are 2–4 units, RES3C–F
+ * 5 and more: ResStock's own split between the two multifamily types.
+ * Assembly, worship and government are modelled as a small office, as the
+ * OSM rules do.
+ */
+export function hazusArchetype(occtype: string, units: number | null): { archetype: ArchetypeId | null; heated: boolean } | null {
+  const code = occtype.split('-')[0]!.toUpperCase();
+  if (code === 'RES1' || code === 'RES2') return { archetype: 'single-family', heated: true };
+  if (code === 'RES3A' || code === 'RES3B') return { archetype: 'small-multifamily', heated: true };
+  if (/^RES3[C-F]$/.test(code)) return { archetype: 'large-multifamily', heated: true };
+  if (code === 'RES3') return { archetype: units !== null && units <= 4 ? 'small-multifamily' : 'large-multifamily', heated: true };
+  if (code === 'RES4') return { archetype: 'hotel', heated: true };
+  if (code === 'RES5' || code === 'RES6') return { archetype: 'large-multifamily', heated: true };
+  const map: Record<string, ArchetypeId | null> = {
+    COM1: 'retail-standalone',
+    COM2: 'warehouse',
+    COM3: 'retail-standalone',
+    COM4: 'office-small',
+    COM5: 'office-small',
+    COM6: 'hospital',
+    COM7: 'outpatient',
+    COM8: 'restaurant',
+    COM9: 'office-small',
+    COM10: null,
+    REL1: 'office-small',
+    GOV1: 'office-small',
+    GOV2: 'office-small',
+    EDU1: 'school-primary',
+    EDU2: 'school-secondary',
+    AGR1: null,
+  };
+  if (code in map) return { archetype: map[code]!, heated: map[code] !== null };
+  if (code.startsWith('IND')) return { archetype: 'warehouse', heated: true };
+  return null;
+}
+
+/** FEMA USA Structures' PRIM_OCC → an archetype, or null when it says nothing usable. */
+export function femaArchetype(occupancy: string, occupancyClass: string, footprint: number): { archetype: ArchetypeId | null; heated: boolean } | null {
+  const o = occupancy.toLowerCase();
+  const c = occupancyClass.toLowerCase();
+  if (o === 'single family dwelling' || o === 'manufactured home') return { archetype: 'single-family', heated: true };
+  // FEMA gives no unit count; the OSM apartments rule decides the size.
+  if (o.startsWith('multi')) return { archetype: footprint > 600 ? 'large-multifamily' : 'small-multifamily', heated: true };
+  if (o === 'temporary lodging') return { archetype: 'hotel', heated: true };
+  if (o === 'institutional dormitory' || o === 'nursing home') return { archetype: 'large-multifamily', heated: true };
+  if (o === 'retail trade' || o === 'personal and repair services' || o.startsWith('veterinary')) {
+    return { archetype: footprint > 4_000 ? 'retail-stripmall' : 'retail-standalone', heated: true };
+  }
+  if (o === 'wholesale trade') return { archetype: 'warehouse', heated: true };
+  if (o === 'hospital') return { archetype: 'hospital', heated: true };
+  if (o === 'medical office/clinic') return { archetype: 'outpatient', heated: true };
+  if (o === 'entertainment and recreation') return { archetype: 'restaurant', heated: true };
+  if (o === 'pre-k - 12 schools') return { archetype: 'school-primary', heated: true };
+  if (o === 'colleges/universities') return { archetype: 'school-secondary', heated: true };
+  if (c === 'industrial') return { archetype: 'warehouse', heated: true };
+  if (o === 'parking' || c === 'agriculture' || c === 'utility and misc' || o === 'non-civilian structures') return { archetype: null, heated: false };
+  if (c === 'commercial' || c === 'government' || c === 'assembly' || c === 'education') return { archetype: 'office-small', heated: true };
+  return null;
+}
+
+interface Federal {
+  readonly fema: FemaStructure | null;
+  readonly nsi: readonly NsiStructure[];
+}
+
+/** What federal data says a footprint is, as a decision, or null. Always guessed. */
+function fromFederal(fed: Federal, footprint: number): Decision | null {
+  // The NSI point with the most floor area speaks for the footprint.
+  const main = [...fed.nsi].sort((a, b) => (b.floorAreaM2 ?? 0) - (a.floorAreaM2 ?? 0))[0];
+  if (main) {
+    const h = hazusArchetype(main.occtype, main.units);
+    if (h) {
+      const units = main.units && main.units > 1 ? `, ${main.units} units` : '';
+      return h.heated
+        ? { archetype: h.archetype, guessed: true, reason: `National Structure Inventory: ${main.occtype}${units}` }
+        : { archetype: null, guessed: true, reason: `National Structure Inventory: ${main.occtype}, not heated` };
+    }
+  }
+  if (fed.fema) {
+    const f = femaArchetype(fed.fema.occupancy, fed.fema.occupancyClass, footprint);
+    if (f) {
+      return f.heated
+        ? { archetype: f.archetype, guessed: true, reason: `FEMA USA Structures: ${fed.fema.occupancy}` }
+        : { archetype: null, guessed: true, reason: `FEMA USA Structures: ${fed.fema.occupancy}, not heated` };
+    }
+  }
+  return null;
+}
+
+/** Levels from federal data when OSM has none: NSI storeys, else FEMA height. */
+function federalLevels(fed: Federal): { levels: number; source: 'nsi' | 'fema' } | null {
+  const storeys = Math.max(0, ...fed.nsi.map((n) => n.stories ?? 0));
+  if (storeys > 0) return { levels: Math.max(1, Math.round(storeys)), source: 'nsi' };
+  if (fed.fema?.heightM) return { levels: Math.max(1, Math.round(fed.fema.heightM / 3.2)), source: 'fema' };
+  return null;
+}
+
+function yearBand(year: number): VintageBand {
+  if (year < 1950) return 'pre-1950';
+  if (year < 1980) return '1950-1979';
+  if (year < 2000) return '1980-1999';
+  return '2000+';
+}
+
+function nsiInside(nsi: readonly NsiStructure[], ring: Ring): NsiStructure[] {
+  const [w, s, e, n] = bbox(ring);
+  return nsi.filter(({ at: [x, y] }) => x >= w && x <= e && y >= s && y <= n && pointInRing([x, y], ring));
+}
+
+/**
+ * A FEMA footprint and an OSM one are the same building when either's centre
+ * is inside the other, their boxes overlap by more than 30% of the smaller,
+ * or their centres are within 8 m: imagery-traced outlines sit a few metres
+ * off OSM's, and on the fixtures the centre test alone let seven offset
+ * copies of small houses through as new buildings.
+ */
+const SAME_CENTRE_M = 8;
+
+function sameBuilding(a: Ring, aCentre: LonLat, b: Ring, bCentre: LonLat): boolean {
+  const [w, s, e, n] = bbox(a);
+  const [w2, s2, e2, n2] = bbox(b);
+  if (w > e2 || w2 > e || s > n2 || s2 > n) return false;
+  if (pointInRing(bCentre, a) || pointInRing(aCentre, b) || distance(aCentre, bCentre) < SAME_CENTRE_M) return true;
+  const overlap = (Math.min(e, e2) - Math.max(w, w2)) * (Math.min(n, n2) - Math.max(s, s2));
+  return overlap > 0.3 * Math.min((e - w) * (n - s), (e2 - w2) * (n2 - s2));
+}
+
 function levelsOf(t: Readonly<Record<string, string>>, archetype: ArchetypeId | null): { levels: number; guessed: boolean } {
   const tagged = Number.parseFloat(t['building:levels'] ?? '');
   if (Number.isFinite(tagged) && tagged > 0 && tagged < 200) return { levels: Math.max(1, Math.round(tagged)), guessed: false };
@@ -234,10 +381,7 @@ export function vintageOf(t: Readonly<Record<string, string>>): VintageBand | nu
   const raw = t['start_date'] ?? t['building:start_date'] ?? '';
   const year = Number.parseInt(/\d{4}/.exec(raw)?.[0] ?? '', 10);
   if (!Number.isFinite(year) || year < 1600 || year > 2100) return null;
-  if (year < 1950) return 'pre-1950';
-  if (year < 1980) return '1950-1979';
-  if (year < 2000) return '1980-1999';
-  return '2000+';
+  return yearBand(year);
 }
 
 function anchorOf(t: Readonly<Record<string, string>>): AnchorKind | null {
@@ -352,6 +496,13 @@ export function classifySite(data: SiteData): Site {
   const sources: SourceCandidate[] = [];
   const seenSources = new Set<string>();
 
+  // Federal structures (phase 12): FEMA footprints with their centres, and
+  // NSI points. Those an OSM building claims are marked; the rest of FEMA's
+  // become buildings of their own below.
+  const fema = (data.structures?.fema ?? []).map((s) => ({ s, centre: centroid(s.ring) }));
+  const nsi = data.structures?.nsi ?? [];
+  const claimedFema = new Set<string>();
+
   const addSource = (f: OsmFeature, kind: SourceKindFound, footprintM2: number | null) => {
     if (seenSources.has(f.id)) return;
     const { at, distanceM } = nearestPoint(f, boundary);
@@ -403,15 +554,27 @@ export function classifySite(data: SiteData): Site {
         }
       }
     }
+    const matches = fema.filter((x) => sameBuilding(ring, c, x.s.ring, x.centre));
+    for (const m of matches) claimedFema.add(m.s.id);
+    const fed: Federal = { fema: matches[0]?.s ?? null, nsi: nsiInside(nsi, ring) };
+    // Federal data replaces a guess (building=residential by size, commercial
+    // as an office), never a tag that named the use.
+    if (!decision || (decision.guessed && decision.archetype !== null)) decision = fromFederal(fed, footprint) ?? decision;
     if (!decision) {
       const lu = landuse.find((l) => pointInRing(c, (l.geometry as { ring: Ring }).ring));
       decision = fromLanduse(lu?.tags['landuse'], footprint);
     }
     decision ??= residentialBySize(footprint, 'Untagged; most untagged US buildings are homes — type from its size');
 
-    const { levels, guessed: levelsGuessed } = levelsOf(f.tags, decision.archetype);
+    const tagged = levelsOf(f.tags, decision.archetype);
+    const fedLevels = tagged.guessed ? federalLevels(fed) : null;
+    const levels = fedLevels?.levels ?? tagged.levels;
+    const levelsGuessed = tagged.guessed;
+    const levelsSource = !tagged.guessed ? 'osm' : fedLevels ? fedLevels.source : 'default';
     const floorArea = decision.archetype ? footprint * levels * CONDITIONED_FRACTION : 0;
     const archetype = decision.archetype ? sizeOffice(decision.archetype, floorArea) : null;
+    const osmVintage = vintageOf(f.tags);
+    const medianYear = fed.nsi.find((x) => x.medianYearBuilt !== null)?.medianYearBuilt ?? null;
 
     let anchor = anchorOf(f.tags);
     for (const p of inside) anchor ??= anchorOf(p.tags);
@@ -427,12 +590,48 @@ export function classifySite(data: SiteData): Site {
       levels,
       levelsGuessed,
       floorArea: Math.round(floorArea),
-      vintage: vintageOf(f.tags),
+      vintage: osmVintage ?? (medianYear !== null ? yearBand(medianYear) : null),
       anchor,
+      origin: 'osm',
+      levelsSource,
+      vintageSource: osmVintage ? 'osm' : medianYear !== null ? 'nsi-median' : null,
     });
 
     const kind = sourceKind(f.tags) ?? inside.map((p) => sourceKind(p.tags)).find((k) => k !== null) ?? null;
     if (kind) addSource(f, kind, footprint);
+  }
+
+  // FEMA footprints no OSM building covers: buildings OSM does not have.
+  const osmRings = buildings.map((b) => ({ ring: b.footprint, centre: centroid(b.footprint) }));
+  for (const { s, centre } of fema) {
+    if (claimedFema.has(s.id) || s.outbuilding || !pointInRing(centre, boundary)) continue;
+    if (osmRings.some((o) => sameBuilding(o.ring, o.centre, s.ring, centre))) continue;
+    const footprint = ringArea(s.ring);
+    if (footprint < MIN_FOOTPRINT_M2) continue;
+    const fed: Federal = { fema: s, nsi: nsiInside(nsi, s.ring) };
+    const found = fromFederal(fed, footprint) ?? residentialBySize(footprint, 'Type from its size');
+    const decision = { ...found, reason: `Not in OpenStreetMap. ${found.reason}` };
+    const fl = federalLevels(fed);
+    const levels = fl?.levels ?? (decision.archetype ? DEFAULT_LEVELS[decision.archetype] : 1);
+    const floorArea = decision.archetype ? footprint * levels * CONDITIONED_FRACTION : 0;
+    const medianYear = fed.nsi.find((x) => x.medianYearBuilt !== null)?.medianYearBuilt ?? null;
+    buildings.push({
+      id: s.id,
+      footprint: s.ring,
+      footprintM2: Math.round(footprint),
+      name: null,
+      archetype: decision.archetype ? sizeOffice(decision.archetype, floorArea) : null,
+      archetypeGuessed: true,
+      reason: decision.reason,
+      levels,
+      levelsGuessed: true,
+      floorArea: Math.round(floorArea),
+      vintage: medianYear !== null ? yearBand(medianYear) : null,
+      anchor: null,
+      origin: 'fema',
+      levelsSource: fl?.source ?? 'default',
+      vintageSource: medianYear !== null ? 'nsi-median' : null,
+    });
   }
 
   // Sources that are not buildings inside the boundary: nearby plants, water.
@@ -481,6 +680,9 @@ export function classifySite(data: SiteData): Site {
     barriers: uniqueBarriers,
     openSpaceM2: Math.round(openSpace),
     skipped: data.skipped,
+    ...(data.structures
+      ? { structures: { fema: data.structures.fema !== null, nsi: data.structures.nsi !== null, femaTruncated: Boolean(data.structures.femaTruncated) } }
+      : {}),
   };
 }
 

@@ -7,7 +7,8 @@
  *   GET  /api/place?q=            Open-Meteo geocoder     → places to fly to
  *   GET  /api/site?lat=&lon=      Census geocoder         → county, climate zone, grid region
  *   GET  /api/weather?lat=&lon=   Open-Meteo archive      → a year, hourly, local standard time
- *   POST /api/buildings           Overpass                → a normalised site
+ *   POST /api/buildings           Overpass                → a normalised site,
+ *                                 + FEMA USA Structures and USACE NSI (phase 12)
  *
  * Why relay at all: the CSP keeps `connect-src 'self'` for data; the edge
  * cache is shared by everyone looking at the same place; and the browser gets
@@ -19,7 +20,10 @@ import { normaliseZone } from '../loads/zones.ts';
 import type { ClimateZone } from '../loads/zones.ts';
 import { boundaryProblem, normaliseElements, overpassQuery } from '../site/osm.ts';
 import type { OverpassElement, SiteData } from '../site/osm.ts';
+import { bbox } from '../site/geometry.ts';
 import type { Ring } from '../site/geometry.ts';
+import { normaliseFema, normaliseNsi, STRUCTURES_ATTRIBUTION } from '../site/structures.ts';
+import type { Structures } from '../site/structures.ts';
 
 export type Fetcher = (url: string, init?: { method?: string; body?: string; headers?: Record<string, string>; timeoutMs?: number }) => Promise<Response>;
 
@@ -57,11 +61,17 @@ export const OVERPASS_TIMEOUT_MS = 20_000;
  * allowed string, and a relay that fetches whatever it is handed is an open
  * proxy on our own domain.
  */
+/** FEMA USA Structures, as ArcGIS Online serves it; and USACE's NSI API. */
+export const FEMA_HOST = 'services2.arcgis.com';
+export const NSI_HOST = 'nsi.sec.usace.army.mil';
+
 export const ALLOWED_HOSTS = Object.freeze([
   'geocoding-api.open-meteo.com',
   'archive-api.open-meteo.com',
   'geocoding.geo.census.gov',
   ...OVERPASS_HOSTS,
+  FEMA_HOST,
+  NSI_HOST,
 ]);
 
 export function isAllowedHost(hostname: string): boolean {
@@ -69,7 +79,7 @@ export function isAllowedHost(hostname: string): boolean {
 }
 
 /** Bump to invalidate every cached answer when a derivation changes. */
-export const RELAY_VERSION = '2';
+export const RELAY_VERSION = '3';
 
 const DAY = 86400;
 export const CACHE = { place: 30 * DAY, site: 365 * DAY, weather: 30 * DAY, buildings: 7 * DAY } as const;
@@ -78,6 +88,7 @@ export const ATTRIBUTION = {
   weather: 'Weather © Open-Meteo (ERA5), CC BY 4.0',
   osm: '© OpenStreetMap contributors, ODbL',
   census: 'County from the U.S. Census Bureau geocoder',
+  structures: STRUCTURES_ATTRIBUTION,
 } as const;
 
 const problem = (status: number, message: string): RelayResult => ({ status, body: { message } });
@@ -353,10 +364,62 @@ export function buildingsCacheKey(boundary: Ring): string {
 export const OVERPASS_DOWN =
   'OpenStreetMap’s building service is not responding right now. It is run by volunteers and is sometimes overloaded or down. Your boundary is kept: try again in a few minutes.';
 
+/** Each federal service gets this long; it never holds up OSM for longer. */
+export const STRUCTURES_TIMEOUT_MS = 15_000;
+
+/** The fields read, and no more: FEMA's full record is ~40 fields. */
+const FEMA_FIELDS = ['BUILD_ID', 'OCC_CLS', 'PRIM_OCC', 'HEIGHT', 'OUTBLDG'].join(',');
+
+export function femaUrl(boundary: Ring): string {
+  const [w, s, e, n] = bbox(boundary);
+  const q = new URLSearchParams({
+    where: '1=1',
+    geometry: [w, s, e, n].map((x) => x.toFixed(6)).join(','),
+    geometryType: 'esriGeometryEnvelope',
+    inSR: '4326',
+    spatialRel: 'esriSpatialRelIntersects',
+    outFields: FEMA_FIELDS,
+    outSR: '4326',
+    resultRecordCount: '2000',
+    f: 'geojson',
+  });
+  return `https://${FEMA_HOST}/FiaPA4ga0iQKduv3/arcgis/rest/services/USA_Structures_View/FeatureServer/0/query?${q}`;
+}
+
+export function nsiUrl(boundary: Ring): string {
+  const [w, s, e, n] = bbox(boundary).map((x) => x.toFixed(6));
+  // NSI takes the box as a closed ring of x,y pairs.
+  return `https://${NSI_HOST}/nsiapi/structures?bbox=${[w, s, e, s, e, n, w, n, w, s].join(',')}`;
+}
+
+/**
+ * Both federal sets, in parallel. A failure is null for that set, never an
+ * error: the site is still OSM, and the panel says which set is missing.
+ */
+export async function fetchStructures(boundary: Ring, fetcher: Fetcher): Promise<Structures> {
+  const get = async (url: string) => {
+    const response = await fetcher(url, { timeoutMs: STRUCTURES_TIMEOUT_MS });
+    if (!response.ok) throw new Error(String(response.status));
+    return response.json() as Promise<unknown>;
+  };
+  const [fema, nsi] = await Promise.allSettled([get(femaUrl(boundary)), get(nsiUrl(boundary))]);
+  let femaOut: Structures['fema'] = null;
+  let truncated = false;
+  if (fema.status === 'fulfilled' && !(fema.value as { error?: unknown })?.error) {
+    const r = normaliseFema(fema.value);
+    femaOut = r.structures;
+    truncated = r.truncated;
+  }
+  const nsiOut = nsi.status === 'fulfilled' ? normaliseNsi(nsi.value) : null;
+  return { fema: femaOut, nsi: nsiOut, ...(truncated ? { femaTruncated: true } : {}) };
+}
+
 export async function handleBuildings(body: unknown, fetcher: Fetcher): Promise<RelayResult> {
   const boundary = parseBoundary(body);
   if (isRelayResult(boundary)) return boundary;
   const data = `data=${encodeURIComponent(overpassQuery(boundary))}`;
+  // Started now, awaited only once OSM has answered: the two run side by side.
+  const structures = fetchStructures(boundary, fetcher);
 
   // Try each public instance in turn. Busy (429), down (5xx, including
   // Cloudflare's 521/522/523/524), slow or unreachable → the next one. A
@@ -384,9 +447,9 @@ export async function handleBuildings(body: unknown, fetcher: Fetcher): Promise<
     if (json.remark && /runtime error|timed out|out of memory/i.test(json.remark)) {
       return problem(503, 'That area is too large for OpenStreetMap’s building service. Draw a smaller one.');
     }
-    const site: SiteData = normaliseElements(json.elements ?? [], boundary);
+    const site: SiteData = { ...normaliseElements(json.elements ?? [], boundary), structures: await structures };
     // `servedBy` names the instance that answered, for tracing a live problem.
-    return { status: 200, body: { site, attribution: ATTRIBUTION.osm, servedBy: host }, cacheSeconds: CACHE.buildings };
+    return { status: 200, body: { site, attribution: `${ATTRIBUTION.osm}. ${ATTRIBUTION.structures}`, servedBy: host }, cacheSeconds: CACHE.buildings };
   }
   return problem(503, OVERPASS_DOWN);
 }

@@ -14,6 +14,11 @@ import {
   siteForCounty,
   standardOffsetSeconds,
   yearFromArchive,
+  FEMA_HOST,
+  femaUrl,
+  NSI_HOST,
+  nsiUrl,
+  STRUCTURES_TIMEOUT_MS,
 } from '../src/relay/relay';
 import type { Fetcher } from '../src/relay/relay';
 import { handle } from '../worker/handler';
@@ -151,6 +156,8 @@ describe('/api/weather', () => {
   });
 });
 
+const FEDERAL = new Set([FEMA_HOST, NSI_HOST]);
+
 describe('/api/buildings', () => {
   const box = [
     [-94.0, 44.16],
@@ -188,6 +195,7 @@ describe('/api/buildings', () => {
     const asked: string[] = [];
     const fetcher: Fetcher = async (url, init) => {
       const host = new URL(url).hostname;
+      if (FEDERAL.has(host)) return jsonResponse({ features: [] });
       asked.push(host);
       expect(init?.timeoutMs).toBeGreaterThan(0);
       if (host === OVERPASS_HOSTS[0]) return new Response('<html>Web server is down</html>', { status: 521 });
@@ -202,6 +210,7 @@ describe('/api/buildings', () => {
     const asked: string[] = [];
     const fetcher: Fetcher = async (url) => {
       const host = new URL(url).hostname;
+      if (FEDERAL.has(host)) return jsonResponse({ features: [] });
       asked.push(host);
       if (host === OVERPASS_HOSTS[0]) return new Response('slow down', { status: 429 });
       if (host === OVERPASS_HOSTS[1]) throw new Error('The operation was aborted due to timeout');
@@ -221,12 +230,76 @@ describe('/api/buildings', () => {
 
   it('stops at a 400: the query is at fault, and every instance would refuse it', async () => {
     let calls = 0;
-    const r = await handleBuildings({ boundary: box }, async () => {
+    const r = await handleBuildings({ boundary: box }, async (url) => {
+      if (FEDERAL.has(new URL(url).hostname)) return jsonResponse({ features: [] });
       calls++;
       return new Response('bad', { status: 400 });
     });
     expect(calls).toBe(1);
     expect(r.status).toBe(502);
+  });
+
+  it('attaches FEMA and NSI structures beside OSM, each asked once, in parallel', async () => {
+    const asked: string[] = [];
+    const fetcher: Fetcher = async (url, init) => {
+      const u = new URL(url);
+      asked.push(u.hostname);
+      if (u.hostname === FEMA_HOST) {
+        expect(u.searchParams.get('f')).toBe('geojson');
+        expect(u.searchParams.get('geometryType')).toBe('esriGeometryEnvelope');
+        expect(init?.timeoutMs).toBe(STRUCTURES_TIMEOUT_MS);
+        return jsonResponse({
+          type: 'FeatureCollection',
+          features: [
+            {
+              geometry: { type: 'Polygon', coordinates: [[[-93.996, 44.165], [-93.9955, 44.165], [-93.9955, 44.1655], [-93.996, 44.1655], [-93.996, 44.165]]] },
+              properties: { BUILD_ID: 7, OCC_CLS: 'Residential', PRIM_OCC: 'Single Family Dwelling', HEIGHT: null, OUTBLDG: null },
+            },
+          ],
+        });
+      }
+      if (u.hostname === NSI_HOST) {
+        expect(u.searchParams.get('bbox')!.split(',')).toHaveLength(10);
+        return jsonResponse({
+          type: 'FeatureCollection',
+          features: [{ type: 'Feature', geometry: { type: 'Point', coordinates: [-93.99575, 44.16525] }, properties: { fd_id: 9, occtype: 'RES3C', num_story: 2, sqft: 5436, resunits: 8, med_yr_blt: 1974 } }],
+        });
+      }
+      return jsonResponse({ elements: [] });
+    };
+    const r = await handleBuildings({ boundary: box }, fetcher);
+    const site = (r.body as { site: { structures: { fema: { id: string; occupancy: string }[]; nsi: { id: string; units: number; floorAreaM2: number }[] } } }).site;
+    expect(asked.filter((h) => h === FEMA_HOST)).toHaveLength(1);
+    expect(asked.filter((h) => h === NSI_HOST)).toHaveLength(1);
+    expect(site.structures.fema[0]).toMatchObject({ id: 'fema:7', occupancy: 'Single Family Dwelling' });
+    expect(site.structures.nsi[0]).toMatchObject({ id: 'nsi:9', units: 8, floorAreaM2: 505 });
+  });
+
+  it('a federal set that fails is null, and the site still comes back', async () => {
+    const r = await handleBuildings({ boundary: box }, async (url) => {
+      const host = new URL(url).hostname;
+      if (host === FEMA_HOST) return new Response('down', { status: 503 });
+      if (host === NSI_HOST) throw new Error('timeout');
+      return jsonResponse({ elements: [] });
+    });
+    expect(r.status).toBe(200);
+    expect((r.body as { site: { structures: unknown } }).site.structures).toEqual({ fema: null, nsi: null });
+  });
+
+  it('an ArcGIS error body (200 with { error }) counts as a failure', async () => {
+    const r = await handleBuildings({ boundary: box }, async (url) =>
+      new URL(url).hostname === FEMA_HOST ? jsonResponse({ error: { code: 400, message: 'Invalid query' } }) : jsonResponse({ elements: [], features: [] }),
+    );
+    expect((r.body as { site: { structures: { fema: unknown } } }).site.structures.fema).toBeNull();
+  });
+
+  it('pins the federal hosts exactly, never by suffix', () => {
+    for (const h of [FEMA_HOST, NSI_HOST]) {
+      expect(isAllowedHost(h)).toBe(true);
+      expect(isAllowedHost(`${h}.example.com`)).toBe(false);
+    }
+    expect(new URL(femaUrl(parseBoundary({ boundary: box }) as never)).hostname).toBe(FEMA_HOST);
+    expect(new URL(nsiUrl(parseBoundary({ boundary: box }) as never)).hostname).toBe(NSI_HOST);
   });
 
   it('pins every Overpass mirror exactly, never by suffix', () => {

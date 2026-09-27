@@ -259,8 +259,7 @@ Things that looked right and were not:
   building. `leisure=ice_rink` alone found neither.
 - **OSM is thinner than it looks.** Mankato's blocks south of downtown have
   almost no house footprints in OSM — a boundary there returns one
-  building. The tool says so rather than inventing homes; filling gaps from
-  Microsoft's US building footprints is in the backlog.
+  building. Phase 12 fills it from FEMA USA Structures and NSI (below).
 - **This sandbox resets plain curl to Overpass, but `wrangler dev` reaches
   it** — the Workers runtime egresses differently. Verify live relay paths
   through `preview:worker`, not curl.
@@ -538,3 +537,32 @@ Things that looked right and were not:
   each and the file doubles (790 KB → 346 KB for a Highland Park block).
 - Verified in the browser with `/api/**` blocked: same score, same peak,
   units restored, zero relay calls.
+
+## Federal structure data (phase 12)
+
+- **`site/structures.ts` normalises FEMA USA Structures and USACE NSI; the
+  relay fetches both beside Overpass** (`fetchStructures`, 15 s each, host
+  pinned). They ride on `SiteData.structures`, so a saved file keeps them.
+  Either failing is `null` for that set, never an error; the Site panel says
+  which is missing. `RELAY_VERSION` went to 3 so cached OSM-only answers
+  expire.
+- **OSM stays first.** Use: OSM tag → a point inside → NSI Hazus
+  (`hazusArchetype`) → FEMA occupancy (`femaArchetype`) → land use → size.
+  Federal data replaces a GUESS (building=residential by size), never a tag
+  that names the use; a test holds that on every fixture. Storeys: OSM → NSI
+  → FEMA height → default (`levelsSource`). Year: OSM → NSI's
+  **block-group median** (`vintageSource: 'nsi-median'`), said so on the
+  building.
+- **A FEMA footprint OSM does not have becomes a building** (`origin:
+  'fema'`, id `fema:<BUILD_ID>`, always guessed). "Does not have" is strict:
+  either centre inside the other, boxes overlapping 30% of the smaller, or
+  centres within 8 m. The centre test alone let seven offset copies of small
+  houses through on the fixtures; a test now checks none is within 8 m.
+- **Fixtures**: `npm run fixtures:structures` writes
+  `tests/fixtures/structures/` with the relay's own fetch; fixture mode and
+  the tests read them. Both services answered from this sandbox with plain
+  curl AND from `preview:worker` (unlike Overpass's mirrors).
+- **Attribution** — "FEMA USA Structures (FEMA, ORNL), CC BY 4.0; USACE
+  National Structure Inventory" — is on the Site panel, chart exports and the
+  award. They are data licences, like NLR's, and so appear outside Learn;
+  Learn cites them as sources too.

@@ -13,7 +13,8 @@ import type { ArchetypeId } from '../loads/archetypes';
 import type { Place } from '../relay/relay';
 import { MAX_BUILDINGS } from '../site/classify';
 import { SOURCE_SEARCH_M } from '../site/osm';
-import type { SiteBuilding } from '../site/classify';
+import type { Site, SiteBuilding } from '../site/classify';
+import { STRUCTURES_ATTRIBUTION } from '../site/structures';
 import { siteContext } from '../site/context';
 import { connected, effective } from '../site/neighbourhood';
 import type { UnitSystem } from '../units/units';
@@ -101,6 +102,23 @@ function Stat({ label, value, note }: { label: string; value: string; note?: str
   );
 }
 
+/** What the federal structure sets added to this site, or why they did not. */
+function StructuresNote({ site, connected }: { site: Site; connected: readonly SiteBuilding[] }) {
+  const s = site.structures;
+  const lines: string[] = [];
+  if (!s) lines.push(MAP_COPY.structures.none);
+  else {
+    const missing = [s.fema ? null : 'FEMA USA Structures', s.nsi ? null : 'The National Structure Inventory'].filter((x): x is string => x !== null);
+    if (missing.length) lines.push(MAP_COPY.structures.missing(missing.join(' and ')));
+    const added = connected.filter((b) => b.origin === 'fema').length;
+    const filled = connected.filter((b) => b.levelsSource === 'nsi').length;
+    if (added) lines.push(MAP_COPY.structures.added(added));
+    if (filled) lines.push(MAP_COPY.structures.filled(filled));
+    if (s.femaTruncated) lines.push(MAP_COPY.structures.truncated);
+  }
+  return lines.length ? <p className="card__note">{lines.join(' ')}</p> : null;
+}
+
 function SelectedBuilding({ b, excluded, onToggle, onOverride, units }: { b: SiteBuilding; excluded: boolean; onToggle: () => void; onOverride: (a: ArchetypeId | null) => void; units: UnitSystem }) {
   return (
     <section className="card" aria-labelledby="selected-heading">
@@ -124,7 +142,8 @@ function SelectedBuilding({ b, excluded, onToggle, onOverride, units }: { b: Sit
       <p className="card__note">
         {b.archetypeGuessed ? 'Guessed: ' : ''}
         {b.reason}. {b.levels} {b.levels === 1 ? 'storey' : 'storeys'}
-        {b.levelsGuessed ? ' (guessed)' : ''}, {withUnit('area', b.floorArea, units)} conditioned.
+        {b.levelsGuessed ? MAP_COPY.structures.levels[b.levelsSource] : ''}, {withUnit('area', b.floorArea, units)} conditioned.
+        {b.vintageSource === 'nsi-median' && b.vintage && <> {MAP_COPY.structures.vintageMedian(b.vintage.replace('-', '–'))}</>}
       </p>
       {b.archetype && (
         <label className="check">
@@ -222,6 +241,7 @@ export function SitePanel(props: SitePanelProps) {
             {buildings.length > MAX_BUILDINGS && <p className="message message--error">{MAP_COPY.tooMany(buildings.length, MAX_BUILDINGS)}</p>}
             {buildings.length === 0 && <p className="message">{MAP_COPY.none}</p>}
             {guessed > 0 && <p className="card__note">{MAP_COPY.guessedNote}</p>}
+            <StructuresNote site={site} connected={buildings} />
           </section>
 
           {selected && (
@@ -325,7 +345,7 @@ export function SitePanel(props: SitePanelProps) {
           </section>
 
           <p className="attribution">
-            {state.weather?.attribution} · © OpenStreetMap contributors · {place.attribution} · Grid carbon: NLR Cambium 2023 · Loads calibrated to NLR ComStock™/ResStock™ · {sig(site.areaM2 / 1e6, 2)} km² drawn
+            {state.weather?.attribution} · © OpenStreetMap contributors{site.structures ? ` · ${STRUCTURES_ATTRIBUTION}` : ''} · {place.attribution} · Grid carbon: NLR Cambium 2023 · Loads calibrated to NLR ComStock™/ResStock™ · {sig(site.areaM2 / 1e6, 2)} km² drawn
           </p>
         </>
       )}

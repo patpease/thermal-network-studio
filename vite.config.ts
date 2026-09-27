@@ -17,7 +17,8 @@ import type { Ring } from './src/site/geometry';
  *
  * FIXTURE MODE (`TNS_FIXTURES=1 npm run dev`) answers from the committed test
  * fixtures instead of the network: the three Minnesota sites from
- * tests/fixtures/sites, and the calibration weather year for their zone. For
+ * tests/fixtures/sites with their federal structures from
+ * tests/fixtures/structures, and the calibration weather year for their zone. For
  * working offline, and for anywhere Overpass or Open-Meteo cannot be reached.
  * It exists only here, in development; the Worker has no such mode.
  */
@@ -118,7 +119,11 @@ function fixtureAnswer(url: URL, body: string): RelayResult {
     const boundary = (safeJson(body) as { boundary?: Ring })?.boundary ?? [];
     const site = boundary.length ? nearest(centroid(boundary) as [number, number]) : FIXTURE_SITES[0]!;
     const data = loadFixture(site.key).data;
-    return { status: 200, body: { site: { ...data, boundary }, attribution: '© OpenStreetMap contributors, ODbL (fixture)' } };
+    const federal = JSON.parse(readFileSync(resolve(__dirname, `tests/fixtures/structures/${site.key}.json`), 'utf8')) as { structures: unknown };
+    return {
+      status: 200,
+      body: { site: { ...data, boundary, structures: federal.structures }, attribution: '© OpenStreetMap contributors, ODbL; FEMA USA Structures, NSI (fixture)' },
+    };
   }
   return { status: 404, body: { message: 'Not found.' } };
 }

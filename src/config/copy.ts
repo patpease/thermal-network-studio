@@ -43,13 +43,23 @@ export const MAP_COPY = {
   editHint: 'Press and drag a corner to move it. Done re-reads the buildings inside the new boundary. The design and building changes carry over.',
   doneButton: 'Done',
   intro:
-    'Draw a boundary around a neighbourhood: a campus, a downtown or a few blocks of homes. Buildings come from OpenStreetMap. Each building gets an hourly heating and cooling load for one year.',
-  loading: 'Reading buildings from OpenStreetMap, a year of weather, and the local grid…',
+    'Draw a boundary around a neighbourhood: a campus, a downtown or a few blocks of homes. Buildings come from OpenStreetMap, with gaps filled from federal structure data. Each building gets an hourly heating and cooling load for one year.',
+  loading: 'Reading buildings from OpenStreetMap and federal structure data, a year of weather, and the local grid…',
   guessedNote:
-    'Faint, dashed buildings have a guessed type. OpenStreetMap does not record their use; the type comes from nearby features or building size. Tap a building to change its type.',
+    'Faint, dashed buildings have a guessed type. Where OpenStreetMap does not record a use, the type comes from federal structure data, nearby features or building size. Tap a building to change its type.',
   tooMany: (n: number, max: number) =>
     `${n.toLocaleString('en-US')} heated buildings. A network in this tool connects at most ${max}. Draw a smaller area or remove buildings.`,
   none: 'No heated buildings inside that boundary.',
+  /** Phase 12: what the federal structure sets added. */
+  structures: {
+    added: (n: number) => `${n.toLocaleString('en-US')} ${n === 1 ? 'building is' : 'buildings are'} from FEMA USA Structures and not in OpenStreetMap.`,
+    filled: (n: number) => `${n.toLocaleString('en-US')} ${n === 1 ? 'building takes its' : 'buildings take their'} storeys from the National Structure Inventory.`,
+    missing: (which: string) => `${which} did not answer. Buildings are from OpenStreetMap alone.`,
+    truncated: 'FEMA USA Structures returned its limit of 2,000 structures. Some may be missing.',
+    none: 'This site was read without federal structure data. Re-read it to add them.',
+    levels: { osm: '', nsi: ' (National Structure Inventory)', fema: ' (from FEMA height)', default: ' (guessed)' },
+    vintageMedian: (band: string) => `Built ${band}: the census block group’s median year, not this building’s own.`,
+  },
   contextHeading: 'Site features',
   contextNote:
     'What this tool finds about the site. None of it affects the score.',

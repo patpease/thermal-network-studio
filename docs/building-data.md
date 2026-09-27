@@ -50,7 +50,15 @@ Also reviewed, not measured:
 - **Microsoft direct** is superseded: its footprints reach us through Overture,
   and ORNL's through USA Structures and NSI (`ftprntsrc: "Bing"` on 60 of 81).
 
-## Recommendation (phase 12)
+## Recommendation (phase 12) — built
+
+Built as below. On the three fixtures, heated buildings went 59 → 396
+(Mankato), 714 → 739 (Highland Park), 248 → 317 (Alexandria). Conditioned
+floor area FELL in Highland Park (−30%) and Alexandria (−43%): NSI's storeys
+replaced the default guesses (two storeys for a house, three to five for
+apartments), and Alexandria's downtown "apartments by size" were commercial.
+
+
 
 OSM stays first: its tags name uses the federal sets do not (a rink, a
 supermarket, a data centre), and they are what find heat sources. Then:

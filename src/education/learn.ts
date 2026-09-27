@@ -20,7 +20,7 @@ import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
-export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'tool';
+export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'tool';
 
 export const REFERENCES: Record<RefId, { short: string; full: string; url?: string }> = {
   epri: {
@@ -57,6 +57,8 @@ export const REFERENCES: Record<RefId, { short: string; full: string; url?: stri
   claesson: { short: 'Claesson & Javed 2011', full: 'Claesson, J. and Javed, S. An analytical method to calculate borehole fluid temperatures for time-scales from minutes to decades. ASHRAE Transactions 117(2), 2011.' },
   stull: { short: 'Stull 2011', full: 'Stull, R. Wet-bulb temperature from relative humidity and air temperature. J. Appl. Meteor. Climatol. 50: 2267–2269, 2011.' },
   osm: { short: 'OpenStreetMap', full: 'OpenStreetMap contributors. Data under the Open Database Licence.', url: 'https://www.openstreetmap.org/copyright' },
+  fema: { short: 'FEMA USA Structures', full: 'FEMA and Oak Ridge National Laboratory, USA Structures. CC BY 4.0.', url: 'https://gis-fema.hub.arcgis.com/datasets/fedmaps::usa-structures/about' },
+  nsi: { short: 'National Structure Inventory', full: 'U.S. Army Corps of Engineers, National Structure Inventory.', url: 'https://www.hec.usace.army.mil/confluence/nsi' },
   tool: { short: 'This tool', full: 'A modelling choice in this tool. See the source code (MIT).', url: 'https://github.com/patpease/thermal-network-studio' },
 };
 
@@ -156,6 +158,8 @@ export function sections(f: Formatters): Section[] {
         { text: 'In the coldest hours a network uses the plant that still runs. Heat left to electric backup adds to its winter peak.', refs: ['tool'] },
         { text: 'The ground over 25 years is shown and not scored. A challenge may require it.', refs: ['tool'] },
         { text: 'Annual loads match NLR’s building stock data. The hour-by-hour shape is this tool’s model.', refs: ['nlr', 'tool'] },
+        { text: 'Where OpenStreetMap has no building, this tool adds the footprints in FEMA USA Structures. Where OpenStreetMap records no use or storeys, it takes them from the National Structure Inventory, else from FEMA.', refs: ['osm', 'fema', 'nsi', 'tool'] },
+        { text: 'The National Structure Inventory gives each structure the median year built of its census block group, not its own. This tool uses it as a guessed age.', refs: ['nsi', 'tool'] },
         { text: `${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, refs: ['tool'] },
       ],
     },

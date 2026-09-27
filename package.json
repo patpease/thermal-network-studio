@@ -20,6 +20,7 @@
     "carbon:extract": "node scripts/carbon/extract.mjs",
     "geo:counties": "node scripts/geo/counties.mjs",
     "fixtures:sites": "node scripts/fixtures/sites.ts",
+    "fixtures:structures": "node scripts/fixtures/structures.ts",
     "dev:fixtures": "TNS_FIXTURES=1 vite",
     "brand:icons": "node scripts/brand/icons.ts"
   },

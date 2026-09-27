@@ -101,9 +101,12 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       BLE): a Results chart (winter peak, summer peak, the year; today as a
       rule), a Design tab stat, Learn facts, and the "Easy on the grid"
       challenge (winter peak ≥ 25% below BLE, ≤ 100 backup hours).
-- [ ] **12 More building data** — FEMA USA Structures fills footprints OSM
-      lacks; USACE NSI fills storeys, floor area and unit counts. Reviewed
-      and measured in `docs/building-data.md`; not built.
+- [x] **12 More building data** — FEMA USA Structures fills footprints OSM
+      lacks; USACE NSI fills use, storeys, unit counts and a block-median
+      year. Fetched beside Overpass, attached to the site (and so to a saved
+      file), flagged by source, attributed on the panel and every export.
+      Verified through `preview:worker`: 1 OSM feature, 92 FEMA, 81 NSI on
+      the Mankato block.
 - [ ] **Validate the hourly load shape against ORNL AutoBEM** (offline, a
       test, nothing in the running tool). The annual loads are calibrated to
       ComStock/ResStock; the hour-by-hour shape is this tool's model and

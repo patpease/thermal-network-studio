@@ -12,6 +12,7 @@
  */
 import { bbox, ringArea } from './geometry.ts';
 import type { LonLat, Ring } from './geometry.ts';
+import type { Structures } from './structures.ts';
 
 export type Geometry =
   | { readonly type: 'point'; readonly at: LonLat }
@@ -31,6 +32,11 @@ export interface SiteData {
   readonly features: readonly OsmFeature[];
   /** Multipolygon relations too complex to resolve, dropped and counted. */
   readonly skipped: number;
+  /**
+   * The federal structure sets for the same area (phase 12). Absent in a
+   * site read before them, or from a project file saved before them.
+   */
+  readonly structures?: Structures;
 }
 
 /** The tags anything downstream reads. Everything else is dropped. */
