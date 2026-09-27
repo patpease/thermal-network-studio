@@ -140,6 +140,27 @@ h1, h2, h3, p, figure {
   color: var(--ink-muted);
 }
 
+/* The release stage sits beside the name, outside the h1, so the heading
+   stays the product's name alone. An outline in the accent, never a fill:
+   it labels the product, it is not a button. */
+.brand-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-stage {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent);
+}
+
 
 .header-toggles {
   display: flex;

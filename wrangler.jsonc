@@ -24,9 +24,15 @@
     "not_found_handling": "none",
     "run_worker_first": true
   },
-  // workers.dev until a domain is chosen (D18). When one is, add a
-  // `routes` entry with `custom_domain: true` and move BRAND.host with it —
-  // an export carries the hostname and outlives the deploy that produced it.
-  "workers_dev": true,
+  // The tool's own address (D18). BRAND.host moves with it — an export
+  // carries the hostname and outlives the deploy that produced it.
+  "routes": [{ "pattern": "thermalnetwork.peasestudio.com", "custom_domain": true }],
+  // Off: the custom domain is the only address. Leaving this true would
+  // switch workers.dev back on at every deploy.
+  "workers_dev": false,
+  // Required by `wrangler preview`, the deploy command Workers Builds runs on
+  // non-production branches. Empty: previews inherit everything above.
+  // Without it every branch build fails before deploying anything.
+  "previews": {},
   "observability": { "enabled": true }
 }

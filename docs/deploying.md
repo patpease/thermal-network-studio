@@ -4,10 +4,14 @@ A Cloudflare **Worker** serving the built site as static assets, plus the relay
 under `/api/*`. No database, no KV, no secrets, no environment variables:
 nothing is kept, so there is nothing to configure beyond the Worker itself.
 
-Target: **`https://thermal-network-studio.patpease0.workers.dev`** — the
-Worker's `name` in `wrangler.jsonc` on the `patpease0` workers.dev subdomain
-the sibling tools use. `BRAND.host` in `src/config/branding.ts` says the same
-thing; they move together.
+Target: **`https://thermalnetwork.peasestudio.com`** — a custom-domain route
+in `wrangler.jsonc`. `BRAND.host` in `src/config/branding.ts` says the same
+thing; they move together. The workers.dev address is switched off
+(`workers_dev: false`), so the custom domain is the only one.
+
+Branch builds deploy with `npx wrangler preview`, which refuses to run without
+a `previews` block in `wrangler.jsonc`. It is there and empty; do not remove
+it, or every non-production build fails after a green build step.
 
 ## Workers, not Pages
 
@@ -106,7 +110,7 @@ All nine were checked on the production build in `wrangler dev` on
 
 ## After the first deploy
 
-Repeat the nine checks against `https://thermal-network-studio.patpease0.workers.dev`,
+Repeat the nine checks against `https://thermalnetwork.peasestudio.com`,
 then:
 
 - **Hard-refresh twice** after any later deploy and look for a blank page.
@@ -117,14 +121,11 @@ then:
   `worker/handler.ts` with a test in `tests/worker.test.ts`, never only in
   the dashboard.
 
-## When the tool has its own address
+## The tool's address
 
 Every award and LinkedIn post carries `AWARD_LINK_BASE`
-(`src/config/branding.ts`), which is `https://` + `BRAND.host`. Change the
-host in the same commit as the route (D18), and awards follow.
-
-## A custom domain, later
-
-When `peasestudio.com` serves: add
-`"routes": [{ "pattern": "thermalnetwork.peasestudio.com", "custom_domain": true }]`
-to `wrangler.jsonc` and change `BRAND.host` in the same commit (D18).
+(`src/config/branding.ts`), which is `https://` + `BRAND.host`, and every
+chart export prints the host. Since 27 Sep 2026 that is
+`thermalnetwork.peasestudio.com`, bound as a custom-domain route in
+`wrangler.jsonc`. If it ever moves, change the route and `BRAND.host` in the
+same commit (D18).

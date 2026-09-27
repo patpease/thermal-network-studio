@@ -45,7 +45,7 @@ sits on the page and is burned into every export.
 | D15 | **No thermal storage in v1** | The bore field is the only storage (seasonal) |
 | D16 | **Challenges are generic goals on any map** | e.g. "Beat BAU carbon by 60% without a cooling tower". A goal is data: constraints + thresholds on engine outputs. |
 | D17 | **CSP allows the OpenFreeMap origin explicitly** | The only third-party origins: OpenFreeMap + the Cloudflare beacon |
-| D18 | **workers.dev for now** | `BRAND.host` follows whenever a domain is chosen |
+| D18 | **workers.dev for now**; `thermalnetwork.peasestudio.com` from 27 Sep 2026 | `BRAND.host` follows the route; workers.dev switched off |
 | D19 | ~~Labs added as archetype 16~~ **Deferred** (decided in phase 02). ZEEL publishes energy, not load; revisit with the map, when real campuses appear. | |
 | D20 | **Score = 50% efficiency + 50% carbon** | Efficiency = % less site energy than business as usual; carbon = % less CO₂. Each clamped 0–100 for the score, unclamped value always shown. (Phase 02.) |
 | D21 | **Baseline = regional existing stock** | BAU heating fuel mix and cooling from ComStock/ResStock per climate zone and archetype. Aggregates only — no hourly shapes — baked in by the D22 calibration generator. |
