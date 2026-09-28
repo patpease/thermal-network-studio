@@ -12,7 +12,7 @@ import { readPalette } from '../map/style';
 import type { MapPalette } from '../map/style';
 import type { UnitSystem } from '../units/units';
 import { challengeById, evaluate } from '../challenges/challenges';
-import { CHALLENGE_COPY, DESIGN_COPY, LEARN_COPY, MAP_COPY, PROJECT_COPY, RESULTS_COPY } from '../config/copy';
+import { CHALLENGE_COPY, DESIGN_COPY, LEARN_COPY, MAP_COPY, PROJECT_COPY, RESULTS_COPY, TOUR_COPY } from '../config/copy';
 import { challengeSiteFact } from '../education/learn';
 import { download } from '../award/raster';
 import { openProject, projectFilename, projectJson } from '../io/project';
@@ -25,6 +25,9 @@ import { ChallengeCard } from './ChallengeCard';
 import { DesignPanel } from './DesignPanel';
 import { LearnPanel } from './LearnPanel';
 import { ProjectCard } from './ProjectCard';
+import { TourCard } from './TourCard';
+import { TOUR_STEPS } from '../education/tour';
+import { TOUR_DESIGNS, TOUR_FILE } from '../education/generated/tourDesigns';
 import { ResultsPanel } from './ResultsPanel';
 import { SitePanel } from './SitePanel';
 import type { ThemeChoice } from './theme';
@@ -38,7 +41,18 @@ type Tab = 'map' | 'site' | 'design' | 'results' | 'learn';
 const TAB_LABEL: Record<Tab, string> = {
   map: 'Map', site: DESIGN_COPY.tabSite, design: DESIGN_COPY.tabDesign, results: RESULTS_COPY.tab, learn: LEARN_COPY.tab };
 
-export function Workspace({ units, theme, onUnits }: { units: UnitSystem; theme: ThemeChoice; onUnits: (u: UnitSystem) => void }) {
+export function Workspace({
+  units,
+  theme,
+  onUnits,
+  tourRequest = 0,
+}: {
+  units: UnitSystem;
+  theme: ThemeChoice;
+  onUnits: (u: UnitSystem) => void;
+  /** Bumped by the header's tour button; each new value starts the tour. */
+  tourRequest?: number;
+}) {
   const site = useSite();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<{ center: [number, number]; zoom: number; key: number } | null>(null);
@@ -120,6 +134,8 @@ export function Workspace({ units, theme, onUnits }: { units: UnitSystem; theme:
     [challenge, state.result, state.site, state.design],
   );
   const [showAward, setShowAward] = useState(false);
+  // The tour step that shows the award keeps it up through its own re-run.
+  const [tourAward, setTourAward] = useState(false);
   // An award is for the design as it stands: any miss closes it.
   useEffect(() => {
     if (!evaluation?.met) setShowAward(false);
@@ -213,8 +229,80 @@ export function Workspace({ units, theme, onUnits }: { units: UnitSystem; theme:
     </div>
   );
 
+  // ---- the guided tour
+  const [tour, setTour] = useState<{ step: number; loading: boolean; error: string | null } | null>(null);
+  // The player's own work, put back when the tour ends.
+  const beforeTour = useRef<{ state: typeof state; tab: Tab; selectedId: string | null } | null>(null);
+  const tourFormatters = useMemo(() => ({ temperature: (c: number) => withUnit('temperature', c, units, 2) }), [units]);
+
+  const showStep = (i: number) => {
+    const s = TOUR_STEPS[i]!;
+    site.setTourStep(TOUR_DESIGNS[s.design], s.challenge);
+    setShowAward(false);
+    setTourAward(Boolean(s.award));
+    setTab(s.tab);
+    setTour({ step: i, loading: false, error: null });
+    if (s.focus) {
+      requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById(s.focus!)?.scrollIntoView({ block: 'start', behavior: 'smooth' })));
+    }
+  };
+
+  const startTour = async () => {
+    if (tour) return;
+    beforeTour.current = { state: site.state, tab: chosen, selectedId };
+    setTour({ step: 0, loading: true, error: null });
+    try {
+      const response = await fetch(TOUR_FILE);
+      if (!response.ok) throw new Error(String(response.status));
+      const opened = openProject(await response.text());
+      if (!opened.ok) throw new Error(opened.reason);
+      setSelectedId(null);
+      site.open(opened.project, { tour: true });
+      const [lon, lat] = centroid(opened.project.boundary);
+      setFlyTo({ center: [lon, lat], zoom: 15, key: Date.now() });
+      showStep(0);
+    } catch {
+      setTour({ step: 0, loading: false, error: TOUR_COPY.failed });
+    }
+  };
+
+  const exitTour = () => {
+    const before = beforeTour.current;
+    beforeTour.current = null;
+    setTour(null);
+    setTourAward(false);
+    setShowAward(false);
+    if (!before) return;
+    site.restore(before.state);
+    setSelectedId(before.selectedId);
+    setTab(before.tab);
+    if (before.state.boundary) {
+      const [lon, lat] = centroid(before.state.boundary);
+      setFlyTo({ center: [lon, lat], zoom: 15, key: Date.now() });
+    }
+  };
+
+  // The header's button: a new request starts the tour (0 is "never asked").
+  const lastRequest = useRef(tourRequest);
+  useEffect(() => {
+    if (tourRequest === lastRequest.current) return;
+    lastRequest.current = tourRequest;
+    void startTour();
+  });
+
   return (
     <div className="workspace-map" data-tab={tab}>
+      {tour && (
+        <TourCard
+          step={tour.step}
+          loading={tour.loading}
+          error={tour.error}
+          f={tourFormatters}
+          onStep={showStep}
+          onLearn={(section) => openLearn(`learn-${section}`)}
+          onExit={exitTour}
+        />
+      )}
       <div className="map-pane">
         <MapView
           palette={palette}
@@ -351,7 +439,7 @@ export function Workspace({ units, theme, onUnits }: { units: UnitSystem; theme:
                   onAward={() => setShowAward(true)}
                   siteFact={challenge && state.result ? challengeSiteFact(challenge, state.site, state.result.site, (m) => withUnit('length', m, units)) : null}
                 />
-                {showAward && challenge && evaluation?.met && state.result && state.site && (
+                {(showAward || tourAward) && challenge && evaluation?.met && state.result && state.site && (
                   <AwardCard
                     challenge={challenge}
                     result={state.result}

@@ -144,6 +144,19 @@ export const GRID_COPY = {
   statNote: (network: string, ble: string) => `${network} against ${ble} with a heat pump in every building`,
 } as const;
 
+/** The guided tour: the card's own words (the steps are in education/tour.ts). */
+export const TOUR_COPY = {
+  button: 'Take the tour',
+  count: (n: number, of: number) => `Tour · ${n} of ${of}`,
+  loading: 'Loading the example neighbourhood…',
+  failed: 'The example neighbourhood could not be loaded. Reload the page and try again.',
+  back: 'Back',
+  next: 'Next',
+  finish: 'Finish',
+  exit: 'Exit tour',
+  learnMore: 'Read more on the Learn tab',
+} as const;
+
 /** Save, open and share (phase 11). */
 export const PROJECT_COPY = {
   heading: 'Save and share',

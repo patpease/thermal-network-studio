@@ -238,7 +238,7 @@ export function useSite() {
    * Open a project file: the saved snapshot, re-classified, with no network
    * call. The challenge comes from the file, not from what was open.
    */
-  const open = useCallback((p: Project) => {
+  const open = useCallback((p: Project, options: { tour?: boolean } = {}) => {
     generation.current++;
     beforeEdit.current = null;
     const init: Init = { selection: p.selection, design: p.design, placeEdits: p.placeEdits };
@@ -256,8 +256,23 @@ export function useSite() {
       challengeId: p.challenge,
       placeEdits: p.placeEdits,
       snapshot: p.snapshot,
-      openedFrom: p.saved,
+      openedFrom: options.tour ? null : p.saved,
     });
+  }, []);
+
+  /** The tour: a step's design and challenge, in one write. */
+  const setTourStep = useCallback((design: Design, challengeId: string | null) => {
+    setState((s) => ({ ...s, design, challengeId, placing: null }));
+  }, []);
+
+  /**
+   * Put back a state saved earlier (the player's own work, when the tour
+   * ends). Supersedes anything still loading, as a new boundary would.
+   */
+  const restore = useCallback((saved: SiteState) => {
+    generation.current++;
+    beforeEdit.current = null;
+    setState({ ...saved, running: false });
   }, []);
 
   /** Re-read OpenStreetMap and the weather for the same boundary, keeping the player's work. */
@@ -378,6 +393,8 @@ export function useSite() {
     load,
     open,
     reread,
+    setTourStep,
+    restore,
     updateDesign,
     startPlacing,
     placeAt,

@@ -623,3 +623,28 @@ Things that looked right and were not:
 - **Citation**: the NREL source's full citation (with DOI and CC BY 4.0) is
   on Learn; its short name is the attribution line on the card. IDEA's map
   has no licence: linked and cited on Learn only, and named nowhere else.
+
+## The guided tour
+
+- **"Take the tour" in the header** runs 13 steps through downtown Mankato
+  (`education/tour.ts`, `ui/TourCard.tsx`). Each step declares its tab,
+  design and challenge; `Workspace.showStep` applies it with
+  `useSite.setTourStep`, so Back restores a step exactly.
+- **The player's work is saved on entry and put back on exit**
+  (`useSite.restore`); the tour's own file opens with `open(p, { tour: true })`
+  so no "Opened from a file" note appears. Verified in the browser: a
+  Highland Park design scoring 74 came back at 74 after all 13 steps.
+- **The site and designs are GENERATED** by `npm run tour:build` from the
+  committed fixtures and zone weather: `public/tour/mankato.thermal-network.json`
+  (a project file, fetched only when the tour starts) and
+  `src/education/generated/tourDesigns.ts`. Re-run it after a model or
+  classifier change, then `npm test`.
+- **Every claim is a test** (`tests/tour.test.ts`, on the same file the
+  browser opens): the suggestion holds 40 °F but its field overheats over 25
+  years; a −1 °C floor runs it far cooler and needs glycol; 8 MW of river
+  meets Waste not and lowers the winter peak; the retrofit with a −3 °C floor
+  meets Half the carbon. If the engine moves, the tour's words fail there
+  first. Tour text is held to the wording rules like `copy.ts`.
+- **The award step** keeps the award up through its own re-run
+  (`tourAward`); otherwise the "close on any miss" effect shut it while the
+  new design was still running.

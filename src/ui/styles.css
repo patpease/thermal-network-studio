@@ -1336,3 +1336,88 @@ a.button {
 .scale-note p {
   margin: 0;
 }
+
+/* The guided tour's card: docked over the map on a desk, above the tab bar
+   on a phone. The phone rule follows the desk rule it overrides. */
+.tour {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 22;
+  width: min(25rem, calc(100vw - 2rem));
+  max-height: min(34rem, 70vh);
+  overflow-y: auto;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.18);
+  border-left: 3px solid var(--accent);
+}
+
+.tour__count {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.tour__title {
+  margin: 0.2rem 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.tour__title:focus {
+  outline: none;
+}
+
+.tour__text {
+  margin: 0 0 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.tour__question {
+  margin: 0.4rem 0 0.6rem;
+  padding: 0.55rem 0.65rem;
+  background: var(--surface-sunk);
+  border-radius: 6px;
+}
+
+.tour__prompt {
+  margin: 0 0 0.45rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.tour__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tour__option--right {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.tour__option--wrong {
+  color: var(--ink-muted);
+}
+
+.tour__response {
+  margin: 0.5rem 0 0;
+  font-size: 0.86rem;
+}
+
+.tour__nav {
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 860px) {
+  .tour {
+    left: 0.6rem;
+    right: 0.6rem;
+    width: auto;
+    bottom: calc(3.4rem + env(safe-area-inset-bottom) + 0.5rem);
+    max-height: 45vh;
+  }
+}

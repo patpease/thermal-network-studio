@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CHALLENGES } from '../src/challenges/challenges';
 import * as COPY from '../src/config/copy';
+import { tourText } from '../src/education/tour';
 
 /**
  * The tool's wording states facts; it does not argue with the reader (D37).
@@ -18,7 +19,7 @@ function strings(value: unknown): string[] {
 }
 
 describe('wording', () => {
-  const all = [...strings(COPY), ...CHALLENGES.flatMap((c) => [c.brief, c.idea])];
+  const all = [...strings(COPY), ...CHALLENGES.flatMap((c) => [c.brief, c.idea]), ...tourText({ temperature: (c) => `${c} °C` })];
 
   it('covers a real amount of text', () => {
     expect(all.length).toBeGreaterThan(80);

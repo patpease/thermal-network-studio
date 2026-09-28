@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { BRAND } from '../config/branding';
-import { SCOPE_STATEMENT } from '../config/copy';
+import { SCOPE_STATEMENT, TOUR_COPY } from '../config/copy';
 import { DEFAULT_UNITS } from '../units/units';
 import type { UnitSystem } from '../units/units';
 import { Mark } from './Mark';
@@ -18,6 +18,7 @@ import { Workspace } from './Workspace';
 export function App() {
   const theme = useTheme();
   const [units, setUnits] = useState<UnitSystem>(DEFAULT_UNITS);
+  const [tourRequest, setTourRequest] = useState(0);
 
   return (
     <div className="app">
@@ -37,6 +38,9 @@ export function App() {
         </div>
 
         <div className="header-toggles">
+          <button type="button" className="button button--small tour-button" onClick={() => setTourRequest((n) => n + 1)}>
+            {TOUR_COPY.button}
+          </button>
           <div className="unit-toggle" role="group" aria-label="Unit system">
             {(['ip', 'si'] as UnitSystem[]).map((system) => (
               <button
@@ -84,7 +88,7 @@ export function App() {
       </p>
 
       <main className="workspace">
-        <Workspace units={units} theme={theme.resolved} onUnits={setUnits} />
+        <Workspace units={units} theme={theme.resolved} onUnits={setUnits} tourRequest={tourRequest} />
       </main>
 
       <SiteFooter />

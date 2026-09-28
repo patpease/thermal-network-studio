@@ -22,7 +22,7 @@ import type { Selection } from '../site/neighbourhood';
 import type { SiteData } from '../site/osm';
 import type { UnitSystem } from '../units/units';
 import type { PlaceEdits } from '../ui/useSite';
-import { isNum, isPoint, parseSelection, parseSources, pt } from './share';
+import { isNum, isPoint, parseSelection, parseSources, pt } from './share.ts';
 
 export const PROJECT_FORMAT = 'thermal-network-studio';
 export const PROJECT_VERSION = 1;

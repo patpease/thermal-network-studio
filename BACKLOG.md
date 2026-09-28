@@ -107,24 +107,13 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       file), flagged by source, attributed on the panel and every export.
       Verified through `preview:worker`: 1 OSM feature, 92 FEMA, 81 NSI on
       the Mankato block.
-- [ ] **A guided example, from a header button** — as Psychrometric
-      Studio's walkthrough does (`web/src/education/walkthrough.ts`,
-      `ui/WalkthroughPanel.tsx`): a "Take the tour" action in the header opens
-      a pre-loaded neighbourhood (a committed fixture, so it needs no
-      network) and steps through every feature in the order a real study
-      goes. Each step declares the complete state it wants (site, selection,
-      design, challenge, tab), so going back restores it exactly; some steps
-      ask a question whose answers each teach something; each links to its
-      Learn facts. It snapshots the player's own work on entry and puts it
-      back on exit, and on a phone it docks over the map as a card. Steps to
-      cover: drawing and editing a boundary; buildings, guesses and federal
-      data; site facts and scale; the suggestion; balancing (the Design
-      tab's numbers); the loop band and glycol; bore field fit and the
-      25-year drift; the reversible air-source heat pump; results and the
-      Sankey; grid impact against BLE; a challenge and its award; save,
-      open and share. Key lessons: not every site suits a network; loads
-      cancelling is the point; the cold snap sets the winter peak; the
-      ground must balance over years.
+- [x] **A guided example, from a header button** — "Take the tour": 13
+      steps through downtown Mankato (a generated project file in
+      `public/tour/`, no network), from the drawn site to Half the carbon
+      and its award. Each step declares its tab, design and challenge;
+      questions on four steps; Learn links; the player's work is saved on
+      entry and restored on exit. `tests/tour.test.ts` checks every claim
+      against the design the step shows.
 - [x] **Existing networks nearby** — 137 running networks from NREL's
       geothermal district heating and cooling data (CC BY 4.0), drawn as
       hollow rings on the map, listed within 25 miles on the Site tab (else
