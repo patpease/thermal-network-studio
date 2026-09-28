@@ -43,18 +43,24 @@ export const PATHS = {
 
 /**
  * Public Overpass instances, tried in this order (OpenStreetMap wiki,
- * "Overpass API", public instances). The main instance is run by volunteers
- * and is sometimes overloaded or unreachable from Cloudflare's network — a
- * 521 from a Worker means the connection to it failed. The others carry the
- * same worldwide data.
+ * "Overpass API", public instances), both with the same worldwide data.
+ *
+ * private.coffee first: four servers, and "no rate limit in place — please
+ * notify us in advance if you intend to use our service in a large scale
+ * project". The main instance second: it allows 4 concurrent queries per IP,
+ * calls itself overloaded, and a Worker's requests leave from Cloudflare IPs
+ * shared with other Workers. Kumi Systems was dropped (September 2026): it
+ * timed out when checked, and a dead third host only delayed the fallback.
  */
-export const OVERPASS_HOSTS = Object.freeze(['overpass-api.de', 'overpass.private.coffee', 'overpass.kumi.systems']);
+export const OVERPASS_HOSTS = Object.freeze(['overpass.private.coffee', 'overpass-api.de']);
 
 /**
- * Each instance gets this long before the next is tried, ms. A normal answer
- * takes 5–10 s; three tries keep the worst case to about a minute.
+ * Each instance gets this long before the next is tried, ms: longer than the
+ * query's own [timeout:25], so an answer the server is still producing is
+ * never thrown away. Two instances keep the worst case to a minute before
+ * the federal fallback.
  */
-export const OVERPASS_TIMEOUT_MS = 20_000;
+export const OVERPASS_TIMEOUT_MS = 30_000;
 
 /**
  * Exact hosts, never suffixes: `overpass-api.de.example.com` ends with an

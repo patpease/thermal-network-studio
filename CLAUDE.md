@@ -474,15 +474,16 @@ Things that looked right and were not:
 - **A 521 from the relay meant Cloudflare could not connect to
   overpass-api.de.** That service is public and volunteer-run, and it is
   sometimes overloaded, down or unreachable from Cloudflare's network. The
-  relay now tries `OVERPASS_HOSTS` in order (the main instance, then
-  private.coffee, then Kumi Systems) on a 429, any 5xx, an HTML page, or
-  20 s of silence; a 400 stops (the query is at fault everywhere). If all
+  relay now tries `OVERPASS_HOSTS` in order (private.coffee, then the main
+  instance; Kumi Systems was dropped as dead) on a 429, any 5xx, a "too
+  busy" remark, an HTML page, or 30 s of silence — longer than the query's
+  own 25 s; a 400 stops (the query is at fault everywhere). If all
   fail, the player reads `OVERPASS_DOWN` — what happened and to try again in
   a few minutes — and a Try again button reloads the same boundary, with the
   design an edit carried.
-- **This sandbox cannot reach the mirrors** (its network policy); only the
-  main instance was verified from `wrangler dev`. `servedBy` in the answer
-  shows which one replied on the live site.
+- **Both hosts were verified from the dev server** (September 2026):
+  private.coffee answered first in about 7 s. `servedBy` and `attempts` in
+  the answer show which one replied on the live site.
 - **Why it fails so often live**: the main instance allows 4 concurrent
   queries PER IP and calls itself overloaded; a Worker's requests leave from
   Cloudflare IPs shared with other Workers. Its policy also asks production
@@ -501,7 +502,8 @@ Things that looked right and were not:
   missing and offers "Try OpenStreetMap again". Only with FEMA also down
   does the player see `OVERPASS_DOWN`.
 - turbo.overpass.private.coffee is Overpass Turbo, a query page for people,
-  not an API; private.coffee's API is already the second host.
+  not an API; private.coffee's API is already the first host. It asks to be
+  told before large-scale use — tell them before launch.
 
 ## Organizations are named only on Learn
 

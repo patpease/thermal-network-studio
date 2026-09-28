@@ -9,6 +9,7 @@ import {
   isAllowedHost,
   OVERPASS_DOWN,
   OVERPASS_HOSTS,
+  OVERPASS_TIMEOUT_MS,
   parseBoundary,
   placeNames,
   siteForCounty,
@@ -209,17 +210,24 @@ describe('/api/buildings', () => {
   });
 
   it('moves on when an instance is busy, times out or answers with an HTML page', async () => {
-    const asked: string[] = [];
-    const fetcher: Fetcher = async (url) => {
-      const host = new URL(url).hostname;
-      if (FEDERAL.has(host)) return jsonResponse({ features: [] });
-      asked.push(host);
-      if (host === OVERPASS_HOSTS[0]) return new Response('slow down', { status: 429 });
-      if (host === OVERPASS_HOSTS[1]) throw new Error('The operation was aborted due to timeout');
-      return jsonResponse({ elements: [] });
-    };
-    expect((await handleBuildings({ boundary: box }, fetcher)).status).toBe(200);
-    expect(asked).toEqual([...OVERPASS_HOSTS]);
+    for (const first of [
+      async () => new Response('slow down', { status: 429 }),
+      async (): Promise<Response> => {
+        throw new Error('The operation was aborted due to timeout');
+      },
+      async () => new Response('<html>Service unavailable</html>', { status: 200 }),
+    ]) {
+      const asked: string[] = [];
+      const fetcher: Fetcher = async (url) => {
+        const host = new URL(url).hostname;
+        if (FEDERAL.has(host)) return jsonResponse({ features: [] });
+        asked.push(host);
+        if (host === OVERPASS_HOSTS[0]) return first();
+        return jsonResponse({ elements: [] });
+      };
+      expect((await handleBuildings({ boundary: box }, fetcher, () => {})).status).toBe(200);
+      expect(asked).toEqual([...OVERPASS_HOSTS]);
+    }
   });
 
   it('when every instance is down, says so plainly and says what to do', async () => {
@@ -329,17 +337,15 @@ describe('/api/buildings', () => {
       async (url) => {
         const host = new URL(url).hostname;
         if (FEDERAL.has(host)) return jsonResponse({ features: [] });
-        if (host === OVERPASS_HOSTS[0]) return new Response('slow down', { status: 429 });
-        if (host === OVERPASS_HOSTS[1]) throw new Error('The operation was aborted due to timeout');
+        if (host === OVERPASS_HOSTS[0]) throw new Error('The operation was aborted due to timeout');
         return jsonResponse({ elements: [] });
       },
       (l) => lines.push(l),
     );
     const attempts = (r.body as { attempts: { host: string; outcome: string; status: number | null }[] }).attempts;
     expect(attempts.map((a) => [a.host, a.outcome, a.status])).toEqual([
-      [OVERPASS_HOSTS[0], 'busy', 429],
-      [OVERPASS_HOSTS[1], 'timeout', null],
-      [OVERPASS_HOSTS[2], 'ok', 200],
+      [OVERPASS_HOSTS[0], 'timeout', null],
+      [OVERPASS_HOSTS[1], 'ok', 200],
     ]);
     expect(lines).toHaveLength(1);
     expect(JSON.parse(lines[0]!)).toMatchObject({ event: 'buildings', result: 'osm' });
@@ -391,6 +397,12 @@ describe('/api/buildings', () => {
     }
     expect(new URL(femaUrl(parseBoundary({ boundary: box }) as never)).hostname).toBe(FEMA_HOST);
     expect(new URL(nsiUrl(parseBoundary({ boundary: box }) as never)).hostname).toBe(NSI_HOST);
+  });
+
+  it('asks private.coffee first, the main instance second, and no longer Kumi; waits longer than the query does', () => {
+    expect([...OVERPASS_HOSTS]).toEqual(['overpass.private.coffee', 'overpass-api.de']);
+    expect(isAllowedHost('overpass.kumi.systems')).toBe(false);
+    expect(OVERPASS_TIMEOUT_MS).toBeGreaterThan(25_000);
   });
 
   it('pins every Overpass mirror exactly, never by suffix', () => {

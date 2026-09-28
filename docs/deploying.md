@@ -66,7 +66,7 @@ relay an open proxy):
 
 | Host | For | Limits to know |
 |---|---|---|
-| `overpass-api.de`, then `overpass.private.coffee`, then `overpass.kumi.systems` | buildings | Public, volunteer-run. The relay tries them in order when one is down, busy (429), failing (5xx, incl. Cloudflare's 521) or slower than 20 s; the answer's `servedBy` names which one replied. Sends a User-Agent; caches a boundary for 7 days |
+| `overpass.private.coffee`, then `overpass-api.de` | buildings | Public. private.coffee has no rate limit and asks to be told before large-scale use; the main instance allows 4 queries at a time per IP. The relay moves on when one is down, busy (429, 5xx incl. Cloudflare's 521, or a "too busy" remark) or slower than 30 s, and falls back to FEMA structures if neither answers. `servedBy` and `attempts` in the answer, and one log line per load, say what happened. Sends a User-Agent; caches a boundary for 7 days |
 | `archive-api.open-meteo.com` | a year of weather | 10,000 calls/day free; cached 30 days per ~1 km |
 | `geocoding-api.open-meteo.com` | place search | cached 30 days |
 | `geocoding.geo.census.gov` | point → county | cached a year |
