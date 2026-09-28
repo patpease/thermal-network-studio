@@ -16,6 +16,8 @@ import {
   yearFromArchive,
   FEMA_HOST,
   femaUrl,
+  remarkIsBusy,
+  remarkIsTooLarge,
   NSI_HOST,
   nsiUrl,
   STRUCTURES_TIMEOUT_MS,
@@ -291,6 +293,95 @@ describe('/api/buildings', () => {
       new URL(url).hostname === FEMA_HOST ? jsonResponse({ error: { code: 400, message: 'Invalid query' } }) : jsonResponse({ elements: [], features: [] }),
     );
     expect((r.body as { site: { structures: { fema: unknown } } }).site.structures.fema).toBeNull();
+  });
+
+  it('a "too busy" remark is the server, not the query: it asks the next instance', async () => {
+    const asked: string[] = [];
+    const r = await handleBuildings(
+      { boundary: box },
+      async (url) => {
+        const host = new URL(url).hostname;
+        if (FEDERAL.has(host)) return jsonResponse({ features: [] });
+        asked.push(host);
+        if (host === OVERPASS_HOSTS[0]) {
+          return jsonResponse({ elements: [], remark: 'runtime error: open64: 0 Success /osm3s_osm_base Dispatcher_Client::request_read_and_idx::timeout. The server is probably too busy to handle your request.' });
+        }
+        return jsonResponse({ elements: [] });
+      },
+      () => {},
+    );
+    expect(r.status).toBe(200);
+    expect(asked).toEqual([OVERPASS_HOSTS[0], OVERPASS_HOSTS[1]]);
+    expect((r.body as { attempts: { outcome: string }[] }).attempts.map((a) => a.outcome)).toEqual(['busy', 'ok']);
+  });
+
+  it('tells a busy remark from a query that is genuinely too large', () => {
+    expect(remarkIsBusy('runtime error: … The server is probably too busy to handle your request.')).toBe(true);
+    expect(remarkIsTooLarge('runtime error: Query timed out in "query" at line 3 after 26 seconds.')).toBe(true);
+    expect(remarkIsTooLarge('runtime error: Query run out of memory using about 64 MB of RAM.')).toBe(true);
+    expect(remarkIsTooLarge('runtime error: … The server is probably too busy to handle your request.')).toBe(false);
+  });
+
+  it('records what each instance did, and logs one line per load', async () => {
+    const lines: string[] = [];
+    const r = await handleBuildings(
+      { boundary: box },
+      async (url) => {
+        const host = new URL(url).hostname;
+        if (FEDERAL.has(host)) return jsonResponse({ features: [] });
+        if (host === OVERPASS_HOSTS[0]) return new Response('slow down', { status: 429 });
+        if (host === OVERPASS_HOSTS[1]) throw new Error('The operation was aborted due to timeout');
+        return jsonResponse({ elements: [] });
+      },
+      (l) => lines.push(l),
+    );
+    const attempts = (r.body as { attempts: { host: string; outcome: string; status: number | null }[] }).attempts;
+    expect(attempts.map((a) => [a.host, a.outcome, a.status])).toEqual([
+      [OVERPASS_HOSTS[0], 'busy', 429],
+      [OVERPASS_HOSTS[1], 'timeout', null],
+      [OVERPASS_HOSTS[2], 'ok', 200],
+    ]);
+    expect(lines).toHaveLength(1);
+    expect(JSON.parse(lines[0]!)).toMatchObject({ event: 'buildings', result: 'osm' });
+  });
+
+  it('with no instance answering, FEMA footprints still make a site — flagged, and never cached', async () => {
+    const lines: string[] = [];
+    const r = await handleBuildings(
+      { boundary: box },
+      async (url) => {
+        const host = new URL(url).hostname;
+        if (host === FEMA_HOST) {
+          return jsonResponse({
+            features: [
+              {
+                geometry: { type: 'Polygon', coordinates: [[[-93.996, 44.165], [-93.9955, 44.165], [-93.9955, 44.1655], [-93.996, 44.1655], [-93.996, 44.165]]] },
+                properties: { BUILD_ID: 7, OCC_CLS: 'Residential', PRIM_OCC: 'Single Family Dwelling' },
+              },
+            ],
+          });
+        }
+        if (host === NSI_HOST) return jsonResponse({ features: [] });
+        return new Response('down', { status: 521 });
+      },
+      (l) => lines.push(l),
+    );
+    expect(r.status).toBe(200);
+    expect(r.cacheSeconds).toBeUndefined();
+    const body = r.body as { site: { osmUnavailable?: true; features: unknown[]; structures: { fema: unknown[] } }; servedBy: string | null };
+    expect(body.site.osmUnavailable).toBe(true);
+    expect(body.site.features).toEqual([]);
+    expect(body.site.structures.fema).toHaveLength(1);
+    expect(body.servedBy).toBeNull();
+    expect(JSON.parse(lines[0]!)).toMatchObject({ result: 'federal-only' });
+  });
+
+  it('with neither OSM nor FEMA, says so plainly, with what each instance did', async () => {
+    const r = await handleBuildings({ boundary: box }, async () => new Response('down', { status: 503 }), () => {});
+    expect(r.status).toBe(503);
+    const body = r.body as { message: string; attempts: unknown[] };
+    expect(body.message).toBe(OVERPASS_DOWN);
+    expect(body.attempts).toHaveLength(OVERPASS_HOSTS.length);
   });
 
   it('pins the federal hosts exactly, never by suffix', () => {

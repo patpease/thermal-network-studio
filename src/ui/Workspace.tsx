@@ -318,6 +318,7 @@ export function Workspace({ units, theme, onUnits }: { units: UnitSystem; theme:
               onFinish={finish}
               onEdit={edit}
               onRetry={site.retry}
+              onReread={site.reread}
               onEditDone={editDone}
               onEditCancel={editCancel}
               onUndo={site.undoPoint}

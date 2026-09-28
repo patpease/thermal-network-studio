@@ -38,6 +38,8 @@ export interface SitePanelProps {
   readonly onCancel: () => void;
   readonly onEdit: () => void;
   readonly onRetry: () => void;
+  /** Read the same boundary again, keeping the player's work (OSM did not answer). */
+  readonly onReread: () => void;
   readonly onEditDone: () => void;
   readonly onEditCancel: () => void;
   readonly onToggle: (id: string) => void;
@@ -302,6 +304,14 @@ export function SitePanel(props: SitePanelProps) {
             {buildings.length > MAX_BUILDINGS && <p className="message message--error">{MAP_COPY.tooMany(buildings.length, MAX_BUILDINGS)}</p>}
             {buildings.length === 0 && <p className="message">{MAP_COPY.none}</p>}
             {guessed > 0 && <p className="card__note">{MAP_COPY.guessedNote}</p>}
+            {site.osmUnavailable && (
+              <div className="scale-note" role="status">
+                <p>{MAP_COPY.osmUnavailable}</p>
+                <button type="button" className="button" onClick={props.onReread}>
+                  {MAP_COPY.osmRetry}
+                </button>
+              </div>
+            )}
             <StructuresNote site={site} connected={buildings} />
           </section>
 

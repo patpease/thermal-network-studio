@@ -483,6 +483,25 @@ Things that looked right and were not:
 - **This sandbox cannot reach the mirrors** (its network policy); only the
   main instance was verified from `wrangler dev`. `servedBy` in the answer
   shows which one replied on the live site.
+- **Why it fails so often live**: the main instance allows 4 concurrent
+  queries PER IP and calls itself overloaded; a Worker's requests leave from
+  Cloudflare IPs shared with other Workers. Its policy also asks production
+  apps to stay near 100 queries a day.
+- **"runtime error … too busy" is the server, not the query.** Overpass
+  answers 200 with that remark when its slots are full. It used to read as
+  "area too large", told the player to draw smaller, and never tried the
+  next instance. `remarkIsBusy` / `remarkIsTooLarge` tell them apart.
+- **Every load logs one line** — `{"event":"buildings","result",
+  "attempts":[{host,outcome,status,ms}]}` — to Workers Logs
+  (`observability` is on), and the same `attempts` ride in the answer. Read
+  the live failure pattern there before changing the host list.
+- **No instance answering is not the end.** If FEMA USA Structures answered,
+  the relay returns the site from federal structures alone
+  (`SiteData.osmUnavailable`), never cached; the Site panel says what is
+  missing and offers "Try OpenStreetMap again". Only with FEMA also down
+  does the player see `OVERPASS_DOWN`.
+- turbo.overpass.private.coffee is Overpass Turbo, a query page for people,
+  not an API; private.coffee's API is already the second host.
 
 ## Organizations are named only on Learn
 

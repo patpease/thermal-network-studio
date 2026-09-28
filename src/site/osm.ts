@@ -37,6 +37,11 @@ export interface SiteData {
    * site read before them, or from a project file saved before them.
    */
   readonly structures?: Structures;
+  /**
+   * No Overpass instance answered: the site is the federal structures alone,
+   * with no heat sources, open space, land use or place names.
+   */
+  readonly osmUnavailable?: true;
 }
 
 /** The tags anything downstream reads. Everything else is dropped. */

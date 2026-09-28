@@ -109,6 +109,17 @@ describe('merging federal structures into the site (phase 12)', () => {
     });
   }
 
+  it('with OpenStreetMap unavailable, the federal structures alone make the site, and say so', () => {
+    const { structures } = load('mankato-downtown');
+    const boundary = (JSON.parse(readFileSync(resolve(import.meta.dirname, 'fixtures/sites/mankato-downtown.json'), 'utf8')) as { data: SiteData }).data.boundary;
+    const s = classifySite({ version: 1, boundary, features: [], skipped: 0, structures, osmUnavailable: true });
+    expect(s.osmUnavailable).toBe(true);
+    expect(heated(s).length).toBeGreaterThan(300);
+    expect(s.buildings.every((b) => b.origin === 'fema' && b.reason.startsWith('OpenStreetMap unavailable.'))).toBe(true);
+    expect(s.sources).toEqual([]);
+    expect(s.placeName).toBeNull();
+  });
+
   it('a site read without federal data says so, and is what it was', () => {
     const { osm } = load('highland-park');
     expect(osm.structures).toBeUndefined();

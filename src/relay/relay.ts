@@ -414,17 +414,59 @@ export async function fetchStructures(boundary: Ring, fetcher: Fetcher): Promise
   return { fema: femaOut, nsi: nsiOut, ...(truncated ? { femaTruncated: true } : {}) };
 }
 
-export async function handleBuildings(body: unknown, fetcher: Fetcher): Promise<RelayResult> {
+/** One try at one Overpass instance: what happened and how long it took. */
+export interface OverpassAttempt {
+  readonly host: string;
+  /**
+   * ok: answered. busy: 429, 5xx, or a 200 whose remark says the server is
+   * too busy. timeout / unreachable: no answer. html: a 200 that was not
+   * JSON. refused: a 4xx other than 429. too-large: the query itself timed out
+   * or ran out of memory on the server.
+   */
+  readonly outcome: 'ok' | 'busy' | 'timeout' | 'unreachable' | 'html' | 'refused' | 'too-large';
+  readonly status: number | null;
+  readonly ms: number;
+}
+
+/**
+ * A remark that means the SERVER was busy, not that the query was too big.
+ * Overpass answers 200 with "runtime error: … Dispatcher_Client::… timeout.
+ * The server is probably too busy to handle your request." when its slots
+ * are full; before this was told apart, that sent the player off to draw a
+ * smaller area and never tried the next instance.
+ */
+export function remarkIsBusy(remark: string): boolean {
+  return /too busy|Dispatcher_Client|rate_limited|slot/i.test(remark);
+}
+
+/** A remark that means this query is too large for any instance. */
+export function remarkIsTooLarge(remark: string): boolean {
+  return !remarkIsBusy(remark) && /runtime error|timed out|out of memory/i.test(remark);
+}
+
+export async function handleBuildings(
+  body: unknown,
+  fetcher: Fetcher,
+  log: (line: string) => void = (line) => console.log(line),
+): Promise<RelayResult> {
   const boundary = parseBoundary(body);
   if (isRelayResult(boundary)) return boundary;
   const data = `data=${encodeURIComponent(overpassQuery(boundary))}`;
   // Started now, awaited only once OSM has answered: the two run side by side.
   const structures = fetchStructures(boundary, fetcher);
+  const attempts: OverpassAttempt[] = [];
+  const note = (a: OverpassAttempt) => attempts.push(a);
+  // One structured line per load, for Workers Logs: which instance answered,
+  // or what each one did. The live failure rate is read from these.
+  const report = (result: 'osm' | 'federal-only' | 'failed' | 'too-large' | 'refused') =>
+    log(JSON.stringify({ event: 'buildings', result, attempts }));
 
-  // Try each public instance in turn. Busy (429), down (5xx, including
-  // Cloudflare's 521/522/523/524), slow or unreachable → the next one. A
-  // 400 is our query's fault and would fail everywhere, so it stops here.
+  // Try each public instance in turn. Busy (429, 5xx, a busy remark), slow
+  // or unreachable → the next one. A 4xx is our query's fault and would fail
+  // everywhere, so it stops here; so does a query too large for the server.
   for (const host of OVERPASS_HOSTS) {
+    const started = Date.now();
+    const ms = () => Date.now() - started;
     let response: Response;
     try {
       response = await fetcher(`https://${host}/api/interpreter`, {
@@ -433,23 +475,56 @@ export async function handleBuildings(body: unknown, fetcher: Fetcher): Promise<
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         timeoutMs: OVERPASS_TIMEOUT_MS,
       });
-    } catch {
+    } catch (error) {
+      const timedOut = error instanceof Error && /timeout|abort/i.test(`${error.name} ${error.message}`);
+      note({ host, outcome: timedOut ? 'timeout' : 'unreachable', status: null, ms: ms() });
       continue;
     }
-    if (response.status === 429 || response.status >= 500) continue;
-    if (!response.ok) return problem(502, `OpenStreetMap’s building service refused the request (${response.status}).`);
+    if (response.status === 429 || response.status >= 500) {
+      note({ host, outcome: 'busy', status: response.status, ms: ms() });
+      continue;
+    }
+    if (!response.ok) {
+      note({ host, outcome: 'refused', status: response.status, ms: ms() });
+      report('refused');
+      return problem(502, `OpenStreetMap’s building service refused the request (${response.status}).`);
+    }
     let json: { elements?: OverpassElement[]; remark?: string };
     try {
       json = (await response.json()) as typeof json;
     } catch {
+      note({ host, outcome: 'html', status: response.status, ms: ms() });
       continue; // an HTML error page with a 200: treat as down
     }
-    if (json.remark && /runtime error|timed out|out of memory/i.test(json.remark)) {
+    if (json.remark && remarkIsBusy(json.remark)) {
+      note({ host, outcome: 'busy', status: response.status, ms: ms() });
+      continue;
+    }
+    if (json.remark && remarkIsTooLarge(json.remark)) {
+      note({ host, outcome: 'too-large', status: response.status, ms: ms() });
+      report('too-large');
       return problem(503, 'That area is too large for OpenStreetMap’s building service. Draw a smaller one.');
     }
+    note({ host, outcome: 'ok', status: response.status, ms: ms() });
+    report('osm');
     const site: SiteData = { ...normaliseElements(json.elements ?? [], boundary), structures: await structures };
     // `servedBy` names the instance that answered, for tracing a live problem.
-    return { status: 200, body: { site, attribution: `${ATTRIBUTION.osm}. ${ATTRIBUTION.structures}`, servedBy: host }, cacheSeconds: CACHE.buildings };
+    return {
+      status: 200,
+      body: { site, attribution: `${ATTRIBUTION.osm}. ${ATTRIBUTION.structures}`, servedBy: host, attempts },
+      cacheSeconds: CACHE.buildings,
+    };
   }
-  return problem(503, OVERPASS_DOWN);
+
+  // No instance answered. The federal footprints still make a site: buildings
+  // with uses and storeys, but no heat sources, open space, land use or names.
+  // Not cached, so the next try asks OpenStreetMap again.
+  const federal = await structures;
+  if (federal.fema && federal.fema.length > 0) {
+    report('federal-only');
+    const site: SiteData = { version: 1, boundary, features: [], skipped: 0, structures: federal, osmUnavailable: true };
+    return { status: 200, body: { site, attribution: ATTRIBUTION.structures, servedBy: null, attempts } };
+  }
+  report('failed');
+  return { status: 503, body: { message: OVERPASS_DOWN, attempts } };
 }

@@ -60,6 +60,10 @@ export const MAP_COPY = {
     levels: { osm: '', nsi: ' (National Structure Inventory)', fema: ' (from FEMA height)', default: ' (guessed)' },
     vintageMedian: (band: string) => `Built ${band}: the census block group’s median year, not this building’s own.`,
   },
+  /** OpenStreetMap did not answer; the site is federal structures alone. */
+  osmUnavailable:
+    'OpenStreetMap did not answer. Buildings are from FEMA USA Structures and the National Structure Inventory. Heat sources, open space, land use and place names are missing until OpenStreetMap is read.',
+  osmRetry: 'Try OpenStreetMap again',
   /** Existing networks near the site. */
   networks: {
     heading: 'Existing networks nearby',

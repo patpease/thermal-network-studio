@@ -118,6 +118,8 @@ export interface Site {
    * read without them (an older project file).
    */
   readonly structures?: { readonly fema: boolean; readonly nsi: boolean; readonly femaTruncated: boolean };
+  /** OpenStreetMap did not answer: buildings are federal data alone. */
+  readonly osmUnavailable?: true;
 }
 
 // --------------------------------------------------------------- archetypes
@@ -610,7 +612,7 @@ export function classifySite(data: SiteData): Site {
     if (footprint < MIN_FOOTPRINT_M2) continue;
     const fed: Federal = { fema: s, nsi: nsiInside(nsi, s.ring) };
     const found = fromFederal(fed, footprint) ?? residentialBySize(footprint, 'Type from its size');
-    const decision = { ...found, reason: `Not in OpenStreetMap. ${found.reason}` };
+    const decision = { ...found, reason: `${data.osmUnavailable ? 'OpenStreetMap unavailable.' : 'Not in OpenStreetMap.'} ${found.reason}` };
     const fl = federalLevels(fed);
     const levels = fl?.levels ?? (decision.archetype ? DEFAULT_LEVELS[decision.archetype] : 1);
     const floorArea = decision.archetype ? footprint * levels * CONDITIONED_FRACTION : 0;
@@ -680,6 +682,7 @@ export function classifySite(data: SiteData): Site {
     barriers: uniqueBarriers,
     openSpaceM2: Math.round(openSpace),
     skipped: data.skipped,
+    ...(data.osmUnavailable ? { osmUnavailable: true as const } : {}),
     ...(data.structures
       ? { structures: { fema: data.structures.fema !== null, nsi: data.structures.nsi !== null, femaTruncated: Boolean(data.structures.femaTruncated) } }
       : {}),
