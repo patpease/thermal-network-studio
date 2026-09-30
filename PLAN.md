@@ -75,6 +75,7 @@ sits on the page and is burned into every export.
 | D46 | **Federal structure data fills OSM's gaps** (phase 12) | FEMA USA Structures (CC BY 4.0) and USACE NSI, fetched by the relay beside Overpass. Order for a building's use: OSM tag → a point inside → NSI Hazus occupancy → FEMA occupancy → land use → size; federal data also replaces a guess from a coarse tag, never a tag that names the use. Storeys: OSM → NSI → FEMA height → default. Year: OSM → NSI's block-group median, flagged. A FEMA footprint no OSM building covers (centre inside either, boxes overlapping 30%, or centres within 8 m) is added. Either set failing leaves OSM alone and says so. Reviewed in docs/building-data.md. |
 | D47 | **Existing networks are a dataset in the repo, one CSV per source** (after phase 12) | `data/networks/<source>.csv` in shared columns plus `sources.json` (citation, licence, maintained), validated by `npm run import:networks` into `src/site/generated/networks.ts`. NREL GDR 1282 (CC BY 4.0) came in by a one-off converter kept as a record; it is not expected to be maintained, and the next source brings its own CSV. Prospective projects are not taken. IDEA's map has no licence: linked and cited on Learn, not copied. Shown for learning, never as a connectable source. |
 | D48 | **A guided tour on a generated example** | Psychrometric Studio's walkthrough pattern: steps declare the whole state (tab, design, challenge), so Back restores exactly; the player's work is saved on entry and restored on exit. The site is downtown Mankato from the committed fixtures (OSM + FEMA/NSI + zone weather), written as a project file by `npm run tour:build` and opened through `openProject`; the designs (suggestion, colder loop, river heat, retrofit) are generated with it. Each step's claim is a test. |
+| D49 | **Next: phases 13–17, data expansion** (planned 30 September 2026) | 13 anchor loads and more heat sources (FEMA occupancy anchors, EPA CWNS wastewater, PNNL IM3 data centres); 14 measured vs modelled (NYC LL84, DC BEPS, DOE BPD peers, a benchmarking adapter; compare fuel with fuel, never total EUI); 15 existing district and thermal systems, labelled partial (ORNL Onsite if its terms allow, OSM heat plants, NYC steam users); 16 EU and UK layers (Hotmaps, DESNZ; map-only outside the US unless decided otherwise); 17 Learn reference links, link-only. Each extends an existing pattern: live through the relay, generated committed data, static files in `public/`, overlays inside the MapLibre style, citations on Learn. A licence and attribution register comes first. Detail and open questions in BACKLOG.md. |
 | D38 | **Phone: one screen at a time** (phase 07) | Below 860 px a tab bar at the foot: Map · Site · Design · Results · Learn. Drawing and placing switch to the map, which carries its own Finish/Undo/Cancel; finishing returns to the panel. |
 | D36 | **Four challenges** (phase 06) | Half the carbon; Ground in balance (the drift may be demanded here though never scored, D31); Waste not (15% of the loop's heat from waste heat or water, with a 100-hour backup cap so a data centre plus backup cannot earn it); Off the air. Every challenge caps backup hours. |
 
@@ -150,6 +151,13 @@ sits on the page and is burned into every export.
   heating/cooling sharing, 25-year bore drift, score breakdown
 - **06 Challenges** — goal format, goal library, share links
 - **07 Education, export, phone pass, deploy**
+- **08–12** — loop and sizing, scale, grid impact, save and open, federal
+  building data (done; BACKLOG.md)
+- **13 Anchor loads and more heat sources** (planned)
+- **14 Measured vs modelled** (planned)
+- **15 Existing district and thermal systems, partial** (planned)
+- **16 EU and UK layers** (planned)
+- **17 Learn tab reference links** (planned)
 
 ## Proposed archetypes (Q1 — for review)
 
