@@ -145,18 +145,21 @@ below. Numbered after 12; 11 and 12 ran out of order.
       anchor loads where OSM names none; EPA CWNS 2022 wastewater plants
       with flow-based sewer heat; PNNL IM3 data centres with floor-area
       heat. Wired into the existing source list, suggestion and site facts.
-- [ ] **14 Measured vs modelled** (L) — a toggle beside modelled use: NYC
-      LL84 and DC BEPS reported energy for matched buildings, a variance
-      indicator, DOE BPD peer ranges, and a generic benchmarking adapter.
-      NYC district steam users flagged. Modelled loads stay the default.
+- [ ] **14 District steam connections** (S) — flag the buildings NYC LL84
+      reports on district steam, so the Site tab shows how a building is
+      heated today and what connecting it would replace. Thermal demand
+      only. The measured-vs-modelled comparison is **on hold** (owner, 30
+      September 2026) until a fair comparison basis is found.
 - [ ] **15 Existing district and thermal systems, partial** (M) — extend the
       existing-networks layer: ORNL Onsite Energy installations (terms
       permitting), OSM district heating plants, NYC steam users from 14.
       Labelled "Partial — no complete open US inventory exists".
-- [ ] **16 EU and UK layers** (L) — region detection; Hotmaps heat and floor
-      area density as an overlay; DESNZ Heat Networks Planning Database in
-      the existing-networks importer. Map-only outside the US unless the
-      model is extended (open question). Stretch: EUBUCCO, Peta/sEEnergies.
+- [ ] **16 EU and UK layers** (L) — **backlog, not scheduled** (owner, 30
+      September 2026). Region detection; Hotmaps heat and floor area density
+      as an overlay; DESNZ operational heat networks only, in the
+      existing-networks importer. Ideally it also brings European weather
+      and carbon modelling so the score runs there; low priority for now.
+      Stretch: EUBUCCO, Peta/sEEnergies.
 - [ ] **17 Learn tab reference links** (S) — link, don't ingest: Upgrade NY,
       NLR 2025 U.S. Geothermal Market Report, EIA 2018 district energy
       study, DOE district-scale geothermal pilots; BDC and IDEA already
@@ -283,71 +286,53 @@ occupancy already sets a building's use where OSM names none (`femaArchetype`).
 
 ---
 
-### Phase 14 — Measured vs modelled (L)
+### Phase 14 — District steam connections (S)
 
-**Goal.** Where a city publishes benchmarking data, show a building's
-reported energy beside the tool's modelled figure, with a variance
-indicator, so a player can see how far the model is from the meters — while
-modelled loads stay the default everywhere.
+**Goal.** Show which buildings in a study area are on district steam today,
+so the player sees how they are heated and what a network connection would
+replace. Thermal demand only: the tool's scope is heating, cooling and hot
+water, and the flag is about how a building connects, not how much it uses.
 
 **Data sources**
 
 | Dataset | URL | Licence | Cadence | Hosting |
 |---|---|---|---|---|
-| NYC LL84 benchmarking, CY2024 (site EUI, fuel use incl. `district_steam_use_kbtu`, lat/long, BBL/BIN, property type, GFA) | https://data.cityofnewyork.us/Environment/NYC-Building-Energy-and-Water-Data-Disclosure-for-/5zyy-y8am (Socrata API) | NYC Open Data terms of use (free reuse, attribution requested) — confirm | annual | live via relay: SoQL `within_circle`, cached 30 days |
-| DC Building Energy Performance | https://opendata.dc.gov/datasets/DCGIS::building-energy-performance/about (ArcGIS FeatureServer) | DC Open Data (CC BY 4.0 on most DCGIS layers) — confirm on the item | annual | live via relay: envelope query, as FEMA |
-| DOE Building Performance Database (peer EUI by type and climate zone) | https://catalog.data.gov/dataset/building-performance-database | CC BY 4.0 per the catalogue — confirm; API needs a key | irregular | generated table (peer percentiles by type × zone), committed; no key at runtime |
+| NYC LL84 benchmarking, CY2024 (`district_steam_use_kbtu`, lat/long, BBL/BIN, property type) | https://data.cityofnewyork.us/Environment/NYC-Building-Energy-and-Water-Data-Disclosure-for-/5zyy-y8am (Socrata API) | NYC Open Data terms of use (free reuse, attribution requested) — confirm | annual | live via relay: SoQL `within_circle`, only the fields above, cached 30 days |
 
 **Tasks**
 
-- *Adapter.* `src/benchmarking/`: one adapter per city, each a relay handler
-  (host pinned, `RELAY_VERSION` in the key) that maps rows into one shape:
-  `{ id, source, at, propertyType, floorAreaM2, year, reported: { siteEUI,
-  gasKWh, steamKWh, oilKWh, electricityKWh } }`. A registry lists which
-  adapter covers which bounding box, so Boston, Seattle, Chicago and others
-  are one adapter each later. Results ride on `SiteData.benchmarking`.
+- *Relay.* One handler (host pinned, `RELAY_VERSION` in the key) returning
+  `{ id, at, propertyType, steam: boolean }` for records with
+  `district_steam_use_kbtu > 0`. Results ride on `SiteData.steam`, so a
+  saved file keeps them. Failure is `null`, never an error, as FEMA.
 - *Matching.* A record joins the building whose footprint contains its point
-  (OSM or FEMA); unmatched records are counted and listed, not forced.
-- *Like with like.* The model covers heating, cooling, hot water and
-  refrigeration, not lighting and plug loads, so total site EUI is not
-  comparable. The comparison is **non-electric fuel intensity** (gas + oil +
-  steam) against the model's business-as-usual heating and hot-water fuel,
-  shown only for buildings whose electricity share says they are
-  fuel-heated; total site EUI is shown for context, not compared.
-- *Steam.* LL84 `district_steam_use_kbtu > 0` flags a Con Edison steam
-  customer on the building and in Site features (and feeds phase 15).
-- *Peers.* BPD percentiles (25th/50th/75th) by type × zone give a peer band
-  beside both numbers.
-- *UI.* A "Measured vs modelled" toggle on the Site tab when any records
-  matched; the selected-building card shows reported, modelled, peer band and
-  a variance chip (low / near / high — never a ± tolerance). A note that
-  benchmarking covers large buildings only (NYC ≥ 25,000 ft²).
-- *Model hooks.* None by default. Optional later: "use reported" per
-  building as an override the player chooses, flagged like any override.
-- *Learn and attribution.* REFERENCES for each city dataset and BPD; the
-  panel attribution names the city dataset; the register.
+  (OSM or FEMA); unmatched records are counted, not forced.
+- *UI.* A steam marker on matched buildings, "on district steam" on the
+  building card, and a count in Site features. A note that LL84 covers large
+  buildings only (≥ 25,000 ft²).
+- *Model hooks.* None. The flag never changes loads or the score.
+- *Learn and attribution.* LL84 in REFERENCES and the register; the panel
+  attribution names the dataset.
 
 **Acceptance criteria**
 
-- On a Manhattan test boundary the toggle appears, records match to
-  footprints, steam customers are flagged, and the variance chip compares
-  fuel with fuel (a test pins the comparison basis).
-- A city with no adapter shows no toggle and no empty card.
-- Adding a city is one adapter file and one registry entry; a test runs
-  every adapter against a recorded fixture response.
-- The score never changes when the toggle is used.
+- On a Manhattan test boundary steam buildings are flagged from a recorded
+  fixture; outside NYC no request is made and nothing is shown.
+- The score and loads are identical with and without the flag (a test).
 
 **Risks and open questions**
 
-- The like-for-like basis (above) is a modelling decision to confirm.
-- Benchmarking rows are self-reported and include errors; outliers are
-  shown, not cleaned.
-- Subrequests: each adapter adds one live call per site load (free plan limit
-  50).
-- Licence terms for NYC, DC and BPD need confirming before attribution text
-  is fixed.
+- LL84 rows are self-reported; a building can be missed or mislabelled.
+- One more live call per NYC site load (free-plan subrequest limit 50).
 
-**Depends on:** the licence register. Phase 15 uses its steam flag.
+**On hold: measured vs modelled.** Comparing reported energy (LL84, DC
+Building Energy Performance, DOE BPD peers) with the modelled loads waits
+until the owner settles a comparison basis. The benchmarking adapter
+registry is deferred with it. Reported data is site energy, including
+lighting and plug loads, and the model is thermal demand; the two do not
+compare directly.
+
+**Depends on:** the licence register. Phase 15 uses the steam flag.
 
 ---
 
@@ -364,7 +349,7 @@ is partial.
 |---|---|---|---|---|
 | DOE / ORNL Onsite Energy Installation Database (CHP, geothermal, thermal storage; ≥ 1 MW at large users; downloadable spreadsheet) | https://onsite-energy-installations.ornl.gov | **No stated terms found** — confirm with ORNL/ICF before redistributing | quarterly | a CSV in `data/networks/` if permitted; otherwise links/counts only |
 | OSM district heating (`plant:output:heat=*`, `power=plant`, `man_made=works` with `heat`, `pipeline=substance:heat`, `district_heating=*`) | https://www.openstreetmap.org | ODbL | live | extend the Overpass query already made |
-| NYC LL84 steam users | phase 14 | as phase 14 | annual | from phase 14 |
+| NYC district steam buildings | phase 14 | as phase 14 | annual | from phase 14 |
 | NREL GDR 1282 (geothermal networks) | already imported (D47) | CC BY 4.0 | not maintained | already done |
 
 **Tasks**
@@ -403,18 +388,19 @@ is partial.
 
 ---
 
-### Phase 16 — EU and UK layers (L)
+### Phase 16 — EU and UK layers (L) — backlog, not scheduled
 
 **Goal.** Let a player looking at a European or UK site see heat density and
-the heat networks that exist or are planned there, with the right layers
-chosen by where the map is.
+the heat networks operating there, with the right layers chosen by where the
+map is. Ideally it later brings European weather and carbon modelling so the
+score runs outside the US; the owner rates that low priority for now.
 
 **Data sources**
 
 | Dataset | URL | Licence | Cadence | Hosting |
 |---|---|---|---|---|
 | Hotmaps heat density (total, residential, non-residential) and gross floor area density, 100 m, EU28 | https://wiki.hotmaps.eu (GitLab repositories) | CC BY 4.0 | static (base year ~2015) | pre-built tiles (see risks); never raw GeoTIFF |
-| UK DESNZ Heat Networks Planning Database (status inception → decommissioning; OS grid coordinates) | https://www.data.gov.uk/dataset/065d267f-23bc-4d0e-9a56-52d388d5835c/desnz-heat-networks-planning-database | Open Government Licence v3.0 | quarterly | a CSV in `data/networks/` via a converter (BNG → WGS 84) |
+| UK DESNZ Heat Networks Planning Database (status inception → decommissioning; OS grid coordinates) | https://www.data.gov.uk/dataset/065d267f-23bc-4d0e-9a56-52d388d5835c/desnz-heat-networks-planning-database | Open Government Licence v3.0 | quarterly | a CSV in `data/networks/` via a converter (BNG → WGS 84); operational rows only |
 | Stretch: EUBUCCO (building age, height) | https://eubucco.com | mostly ODbL, some sources CC BY — per-country check | versioned | per-country static files if adopted |
 | Stretch: Peta / sEEnergies excess heat | https://s-eenergies.eu | to confirm | static | as for Hotmaps |
 
@@ -429,10 +415,10 @@ chosen by where the map is.
   them in files under 25 MiB each; the map adds them as a raster source
   with a legend in GWh/km²·yr (the unit EPRI's density bands already use),
   so the same density guidance applies.
-- *UK networks.* Extend the networks importer: region-aware bounds in
-  place of "inside the United States", and a `status` column. **Planned
-  networks conflict with D47** (prospective projects not taken) — decision
-  needed (open question).
+- *UK networks.* Extend the networks importer with region-aware bounds in
+  place of "inside the United States". The converter keeps **operational
+  networks only**; planned, in-construction and decommissioned rows are
+  dropped and counted, as D47 requires. No `status` column.
 - *Model hooks.* None by default: the load model and score are calibrated to
   the US stock. Hotmaps density feeds the Site features density row as an
   alternative source, flagged.
@@ -451,9 +437,9 @@ chosen by where the map is.
 
 **Risks and open questions**
 
-- **Scope of "international":** map layers only, or a European load model and
-  carbon factors so the score runs there too? The first is L; the second is a
-  separate, larger phase.
+- **Scope (decided 30 September 2026):** map layers first; European weather
+  and carbon modelling ideally follow as a separate, larger phase. Both stay
+  on the backlog.
 - **Tile hosting:** EU-wide 100 m tiles may exceed the static-asset file
   count; R2 (new infrastructure) or a zoom cap may be needed.
 - Hotmaps base year is old; say so on the legend.
@@ -517,25 +503,30 @@ every dataset phases 13–16 add.
 - **Refresh schedule.** In the register: FEMA USA Structures annual (live);
   NSI irregular (live); OSM live; Open-Meteo live; ComStock/ResStock per
   release (`calibrate:extract`); Cambium annual (`carbon:extract`); CWNS
-  four-yearly; IM3 per release; LL84 and DC annual (live); BPD irregular;
+  four-yearly; IM3 per release; LL84 annual (live);
   ORNL Onsite quarterly; DESNZ quarterly; Hotmaps static; NREL GDR not
   maintained.
 - **Vintage labels.** Each layer legend, source card and export line names the
   release ("CWNS 2022", "LL84 CY2024", "Hotmaps — static, 2015 base year").
 
-### Open questions for the owner
+### Decisions and open questions
 
-1. International scope (phase 16): map layers only, or a European load and
-   carbon model too?
-2. Planned UK heat networks (phase 16) against D47's "no prospective
-   projects": show them, labelled planned, or leave them out?
-3. Measured vs modelled basis (phase 14): compare non-electric fuel (as
-   proposed), or something else?
-4. Tile hosting (phase 16): accept R2 as new infrastructure, or cap zoom to
-   stay within static assets?
-5. ORNL Onsite terms (phase 15): contact ORNL/ICF before building, or plan
-   the links-only fallback from the start?
-6. Order: 13 → 14 → 15 → 17 → 16 is proposed (US first, smallest risk first).
+Decided 30 September 2026:
+
+- International scope (16): stays on the backlog. Ideally it includes
+  European weather and carbon modelling; low priority.
+- UK networks (16): operational only. Planned systems are not shown (D47).
+- Measured vs modelled (14): on hold until a comparison basis is found.
+  Phase 14 is the district-steam connection flag alone, thermal demand only.
+
+Still open:
+
+1. Tile hosting (16): accept R2 as new infrastructure, or cap zoom to stay
+   within static assets?
+2. ORNL Onsite terms (15): contact ORNL/ICF before building, or plan the
+   links-only fallback from the start?
+
+Order: 13 → 14 → 15 → 17. 16 waits on the backlog.
 
 ## Phase 11 plan: save and open a project file
 
