@@ -22,6 +22,7 @@ function formatters(units: UnitSystem): Formatters {
     delta: (k) => withUnit('temperatureDelta', k, units, 2),
     size: (tons) => networkSize(tons, units),
     distance: (m) => withUnit('distance', m, units, 2),
+    intensity: (kind, w) => withUnit(kind, w, units, 3),
   };
 }
 

@@ -326,6 +326,15 @@ h1, h2, h3, p, figure {
   font-weight: 700;
 }
 
+/* The selected building's peak check: a group inside the card, ruled off. */
+.peak-check {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--border);
+}
+
 .card__note {
   font-size: 0.82rem;
   color: var(--ink-muted);

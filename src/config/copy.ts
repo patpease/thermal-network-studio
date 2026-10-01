@@ -85,6 +85,22 @@ export const MAP_COPY = {
   todayHeading: 'Today, without a network',
   selectedHeading: 'Selected building',
   include: 'Connected to the network',
+  /** The selected building's peak hour against engineers' rules of thumb. */
+  peakCheck: {
+    heading: 'Peak load against rules of thumb',
+    cooling: 'Peak cooling',
+    heating: 'Peak heating',
+    noCooling: 'No cooling',
+    rule: (v: string) => `Rule of thumb ${v}`,
+    /** A ratio of LOADS: 1.2 is a load 20% above the rule's. */
+    compare: (ratio: number) => {
+      const pct = Math.round((ratio - 1) * 100);
+      return pct === 0 ? 'Load at the rule of thumb' : `Load ${Math.abs(pct)}% ${pct > 0 ? 'above' : 'below'} the rule of thumb`;
+    },
+    note: (cooling: string, heating: string) =>
+      `The single largest hour of the year, per floor area. Not an annual total. Space heating and cooling only, without hot water or refrigeration, for the building as built. One rule of thumb for every building type: ${cooling} cooling and ${heating} heating.`,
+    guessed: 'This building’s type is guessed. Its peak follows the guessed type.',
+  },
 } as const;
 
 export const DESIGN_COPY = {

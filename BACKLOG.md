@@ -129,6 +129,23 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       NLR calibration there, so most of the gap is NLR against AutoBEM.
 - [ ] **Hourly shape** — still unchecked. Needs a public hourly reference
       (AutoBEM's Chattanooga EPB work is not published hourly).
+- [x] **Peak check against rules of thumb** — the selected building card
+      shows its peak hour of space heating and cooling per floor area
+      against 400 ft²/ton and 30 Btu/h·ft² (`engine/ruleOfThumb.ts`). Peak,
+      not annual; no hot water or refrigeration; as built. Never scored.
+- [ ] **Rules of thumb per building type** — the owner will supply them;
+      v1 uses one pair for every type.
+- [ ] **Morning start-up spike (found by the peak check)** — the 1R1C model
+      recovers the night setback in ONE hour with unlimited capacity. In 5A a
+      small office peaks at 105 Btu/h·ft² at 06:00 against about 20–33 the
+      rest of that day, and pulls down to 150 ft²/ton on a summer morning
+      against about 450. Every scheduled commercial type shows it; homes and
+      hospitals (no deep setback) do not. Annual energy is unaffected, but
+      the peaks feed the network size in tons, balancing plant sizing, the
+      winter electric peak and the tour's claims. Candidate fix: spread the
+      recovery over two to three hours (optimal start), or cap heating and
+      cooling at a design-day capacity; then re-fit, rebuild the tour and
+      re-pin the grid figures. Owner to decide.
 - [x] **11 Save and open** — a project file, as Psychrometric Studio has:
       Save file, Open file and Copy a link in one card on the Site and
       Design tabs; Ctrl/⌘+S; the building and weather snapshot opens with no

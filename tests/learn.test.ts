@@ -24,6 +24,7 @@ const fmt = (units: UnitSystem): Formatters => ({
   power: (w) => withUnit('power', w, units, 2),
   delta: (k) => withUnit('temperatureDelta', k, units, 2),
   size: (tons) => networkSize(tons, units),
+  intensity: (kind, w) => withUnit(kind, w, units, 3),
 });
 
 const site = classifySite(

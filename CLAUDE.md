@@ -624,6 +624,22 @@ Things that looked right and were not:
   on Learn; its short name is the attribution line on the card. IDEA's map
   has no licence: linked and cited on Learn only, and named nowhere else.
 
+## Peak check against rules of thumb
+
+- **The selected building card compares its peak hour with rules of
+  thumb** (`engine/ruleOfThumb.ts`): 400 ft²/ton cooling and 30 Btu/h·ft²
+  heating, one pair for every type until the owner supplies values per type.
+  Peak space heating and cooling only — not annual, no hot water or
+  refrigeration — for the building as built. Computed on the main thread
+  from one m² of the archetype; never reaches the network or the score.
+- **ft²/ton is a reciprocal**: a bigger load prints a smaller number. It is
+  the `coolingIntensity` quantity in `units.ts` (W/m² canonical), and every
+  comparison is a ratio of LOADS, never of ft²/ton figures.
+- **It found the morning start-up spike** on its first run: scheduled
+  commercial buildings peak in the one hour that recovers the night setback,
+  3–5× the heating rule. That is the model's real peak, shown as it is; the
+  fix is on the backlog for the owner to decide.
+
 ## The guided tour
 
 - **"Take the tour" in the header** runs 13 steps through downtown Mankato

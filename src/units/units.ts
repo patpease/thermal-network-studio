@@ -32,7 +32,18 @@ export type Quantity =
   /** Electric demand. kW in both systems: US utilities bill and plan in kW. */
   | 'electricPower'
   /** Distances between places, canonical m: miles or kilometres. */
-  | 'distance';
+  | 'distance'
+  /**
+   * Peak heating per floor area, canonical W/m²: Btu/h·ft² in IP, the unit
+   * engineers' rules of thumb are written in.
+   */
+  | 'heatingIntensity'
+  /**
+   * Peak cooling per floor area, canonical W/m². IP prints it as ft²/ton, a
+   * RECIPROCAL: a bigger number is a smaller load. Converted here and nowhere
+   * else, so nothing can compare a ft²/ton figure as if it were a load.
+   */
+  | 'coolingIntensity';
 
 /** Watts in one Btu per hour. */
 const W_PER_BTUH = 0.29307107;
@@ -41,6 +52,8 @@ const KWH_PER_KBTU = 0.29307107;
 /** Square metres in one square foot. */
 const M2_PER_FT2 = 0.09290304;
 const M_PER_FT = 0.3048;
+/** One ton of refrigeration, W (12,000 Btu/h); `engine/scale.ts` holds the same. */
+const W_PER_TON = 3_516.85;
 /**
  * Canonical SI for the big quantities: MW, MWh, GWh/km²·yr. IP: million
  * Btu/h, MMBtu, and billion Btu/mi²·yr — the unit EPRI's density thresholds
@@ -63,6 +76,8 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     density: 'billion Btu/mi²·yr',
     electricPower: 'kW',
     distance: 'mi',
+    heatingIntensity: 'Btu/h·ft²',
+    coolingIntensity: 'ft²/ton',
   },
   si: {
     temperature: '°C',
@@ -76,6 +91,8 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     density: 'GWh/km²·yr',
     electricPower: 'kW',
     distance: 'km',
+    heatingIntensity: 'W/m²',
+    coolingIntensity: 'W/m²',
   },
 };
 
@@ -102,6 +119,10 @@ export function toDisplay(quantity: Quantity, si: number, units: UnitSystem): nu
       return si * MMBTU_PER_MWH;
     case 'density':
       return si * BILLION_BTU_PER_GWH * KM2_PER_MI2;
+    case 'heatingIntensity':
+      return (si * M2_PER_FT2) / W_PER_BTUH;
+    case 'coolingIntensity':
+      return W_PER_TON / (si * M2_PER_FT2);
   }
 }
 
@@ -128,5 +149,10 @@ export function fromDisplay(quantity: Quantity, shown: number, units: UnitSystem
       return shown / MMBTU_PER_MWH;
     case 'density':
       return shown / (BILLION_BTU_PER_GWH * KM2_PER_MI2);
+    case 'heatingIntensity':
+      return (shown * W_PER_BTUH) / M2_PER_FT2;
+    case 'coolingIntensity':
+      // The reciprocal is its own inverse.
+      return W_PER_TON / (shown * M2_PER_FT2);
   }
 }

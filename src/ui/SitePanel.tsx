@@ -5,7 +5,7 @@
  * demand is shaped, what is nearby — and the numbers under it. Everything
  * printed with a unit goes through format.ts.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { MAP_COPY, SCALE_COPY } from '../config/copy';
 import { ARCHETYPES } from '../loads/archetypes';
@@ -24,6 +24,10 @@ import { connected, effective } from '../site/neighbourhood';
 import type { UnitSystem } from '../units/units';
 import { networkSize, percent, rangeWithUnit, sig, tonnes, withUnit } from './format';
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
+import { peakCheck, RULE_OF_THUMB_W_PER_M2 } from '../engine/ruleOfThumb';
+import type { PeakCheck } from '../engine/ruleOfThumb';
+import type { WeatherYear } from '../loads/model';
+import type { ClimateZone } from '../loads/zones';
 import { draftArea } from './useSite';
 import type { SiteState } from './useSite';
 
@@ -182,7 +186,57 @@ function StructuresNote({ site, connected }: { site: Site; connected: readonly S
   return lines.length ? <p className="card__note">{lines.join(' ')}</p> : null;
 }
 
-function SelectedBuilding({ b, excluded, onToggle, onOverride, units }: { b: SiteBuilding; excluded: boolean; onToggle: () => void; onOverride: (a: ArchetypeId | null) => void; units: UnitSystem }) {
+/** The selected building's peak hour against the rules of thumb. Never scored. */
+function PeakCheckRows({ check, guessed, units }: { check: PeakCheck; guessed: boolean; units: UnitSystem }) {
+  const c = MAP_COPY.peakCheck;
+  const rule = (kind: 'heatingIntensity' | 'coolingIntensity', w: number) => withUnit(kind, w, units);
+  return (
+    <div className="peak-check">
+      <h3 id="peak-check-heading" className="card__subheading">
+        {c.heading}
+      </h3>
+      <div className="stats">
+        <Stat
+          label={c.cooling}
+          value={check.coolingWPerM2 > 0 ? rule('coolingIntensity', check.coolingWPerM2) : c.noCooling}
+          note={`${c.rule(rule('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling))}${check.coolingWPerM2 > 0 ? ` · ${c.compare(check.coolingRatio)}` : ''}`}
+        />
+        <Stat
+          label={c.heating}
+          value={rule('heatingIntensity', check.heatingWPerM2)}
+          note={`${c.rule(rule('heatingIntensity', RULE_OF_THUMB_W_PER_M2.heating))} · ${c.compare(check.heatingRatio)}`}
+        />
+      </div>
+      <p className="card__note">
+        {c.note(rule('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling), rule('heatingIntensity', RULE_OF_THUMB_W_PER_M2.heating))}
+        {guessed && <> {c.guessed}</>}
+      </p>
+    </div>
+  );
+}
+
+function SelectedBuilding({
+  b,
+  excluded,
+  onToggle,
+  onOverride,
+  units,
+  zone,
+  weather,
+}: {
+  b: SiteBuilding;
+  excluded: boolean;
+  onToggle: () => void;
+  onOverride: (a: ArchetypeId | null) => void;
+  units: UnitSystem;
+  zone: ClimateZone;
+  weather: WeatherYear | null;
+}) {
+  // One simulation of a square metre; the archetype, vintage and zone decide it.
+  const check = useMemo(
+    () => (b.archetype && weather ? peakCheck({ archetype: b.archetype, zone, ...(b.vintage ? { vintage: b.vintage } : {}) }, weather) : null),
+    [b.archetype, b.vintage, zone, weather],
+  );
   return (
     <section className="card" aria-labelledby="selected-heading">
       <h2 id="selected-heading" className="card__heading">
@@ -213,6 +267,7 @@ function SelectedBuilding({ b, excluded, onToggle, onOverride, units }: { b: Sit
           <input type="checkbox" checked={!excluded} onChange={onToggle} /> {MAP_COPY.include}
         </label>
       )}
+      {check && <PeakCheckRows check={check} guessed={b.archetypeGuessed} units={units} />}
     </section>
   );
 }
@@ -322,6 +377,8 @@ export function SitePanel(props: SitePanelProps) {
               onToggle={() => props.onToggle(selected.id)}
               onOverride={(a) => props.onOverride(selected.id, a)}
               units={units}
+              zone={place.zone}
+              weather={state.weather}
             />
           )}
 

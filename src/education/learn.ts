@@ -19,6 +19,7 @@ import { SCOPE_STATEMENT } from '../config/copy';
 import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/classify';
 import { DESIGN_DIVERSITY } from '../engine/balance';
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
+import { RULE_OF_THUMB_W_PER_M2 } from '../engine/ruleOfThumb';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
@@ -86,6 +87,8 @@ export interface Formatters {
   readonly size: (tons: number) => string;
   /** A distance between places: miles in IP, km in SI. */
   readonly distance: (m: number) => string;
+  /** A peak load per floor area, from W/m²: Btu/h·ft² or ft²/ton in IP. */
+  readonly intensity: (kind: 'heatingIntensity' | 'coolingIntensity', wPerM2: number) => string;
 }
 
 export interface Fact {
@@ -193,6 +196,10 @@ export function sections(f: Formatters): Section[] {
         { text: 'In the coldest hours a network uses the plant that still runs. Heat left to electric backup adds to its winter peak.', refs: ['tool'] },
         { text: 'The ground over 25 years is shown and not scored. A challenge may require it.', refs: ['tool'] },
         { text: 'Annual loads match NLR’s building stock data. The hour-by-hour shape is this tool’s model.', refs: ['nlr', 'tool'] },
+        {
+          text: `The Site tab compares a selected building’s peak hour with rules of thumb: ${f.intensity('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling)} for cooling and ${f.intensity('heatingIntensity', RULE_OF_THUMB_W_PER_M2.heating)} for heating, the same for every building type. A peak is one hour, not an annual total. A rule of thumb is a check on a calculated load, not a design value.`,
+          refs: ['tool'],
+        },
         { text: 'Where OpenStreetMap has no building, this tool adds the footprints in FEMA USA Structures. Where OpenStreetMap records no use or storeys, it takes them from the National Structure Inventory, else from FEMA.', refs: ['osm', 'fema', 'nsi', 'tool'] },
         { text: 'The National Structure Inventory gives each structure the median year built of its census block group, not its own. This tool uses it as a guessed age.', refs: ['nsi', 'tool'] },
         { text: `${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, refs: ['tool'] },

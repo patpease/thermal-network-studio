@@ -64,7 +64,7 @@ describe('the tour is well formed', () => {
         const chart = /^(.*)-title$/.exec(s.focus)?.[1];
         expect(source.includes(`id="${s.focus}"`) || (chart !== undefined && source.includes(`id="${chart}"`))).toBe(true);
       }
-      if (s.learn) expect(sections({ temperature: String, density: String, densityRange: String, area: String, length: String, power: String, delta: String, size: String, distance: String } as never).some((x) => x.id === s.learn)).toBe(true);
+      if (s.learn) expect(sections({ temperature: String, density: String, densityRange: String, area: String, length: String, power: String, delta: String, size: String, distance: String, intensity: String } as never).some((x) => x.id === s.learn)).toBe(true);
     }
   });
 

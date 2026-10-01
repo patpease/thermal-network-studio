@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_UNITS, fromDisplay, LABELS, toDisplay } from '../src/units/units';
 import type { Quantity } from '../src/units/units';
 
-const QUANTITIES: Quantity[] = ['temperature', 'temperatureDelta', 'power', 'energy', 'area', 'length', 'powerLarge', 'energyLarge', 'density'];
+const QUANTITIES: Quantity[] = ['temperature', 'temperatureDelta', 'power', 'energy', 'area', 'length', 'powerLarge', 'energyLarge', 'density', 'heatingIntensity', 'coolingIntensity'];
 
 describe('units', () => {
   it('defaults to IP, because the tool is US-first', () => {
@@ -52,5 +52,20 @@ describe('units', () => {
       expect(LABELS.si[q]).toBeTruthy();
     }
     expect(LABELS.si.temperatureDelta).toBe('K');
+  });
+});
+
+describe('peak load per floor area', () => {
+  it('lands on the rules of thumb engineers write: 30 Btu/h·ft² and 400 ft²/ton', () => {
+    // 30 Btu/h·ft² and 400 ft²/ton (12,000 Btu/h over 400 ft²) are both 94.64 W/m².
+    expect(toDisplay('heatingIntensity', 94.637, 'ip')).toBeCloseTo(30, 2);
+    expect(toDisplay('coolingIntensity', 94.637, 'ip')).toBeCloseTo(400, 0);
+    expect(LABELS.ip.coolingIntensity).toBe('ft²/ton');
+    expect(LABELS.si.coolingIntensity).toBe('W/m²');
+  });
+
+  it('ft²/ton is a reciprocal: a bigger load prints a SMALLER number', () => {
+    expect(toDisplay('coolingIntensity', 200, 'ip')).toBeLessThan(toDisplay('coolingIntensity', 100, 'ip'));
+    expect(toDisplay('heatingIntensity', 200, 'ip')).toBeGreaterThan(toDisplay('heatingIntensity', 100, 'ip'));
   });
 });
