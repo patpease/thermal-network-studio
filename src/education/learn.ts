@@ -88,7 +88,7 @@ export interface Formatters {
   /** A distance between places: miles in IP, km in SI. */
   readonly distance: (m: number) => string;
   /** A peak load per floor area, from W/m²: Btu/h·ft² or ft²/ton in IP. */
-  readonly intensity: (kind: 'heatingIntensity' | 'coolingIntensity', wPerM2: number) => string;
+  readonly intensity: (kind: 'loadIntensity' | 'coolingIntensity', wPerM2: number) => string;
 }
 
 export interface Fact {
@@ -197,7 +197,7 @@ export function sections(f: Formatters): Section[] {
         { text: 'The ground over 25 years is shown and not scored. A challenge may require it.', refs: ['tool'] },
         { text: 'Annual loads match NLR’s building stock data. The hour-by-hour shape is this tool’s model.', refs: ['nlr', 'tool'] },
         {
-          text: `The Site tab compares a selected building’s peak hour with rules of thumb: ${f.intensity('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling)} for cooling and ${f.intensity('heatingIntensity', RULE_OF_THUMB_W_PER_M2.heating)} for heating, the same for every building type. A peak is one hour, not an annual total. A rule of thumb is a check on a calculated load, not a design value.`,
+          text: `The Site tab compares a selected building’s peak hour with rules of thumb: ${f.intensity('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling)} for cooling and ${f.intensity('loadIntensity', RULE_OF_THUMB_W_PER_M2.heating)} for heating, the same for every building type. A peak is one hour, not an annual total. A rule of thumb is a check on a calculated load, not a design value.`,
           refs: ['tool'],
         },
         { text: 'Where OpenStreetMap has no building, this tool adds the footprints in FEMA USA Structures. Where OpenStreetMap records no use or storeys, it takes them from the National Structure Inventory, else from FEMA.', refs: ['osm', 'fema', 'nsi', 'tool'] },

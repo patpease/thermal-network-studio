@@ -11,7 +11,7 @@ describe('the peak check against rules of thumb', () => {
   it('holds the rules as written and in canonical W/m²', () => {
     expect(RULE_OF_THUMB).toEqual({ coolingFt2PerTon: 400, heatingBtuhPerFt2: 30 });
     expect(toDisplay('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling, 'ip')).toBeCloseTo(400, 6);
-    expect(toDisplay('heatingIntensity', RULE_OF_THUMB_W_PER_M2.heating, 'ip')).toBeCloseTo(30, 6);
+    expect(toDisplay('loadIntensity', RULE_OF_THUMB_W_PER_M2.heating, 'ip')).toBeCloseTo(30, 6);
   });
 
   it('is the PEAK hour of space heating and cooling, not the annual sum and not hot water', () => {
@@ -36,5 +36,28 @@ describe('the peak check against rules of thumb', () => {
     const old = peakCheck({ archetype: 'single-family', zone: '5A', vintage: 'pre-1950' }, weather);
     const recent = peakCheck({ archetype: 'single-family', zone: '5A', vintage: '2000+' }, weather);
     expect(old.heatingWPerM2).toBeGreaterThan(recent.heatingWPerM2);
+  });
+});
+
+describe('the peak days', () => {
+  it('are the 24 hours of the day that holds each peak hour', () => {
+    const spec = { archetype: 'office-small', zone: '5A' } as const;
+    const loads = buildingLoads({ ...spec, floorArea: 1 }, weather);
+    const check = peakCheck(spec, weather);
+    for (const [day, series, peak] of [
+      [check.heatingDay!, loads.heating, check.heatingWPerM2],
+      [check.coolingDay!, loads.cooling, check.coolingWPerM2],
+    ] as const) {
+      expect(day.load).toHaveLength(24);
+      expect(day.outdoor).toHaveLength(24);
+      expect(day.load[day.peakHour]).toBe(peak);
+      expect(Math.max(...day.load)).toBe(peak);
+      expect(day.load).toEqual(Array.from(series.slice(day.day * 24, day.day * 24 + 24)));
+      expect(day.outdoor[day.peakHour]).toBe(weather.temperature[day.day * 24 + day.peakHour]);
+      expect(day.weekday).toBe((weather.firstWeekday + day.day) % 7);
+    }
+    // The 5A heating peak is a winter day; the cooling peak a summer one.
+    expect(check.heatingDay!.outdoor[check.heatingDay!.peakHour]!).toBeLessThan(0);
+    expect(check.coolingDay!.outdoor[check.coolingDay!.peakHour]!).toBeGreaterThan(20);
   });
 });

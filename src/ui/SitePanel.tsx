@@ -26,6 +26,7 @@ import { networkSize, percent, rangeWithUnit, sig, tonnes, withUnit } from './fo
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { peakCheck, RULE_OF_THUMB_W_PER_M2 } from '../engine/ruleOfThumb';
 import type { PeakCheck } from '../engine/ruleOfThumb';
+import { PeakDay } from '../charts/PeakDay';
 import type { WeatherYear } from '../loads/model';
 import type { ClimateZone } from '../loads/zones';
 import { draftArea } from './useSite';
@@ -189,7 +190,7 @@ function StructuresNote({ site, connected }: { site: Site; connected: readonly S
 /** The selected building's peak hour against the rules of thumb. Never scored. */
 function PeakCheckRows({ check, guessed, units }: { check: PeakCheck; guessed: boolean; units: UnitSystem }) {
   const c = MAP_COPY.peakCheck;
-  const rule = (kind: 'heatingIntensity' | 'coolingIntensity', w: number) => withUnit(kind, w, units);
+  const rule = (kind: 'loadIntensity' | 'coolingIntensity', w: number) => withUnit(kind, w, units);
   return (
     <div className="peak-check">
       <h3 id="peak-check-heading" className="card__subheading">
@@ -203,17 +204,33 @@ function PeakCheckRows({ check, guessed, units }: { check: PeakCheck; guessed: b
         />
         <Stat
           label={c.heating}
-          value={rule('heatingIntensity', check.heatingWPerM2)}
-          note={`${c.rule(rule('heatingIntensity', RULE_OF_THUMB_W_PER_M2.heating))} · ${c.compare(check.heatingRatio)}`}
+          value={rule('loadIntensity', check.heatingWPerM2)}
+          note={`${c.rule(rule('loadIntensity', RULE_OF_THUMB_W_PER_M2.heating))} · ${c.compare(check.heatingRatio)}`}
         />
       </div>
       <p className="card__note">
-        {c.note(rule('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling), rule('heatingIntensity', RULE_OF_THUMB_W_PER_M2.heating))}
+        {c.note(rule('coolingIntensity', RULE_OF_THUMB_W_PER_M2.cooling), rule('loadIntensity', RULE_OF_THUMB_W_PER_M2.heating))}
         {guessed && <> {c.guessed}</>}
       </p>
     </div>
   );
 }
+
+/** One simulation of a square metre; the archetype, vintage and zone decide it. */
+function usePeakCheck(b: SiteBuilding | undefined, zone: ClimateZone | null, weather: WeatherYear | null): PeakCheck | null {
+  const archetype = b?.archetype ?? null;
+  const vintage = b?.vintage ?? null;
+  return useMemo(
+    () => (archetype && zone && weather ? peakCheck({ archetype, zone, ...(vintage ? { vintage } : {}) }, weather) : null),
+    [archetype, vintage, zone, weather],
+  );
+}
+
+/** "Mankato Clinic · Outpatient clinic", or the type alone. */
+const buildingLabel = (b: SiteBuilding) => {
+  const type = ARCHETYPES.find((a) => a.id === b.archetype)?.label ?? '';
+  return b.name ? `${b.name} · ${type}` : type;
+};
 
 function SelectedBuilding({
   b,
@@ -221,22 +238,15 @@ function SelectedBuilding({
   onToggle,
   onOverride,
   units,
-  zone,
-  weather,
+  check,
 }: {
   b: SiteBuilding;
   excluded: boolean;
   onToggle: () => void;
   onOverride: (a: ArchetypeId | null) => void;
   units: UnitSystem;
-  zone: ClimateZone;
-  weather: WeatherYear | null;
+  check: PeakCheck | null;
 }) {
-  // One simulation of a square metre; the archetype, vintage and zone decide it.
-  const check = useMemo(
-    () => (b.archetype && weather ? peakCheck({ archetype: b.archetype, zone, ...(b.vintage ? { vintage: b.vintage } : {}) }, weather) : null),
-    [b.archetype, b.vintage, zone, weather],
-  );
   return (
     <section className="card" aria-labelledby="selected-heading">
       <h2 id="selected-heading" className="card__heading">
@@ -280,6 +290,8 @@ export function SitePanel(props: SitePanelProps) {
   const guessed = buildings.filter((b) => b.archetypeGuessed).length;
   const floor = buildings.reduce((s, b) => s + b.floorArea, 0);
   const selected = site && props.selectedId ? site.buildings.find((b) => b.id === props.selectedId) : undefined;
+  const chosen = selected ? effective(selected, selection) : undefined;
+  const check = usePeakCheck(chosen, place?.zone ?? null, state.weather);
   const metrics = result?.site ?? null;
   const scale = metrics ? scaleOf(metrics, buildings.length) : null;
 
@@ -372,15 +384,16 @@ export function SitePanel(props: SitePanelProps) {
 
           {selected && (
             <SelectedBuilding
-              b={effective(selected, selection)}
+              b={chosen!}
               excluded={selection.excluded.has(selected.id)}
               onToggle={() => props.onToggle(selected.id)}
               onOverride={(a) => props.onOverride(selected.id, a)}
               units={units}
-              zone={place.zone}
-              weather={state.weather}
+              check={check}
             />
           )}
+          {chosen && check?.heatingDay && <PeakDay kind="heating" day={check.heatingDay} building={buildingLabel(chosen)} units={units} />}
+          {chosen && check?.coolingDay && <PeakDay kind="cooling" day={check.coolingDay} building={buildingLabel(chosen)} units={units} />}
 
           {metrics && result && (
             <section className="card" aria-labelledby="metrics-heading">

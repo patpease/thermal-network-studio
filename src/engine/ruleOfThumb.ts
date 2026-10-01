@@ -33,6 +33,20 @@ export const RULE_OF_THUMB_W_PER_M2 = Object.freeze({
   heating: (RULE_OF_THUMB.heatingBtuhPerFt2 * W_PER_BTUH) / M2_PER_FT2,
 });
 
+/** The day of the year that holds a peak hour, hour by hour. */
+export interface PeakDay {
+  /** Day of the year, 0-based (a 365-day year). */
+  readonly day: number;
+  /** 0 = Monday, as the load model counts. */
+  readonly weekday: number;
+  /** Hour of the day of the peak, 0–23 (local standard time). */
+  readonly peakHour: number;
+  /** W per m² of conditioned floor, 24 values. */
+  readonly load: readonly number[];
+  /** Outdoor air, °C, 24 values. */
+  readonly outdoor: readonly number[];
+}
+
 export interface PeakCheck {
   /** Peak hour's space heating, W per m² of conditioned floor. */
   readonly heatingWPerM2: number;
@@ -41,6 +55,21 @@ export interface PeakCheck {
   /** Load against the rule's load: 1.2 is 20% above. Ratios of LOADS in both, never of ft²/ton. */
   readonly heatingRatio: number;
   readonly coolingRatio: number;
+  /** The peak heating and cooling days; null when the building never needs it. */
+  readonly heatingDay: PeakDay | null;
+  readonly coolingDay: PeakDay | null;
+}
+
+function dayOf(series: ArrayLike<number>, peakAt: number, weather: WeatherYear): PeakDay {
+  const day = Math.floor(peakAt / 24);
+  const hours = Array.from({ length: 24 }, (_, h) => day * 24 + h);
+  return {
+    day,
+    weekday: (weather.firstWeekday + day) % 7,
+    peakHour: peakAt % 24,
+    load: hours.map((h) => series[h]!),
+    outdoor: hours.map((h) => Number(weather.temperature[h])),
+  };
 }
 
 export function peakCheck(spec: Omit<BuildingSpec, 'floorArea' | 'retrofit'>, weather: WeatherYear): PeakCheck {
@@ -49,14 +78,24 @@ export function peakCheck(spec: Omit<BuildingSpec, 'floorArea' | 'retrofit'>, we
   const loads = buildingLoads({ ...spec, floorArea: 1 }, weather);
   let heating = 0;
   let cooling = 0;
+  let heatingAt = -1;
+  let coolingAt = -1;
   for (let h = 0; h < loads.heating.length; h++) {
-    if (loads.heating[h]! > heating) heating = loads.heating[h]!;
-    if (loads.cooling[h]! > cooling) cooling = loads.cooling[h]!;
+    if (loads.heating[h]! > heating) {
+      heating = loads.heating[h]!;
+      heatingAt = h;
+    }
+    if (loads.cooling[h]! > cooling) {
+      cooling = loads.cooling[h]!;
+      coolingAt = h;
+    }
   }
   return {
     heatingWPerM2: heating,
     coolingWPerM2: cooling,
     heatingRatio: heating / RULE_OF_THUMB_W_PER_M2.heating,
     coolingRatio: cooling / RULE_OF_THUMB_W_PER_M2.cooling,
+    heatingDay: heatingAt < 0 ? null : dayOf(loads.heating, heatingAt, weather),
+    coolingDay: coolingAt < 0 ? null : dayOf(loads.cooling, coolingAt, weather),
   };
 }

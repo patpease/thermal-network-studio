@@ -133,6 +133,8 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
       shows its peak hour of space heating and cooling per floor area
       against 400 ft²/ton and 30 Btu/h·ft² (`engine/ruleOfThumb.ts`). Peak,
       not annual; no hot water or refrigeration; as built. Never scored.
+      Two charts below it draw the peak heating day and the peak cooling day
+      hour by hour against the rule (`charts/PeakDay.tsx`).
 - [ ] **Rules of thumb per building type** — the owner will supply them;
       v1 uses one pair for every type.
 - [ ] **Morning start-up spike (found by the peak check)** — the 1R1C model

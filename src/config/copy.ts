@@ -103,6 +103,30 @@ export const MAP_COPY = {
   },
 } as const;
 
+/** The selected building's peak heating and peak cooling days. */
+export const PEAK_DAY_COPY = {
+  heating: {
+    title: 'Peak heating day, per floor area',
+    legendHour: 'Space heating, each hour',
+    column: 'Space heating',
+    tip: 'heating',
+  },
+  cooling: {
+    title: 'Peak cooling day, per floor area',
+    legendHour: 'Space cooling, each hour',
+    column: 'Space cooling',
+    tip: 'cooling',
+  },
+  legendPeak: 'The peak hour of the year',
+  subtitle: (building: string, when: string, peak: string, hour: string, outdoor: string) =>
+    `${building}. ${when}, the day of the year's peak hour: ${peak} at ${hour}, outdoor air ${outdoor}.`,
+  note: 'Space heating and cooling only, without hot water or refrigeration, for the building as built. Hours in local standard time. The line is the rule of thumb, the same for every building type.',
+  ruleLabel: 'rule of thumb',
+  peakHour: 'peak hour',
+  asFt2PerTon: 'the same',
+  outdoor: 'outdoor',
+} as const;
+
 export const DESIGN_COPY = {
   tabSite: 'Site',
   tabDesign: 'Design',

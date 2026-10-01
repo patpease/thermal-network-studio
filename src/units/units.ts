@@ -34,10 +34,11 @@ export type Quantity =
   /** Distances between places, canonical m: miles or kilometres. */
   | 'distance'
   /**
-   * Peak heating per floor area, canonical W/m²: Btu/h·ft² in IP, the unit
-   * engineers' rules of thumb are written in.
+   * A heating or cooling load per floor area, canonical W/m²: Btu/h·ft² in
+   * IP, the unit the heating rule of thumb is written in. Bars are drawn in
+   * this for BOTH heating and cooling, so a taller bar is always more load.
    */
-  | 'heatingIntensity'
+  | 'loadIntensity'
   /**
    * Peak cooling per floor area, canonical W/m². IP prints it as ft²/ton, a
    * RECIPROCAL: a bigger number is a smaller load. Converted here and nowhere
@@ -76,7 +77,7 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     density: 'billion Btu/mi²·yr',
     electricPower: 'kW',
     distance: 'mi',
-    heatingIntensity: 'Btu/h·ft²',
+    loadIntensity: 'Btu/h·ft²',
     coolingIntensity: 'ft²/ton',
   },
   si: {
@@ -91,7 +92,7 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     density: 'GWh/km²·yr',
     electricPower: 'kW',
     distance: 'km',
-    heatingIntensity: 'W/m²',
+    loadIntensity: 'W/m²',
     coolingIntensity: 'W/m²',
   },
 };
@@ -119,7 +120,7 @@ export function toDisplay(quantity: Quantity, si: number, units: UnitSystem): nu
       return si * MMBTU_PER_MWH;
     case 'density':
       return si * BILLION_BTU_PER_GWH * KM2_PER_MI2;
-    case 'heatingIntensity':
+    case 'loadIntensity':
       return (si * M2_PER_FT2) / W_PER_BTUH;
     case 'coolingIntensity':
       return W_PER_TON / (si * M2_PER_FT2);
@@ -149,7 +150,7 @@ export function fromDisplay(quantity: Quantity, shown: number, units: UnitSystem
       return shown / MMBTU_PER_MWH;
     case 'density':
       return shown / (BILLION_BTU_PER_GWH * KM2_PER_MI2);
-    case 'heatingIntensity':
+    case 'loadIntensity':
       return (shown * W_PER_BTUH) / M2_PER_FT2;
     case 'coolingIntensity':
       // The reciprocal is its own inverse.

@@ -634,7 +634,16 @@ Things that looked right and were not:
   from one m² of the archetype; never reaches the network or the score.
 - **ft²/ton is a reciprocal**: a bigger load prints a smaller number. It is
   the `coolingIntensity` quantity in `units.ts` (W/m² canonical), and every
-  comparison is a ratio of LOADS, never of ft²/ton figures.
+  comparison is a ratio of LOADS, never of ft²/ton figures. Bars and axes use
+  `loadIntensity` (Btu/h·ft², W/m²) for heating AND cooling, so a taller
+  column is always more load; ft²/ton appears only as the rule's label and
+  in the tooltip.
+- **Two peak-day charts follow the card** (`charts/PeakDay.tsx`): the 24
+  hours of the day holding the peak heating hour, and of the day holding the
+  peak cooling hour, per floor area — every hour a wash, the peak hour solid,
+  the rule of thumb a line labelled in the right margin. `peakCheck` returns
+  the days (`heatingDay`, `coolingDay`, null if never needed), with outdoor
+  air and the weekday. They show the start-up spike for what it is.
 - **It found the morning start-up spike** on its first run: scheduled
   commercial buildings peak in the one hour that recovers the night setback,
   3–5× the heating rule. That is the model's real peak, shown as it is; the
