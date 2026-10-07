@@ -14,7 +14,7 @@ import type { Place } from '../relay/relay';
 import { MAX_BUILDINGS } from '../site/classify';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site, SiteBuilding } from '../site/classify';
-import { STRUCTURES_ATTRIBUTION } from '../site/structures';
+import { sourceById, sourceLine } from '../config/sources';
 import { NETWORK_KIND_LABEL, NETWORK_SOURCES } from '../site/generated/networks';
 import { NEARBY_NETWORK_M, nearestNetwork, networksNear } from '../site/networks';
 import { centroid } from '../site/geometry';
@@ -162,7 +162,7 @@ function NetworksNearby({ at, units }: { at: LonLat; units: UnitSystem }) {
       )}
       <p className="attribution">
         {[...(sources.size ? sources : new Set(nearest ? [nearest.network.source] : []))]
-          .map((id) => NETWORK_SOURCES.find((s) => s.id === id)?.short)
+          .map((id) => (NETWORK_SOURCES.some((s) => s.id === id) ? `${sourceById(id).short} (${sourceById(id).licence})` : null))
           .filter(Boolean)
           .join(' · ')}
       </p>
@@ -215,6 +215,9 @@ function PeakCheckRows({ check, guessed, units }: { check: PeakCheck; guessed: b
     </div>
   );
 }
+
+/** The weather's credit with its year, unless the credit already names it (the tour's AMY2018). */
+const weatherCredit = (attribution: string, year: number) => (attribution.includes(String(year)) ? attribution : `${attribution}, ${year}`);
 
 /** One simulation of a square metre; the archetype, vintage and zone decide it. */
 function usePeakCheck(b: SiteBuilding | undefined, zone: ClimateZone | null, weather: WeatherYear | null): PeakCheck | null {
@@ -488,7 +491,8 @@ export function SitePanel(props: SitePanelProps) {
           </section>
 
           <p className="attribution">
-            {state.weather?.attribution} · © OpenStreetMap contributors{site.structures ? ` · ${STRUCTURES_ATTRIBUTION}` : ''} · {place.attribution} · Grid carbon: NLR Cambium 2023 · Loads calibrated to NLR ComStock™/ResStock™ · {sig(site.areaM2 / 1e6, 2)} km² drawn
+            {state.weather && weatherCredit(state.weather.attribution, state.weather.year)} · {sourceLine(site.structures ? ['osm', 'fema-structures', 'nsi'] : ['osm'])} · {place.attribution} ·{' '}
+            {sourceLine(['cambium', 'nlr-stock'])} · {sig(site.areaM2 / 1e6, 2)} km² drawn
           </p>
         </>
       )}

@@ -13,12 +13,16 @@
 import { awardFonts, download } from '../award/raster';
 import { BRAND } from '../config/branding';
 import { SCOPE_STATEMENT } from '../config/copy';
+import { sourceLine } from '../config/sources';
 import { escapeXml, monthYear } from '../award/graphic';
 import type { LegendItem } from './Chart';
 
 export const EXPORT_WIDTH = 1200;
 /** The width the chart is drawn at inside the export. */
 export const EXPORT_PLOT = 1104;
+
+/** The datasets every results chart draws on, credited on each export. */
+export const EXPORT_SOURCES = ['nlr-stock', 'cambium', 'open-meteo-weather', 'osm', 'fema-structures', 'nsi'] as const;
 
 const PROPS = [
   'fill',
@@ -142,13 +146,15 @@ export function composeChartSvg(input: {
   const scope = wrap(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, 128);
   const scopeLines = scope.map((line, i) => t(L, y + 30 + i * 21, 15, line, input.ink));
   const after = y + 30 + (scope.length - 1) * 21;
+  // Every dataset a results chart draws on, from the register, with its release.
+  const credits = wrap(`${sourceLine(EXPORT_SOURCES)}.`, 150);
   const footer = [
     `<line x1="${L}" y1="${y}" x2="${EXPORT_WIDTH - L}" y2="${y}" stroke="#D9DEE5" stroke-width="1.5"/>`,
     ...scopeLines,
-    t(L, after + 24, 13, 'Loads calibrated to NLR ComStock™ and ResStock™ · grid carbon NLR Cambium 2023 · buildings © OpenStreetMap contributors, FEMA USA Structures (CC BY 4.0), USACE NSI.', input.muted),
-    t(L, after + 48, 13, `${BRAND.appName} · ${BRAND.host} · ${monthYear(input.date)}`, input.muted),
+    ...credits.map((line, i) => t(L, after + 24 + i * 18, 13, line, input.muted)),
+    t(L, after + 30 + credits.length * 18, 13, `${BRAND.appName} · ${BRAND.host} · ${monthYear(input.date)}`, input.muted),
   ];
-  const height = after + 70;
+  const height = after + 52 + credits.length * 18;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${EXPORT_WIDTH}" height="${height}" viewBox="0 0 ${EXPORT_WIDTH} ${height}">
 <style>${face}</style>
 <rect width="${EXPORT_WIDTH}" height="${height}" fill="#FFFFFF"/>

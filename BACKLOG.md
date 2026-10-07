@@ -186,12 +186,16 @@ below. Numbered after 12; 11 and 12 ran out of order.
 
 Cross-cutting (before or with 13):
 
-- [ ] **One licence and attribution register** — each dataset's licence,
+- [x] **One licence and attribution register** (done 7 October 2026:
+      `src/config/sources.ts`, shown under "Data sources" in Learn's
+      references card; Site panel, chart exports and the award read their
+      lines from it; `tests/sources.test.ts`). Was: each dataset's licence,
       attribution text and share-alike duty, generated into the Learn tab and
       a footer link, with a test that every data source the app loads is in it.
 - [ ] **A refresh schedule per source** — annual, quarterly, four-yearly or
       static, with the command that refreshes each.
-- [ ] **Data-vintage labels** — every layer and card that shows a dataset
+- [x] **Data-vintage labels** (done with the register: every entry has a
+      release, and every attribution line prints it) — every layer and card that shows a dataset
       says which release it is ("Hotmaps — static, 2015 base year").
 
 ## Phases 13–17 plan

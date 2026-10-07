@@ -91,7 +91,7 @@ const DAY = 86400;
 export const CACHE = { place: 30 * DAY, site: 365 * DAY, weather: 30 * DAY, buildings: 7 * DAY } as const;
 
 export const ATTRIBUTION = {
-  weather: 'Weather © Open-Meteo (ERA5), CC BY 4.0',
+  weather: 'Weather by Open-Meteo.com (ERA5, Copernicus), CC BY 4.0',
   osm: '© OpenStreetMap contributors, ODbL',
   census: 'County from the U.S. Census Bureau geocoder',
   structures: STRUCTURES_ATTRIBUTION,

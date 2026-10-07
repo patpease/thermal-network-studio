@@ -1164,6 +1164,44 @@ a.button {
   color: var(--ink);
 }
 
+/* The data source register, inside the references card. */
+.learn__sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.learn__sources > li + li {
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
+}
+
+.learn__source-name {
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+}
+
+.learn__source-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.15rem 0.6rem;
+  margin: 0;
+}
+
+.learn__source-facts dt {
+  color: var(--ink-faint);
+}
+
+.learn__source-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .challenge__site {
   border-left: 3px solid var(--border-strong);
   padding-left: 0.5rem;

@@ -20,6 +20,7 @@ import type { LonLat, Ring } from '../site/geometry';
 import { metresPerDegree } from '../site/geometry';
 import { MARK_STANDARD, markInner } from '../brand/mark';
 import { SCOPE_STATEMENT } from '../config/copy';
+import { sourceLine } from '../config/sources';
 import { ICON_BLUE, ICON_GREEN, ICON_INK, ICON_ORANGE, ICONS } from './icons';
 
 export const AWARD_WIDTH = 1080;
@@ -258,7 +259,7 @@ ${t(W - L - thumbW - 28, stripTop + 118, 18, 'than the buildings today', { fill:
 ${outlineMarkup(input.outline, W - L - thumbW, stripTop, thumbW, stripH)}
 <line x1="${L}" y1="1222" x2="${W - L}" y2="1222" stroke="${C.rule}" stroke-width="2"/>
 ${t(L, 1258, 26, input.url, { weight: 500, fill: C.accent, family: mono })}
-${wrapLines(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis} Buildings © OpenStreetMap contributors, FEMA USA Structures (CC BY 4.0), USACE NSI.`, 128)
+${wrapLines(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis} Buildings ${sourceLine(['osm', 'fema-structures', 'nsi'])}.`, 128)
   .map((line, i) => t(L, 1284 + i * 19, 15, line, { fill: C.muted }))
   .join('\n')}
 </svg>`;

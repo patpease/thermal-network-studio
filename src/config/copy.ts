@@ -261,6 +261,9 @@ export const LEARN_COPY = {
   notEndorsed: 'Sources are cited for the facts taken from them. None of these organizations reviewed or endorses this tool.',
   thisSite: 'This site',
   references: 'References',
+  dataSources: 'Data sources',
+  dataNote: 'Every dataset this tool loads, with its licence, the credit it asks for, the release used and how it is updated.',
+  labels: { licence: 'Licence', shareAlike: 'Share-alike: a database made from it carries the same licence.', release: 'Release', updated: 'Updated', credit: 'Credit', use: 'Used for' },
 } as const;
 
 export const SCALE_COPY = {

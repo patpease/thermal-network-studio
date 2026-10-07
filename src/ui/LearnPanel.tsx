@@ -4,6 +4,7 @@
  * a site is drawn, its own facts come first.
  */
 import { LEARN_COPY } from '../config/copy';
+import { DATA_SOURCES } from '../config/sources';
 import type { SiteMetrics } from '../engine/demand';
 import { REFERENCES, sections, siteFacts } from '../education/learn';
 import type { Fact, Formatters, RefId } from '../education/learn';
@@ -87,6 +88,43 @@ export function LearnPanel({ site, metrics, units }: { site: Site | null; metric
             </li>
           ))}
         </ol>
+        <h3 id="learn-data" className="card__subheading">
+          {LEARN_COPY.dataSources}
+        </h3>
+        <p className="card__note">{LEARN_COPY.dataNote}</p>
+        <ul className="learn__sources" aria-labelledby="learn-data">
+          {DATA_SOURCES.map((s) => (
+            <li key={s.id} id={`data-${s.id}`}>
+              <p className="learn__source-name">
+                <strong>{s.name}</strong> · {s.publisher}{' '}
+                <a href={s.url} target="_blank" rel="noopener noreferrer">
+                  Link
+                </a>
+              </p>
+              <dl className="learn__source-facts">
+                <dt>{LEARN_COPY.labels.use}</dt>
+                <dd>{s.use}</dd>
+                <dt>{LEARN_COPY.labels.licence}</dt>
+                <dd>
+                  {s.licenceUrl ? (
+                    <a href={s.licenceUrl} target="_blank" rel="noopener noreferrer">
+                      {s.licence}
+                    </a>
+                  ) : (
+                    s.licence
+                  )}
+                  {s.shareAlike && <> {LEARN_COPY.labels.shareAlike}</>}
+                </dd>
+                <dt>{LEARN_COPY.labels.release}</dt>
+                <dd>{s.vintage}</dd>
+                <dt>{LEARN_COPY.labels.updated}</dt>
+                <dd>{s.refresh}</dd>
+                <dt>{LEARN_COPY.labels.credit}</dt>
+                <dd>{s.attribution}</dd>
+              </dl>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

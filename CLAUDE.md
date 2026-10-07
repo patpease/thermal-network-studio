@@ -649,6 +649,25 @@ Things that looked right and were not:
   3–5× the heating rule. That is the model's real peak, shown as it is; the
   fix is on the backlog for the owner to decide.
 
+## Data sources: the register
+
+- **`src/config/sources.ts` lists every dataset the tool loads**: licence,
+  the credit it asks for, share-alike, the release used (vintage), how it is
+  refreshed, and the hosts or generated files it comes through. Learn's
+  references card shows it under "Data sources"; the Site panel line, chart
+  exports (`EXPORT_SOURCES`) and the award build their credits with
+  `sourceLine`, so a release changes in one place.
+- **`tests/sources.test.ts` fails if a relay host, the tile host or a file
+  under `src/**/generated/` has no entry**, or an entry has no licence,
+  credit or release. A new source cannot ship without its licence written
+  down. Existing-network sources join from `sources.json` automatically.
+- **Where a release is not known, the entry says so** (NSI's API names none;
+  the EPA factors' edition was never recorded) — never a plausible guess.
+- Credits the licences ask for, checked October 2026: NLR's ComStock and
+  ResStock sentence (CC BY 4.0); **Cambium is not CC BY** — NREL's own
+  licence, credit "DOE/NREL/ALLIANCE"; Open-Meteo is CC BY 4.0 and ERA5
+  carries the Copernicus line, now in the relay's weather credit.
+
 ## The guided tour
 
 - **"Take the tour" in the header** runs 13 steps through downtown Mankato

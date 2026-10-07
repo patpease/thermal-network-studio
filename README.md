@@ -62,4 +62,4 @@ npm run dev:fixtures     # offline: the relay answers from committed fixtures
 
 ## Licence
 
-MIT. Map data © OpenStreetMap contributors, ODbL. Basemap © OpenFreeMap / OpenMapTiles. Load calibration from NLR ComStock™/ResStock™.
+MIT. Map data © OpenStreetMap contributors, ODbL. Basemap © OpenFreeMap / OpenMapTiles. Load calibration from NLR ComStock™/ResStock™. Every dataset, its licence, credit and release is listed in `src/config/sources.ts` and on the Learn tab under Data sources.

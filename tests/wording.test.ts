@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CHALLENGES } from '../src/challenges/challenges';
 import * as COPY from '../src/config/copy';
+import { DATA_SOURCES } from '../src/config/sources';
 import { tourText } from '../src/education/tour';
 
 /**
@@ -19,7 +20,7 @@ function strings(value: unknown): string[] {
 }
 
 describe('wording', () => {
-  const all = [...strings(COPY), ...CHALLENGES.flatMap((c) => [c.brief, c.idea]), ...tourText({ temperature: (c) => `${c} °C` })];
+  const all = [...strings(COPY), ...CHALLENGES.flatMap((c) => [c.brief, c.idea]), ...tourText({ temperature: (c) => `${c} °C` }), ...DATA_SOURCES.flatMap((d) => [d.use, d.vintage, d.refresh])];
 
   it('covers a real amount of text', () => {
     expect(all.length).toBeGreaterThan(80);
