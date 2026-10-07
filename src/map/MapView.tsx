@@ -94,6 +94,7 @@ function buildingData(site: Site | null, selection: Selection, selectedId: strin
           sector: b.archetype && RESIDENTIAL.has(b.archetype) ? 'home' : 'work',
           guessed: b.archetypeGuessed,
           selected: b.id === selectedId,
+          steam: b.steam,
         },
         geometry: { type: 'Polygon', coordinates: [b.footprint.map((p) => [p[0], p[1]])] },
       };
@@ -202,6 +203,14 @@ function withOverlays(p: MapPalette): StyleSpecification {
           'line-color': ['case', ['get', 'selected'], p.ink, ['match', ['get', 'state'], 'connected', ['match', ['get', 'sector'], 'home', p.home, p.work], p.excluded]],
           'line-width': ['case', ['get', 'selected'], 2.5, 1],
         },
+      },
+      {
+        // On district steam today (NYC LL84, phase 14): a heat-coloured outline.
+        id: 'site-building-steam',
+        type: 'line',
+        source: 'buildings',
+        filter: ['get', 'steam'],
+        paint: { 'line-color': p.heat, 'line-width': 2.5 },
       },
       {
         // Dashed outline for guessed buildings: a second line layer, because

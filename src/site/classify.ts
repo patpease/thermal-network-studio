@@ -23,12 +23,13 @@
  */
 import type { ArchetypeId } from '../loads/archetypes.ts';
 import type { VintageBand } from '../loads/zones.ts';
-import { bbox, centroid, distance, lineCrossesRing, pointInRing, ringArea } from './geometry.ts';
+import { bbox, centroid, distance, distanceToRing, lineCrossesRing, pointInRing, ringArea } from './geometry.ts';
 import type { LonLat, Ring } from './geometry.ts';
 import { SOURCE_SEARCH_M } from './osm.ts';
 import type { OsmFeature, SiteData } from './osm.ts';
 import type { FemaStructure, NsiStructure } from './structures.ts';
 import { wastewaterCapacityW } from './wastewater.ts';
+import { LL84_MIN_FLOOR_M2 } from './steam.ts';
 
 /** D11: the most buildings a network may connect. */
 export const MAX_BUILDINGS = 500;
@@ -73,6 +74,11 @@ export interface SiteBuilding {
    * features, never modelled (this tool has no exhaust or process model).
    */
   readonly industrial: boolean;
+  /**
+   * NYC LL84 reports district steam use for a property whose point lies in
+   * this footprint (phase 14). How it is heated today; never a load.
+   */
+  readonly steam: boolean;
   /** Where the footprint came from: OSM, or a FEMA structure OSM does not have. */
   readonly origin: 'osm' | 'fema';
   /** Where the levels came from. Anything but 'osm' is guessed. */
@@ -134,6 +140,12 @@ export interface Site {
   readonly structures?: { readonly fema: boolean; readonly nsi: boolean; readonly femaTruncated: boolean };
   /** OpenStreetMap did not answer: buildings are federal data alone. */
   readonly osmUnavailable?: true;
+  /**
+   * NYC district steam (phase 14), when the site was read in New York City:
+   * the LL84 report year, buildings flagged, and steam properties inside the
+   * boundary whose point fell on no footprint.
+   */
+  readonly steam?: { readonly year: number | null; readonly buildings: number; readonly unmatched: number };
 }
 
 // --------------------------------------------------------------- archetypes
@@ -499,6 +511,9 @@ function sourceKind(t: Readonly<Record<string, string>>): SourceKindFound | null
   return null;
 }
 
+/** An LL84 address point this close to a footprint belongs to it (phase 14). */
+export const STEAM_MATCH_M = 20;
+
 /** An OSM wastewater plant and a CWNS point this close are the same plant. */
 export const CWNS_MATCH_M = 150;
 
@@ -642,6 +657,7 @@ export function classifySite(data: SiteData): Site {
       anchor: anchor ?? fedAnchor?.anchor ?? null,
       anchorSource: anchor ? 'osm' : (fedAnchor?.source ?? null),
       industrial: federalIndustrial(fed.fema, nsiOcc),
+      steam: false,
       origin: 'osm',
       levelsSource,
       vintageSource: osmVintage ? 'osm' : medianYear !== null ? 'nsi-median' : null,
@@ -682,6 +698,7 @@ export function classifySite(data: SiteData): Site {
       anchor: fedAnchor?.anchor ?? null,
       anchorSource: fedAnchor?.source ?? null,
       industrial: federalIndustrial(s, nsiOcc),
+      steam: false,
       origin: 'fema',
       levelsSource: fl?.source ?? 'default',
       vintageSource: medianYear !== null ? 'nsi-median' : null,
@@ -758,6 +775,38 @@ export function classifySite(data: SiteData): Site {
     (b, i) => barriers.findIndex((o) => o.kind === b.kind && o.name === b.name) === i,
   );
 
+  // NYC district steam (phase 14): a property's point inside a footprint
+  // flags that building. LL84 points are address points, often on the
+  // street frontage (4–17 m off the footprint across Midtown), so a point on
+  // no footprint takes the nearest within STEAM_MATCH_M that could be an
+  // LL84 property — heated, with at least half LL84's floor-area threshold,
+  // so a small neighbour on the same frontage is never flagged. Farther ones
+  // are counted, never forced.
+  let steamSummary: Site['steam'];
+  if (data.steam) {
+    let matched = 0;
+    let unmatched = 0;
+    for (const p of data.steam.steam) {
+      if (!pointInRing(p.at, boundary)) continue;
+      let i = buildings.findIndex((b) => pointInRing(p.at, b.footprint));
+      if (i < 0) {
+        let best = STEAM_MATCH_M;
+        buildings.forEach((b, j) => {
+          if (!b.archetype || b.floorArea < LL84_MIN_FLOOR_M2 / 2) return;
+          const d = distanceToRing(p.at, b.footprint);
+          if (d <= best) [best, i] = [d, j];
+        });
+      }
+      if (i < 0) {
+        unmatched++;
+        continue;
+      }
+      if (!buildings[i]!.steam) matched++;
+      buildings[i] = { ...buildings[i]!, steam: true };
+    }
+    steamSummary = { year: data.steam.year, buildings: matched, unmatched };
+  }
+
   sources.sort((a, b) => a.distanceM - b.distanceM);
   return {
     placeName: neighbourhoodName(data.features, boundary),
@@ -769,6 +818,7 @@ export function classifySite(data: SiteData): Site {
     openSpaceM2: Math.round(openSpace),
     skipped: data.skipped,
     ...(data.osmUnavailable ? { osmUnavailable: true as const } : {}),
+    ...(steamSummary ? { steam: steamSummary } : {}),
     ...(data.structures
       ? { structures: { fema: data.structures.fema !== null, nsi: data.structures.nsi !== null, femaTruncated: Boolean(data.structures.femaTruncated) } }
       : {}),

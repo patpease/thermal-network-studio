@@ -6,7 +6,7 @@ import { defineConfig } from 'vite';
 import type { Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
-import { handleBuildings, handlePlace, handleSite, handleWeather, isAllowedHost, PATHS, siteForCounty } from './src/relay/relay';
+import { handleBuildings, handlePlace, handleSite, handleSteam, handleWeather, isAllowedHost, PATHS, siteForCounty } from './src/relay/relay';
 import type { Fetcher, RelayResult } from './src/relay/relay';
 import { centroid, pointInRing } from './src/site/geometry';
 import type { Ring } from './src/site/geometry';
@@ -50,6 +50,7 @@ function relay(): Plugin {
         else if (url.pathname === PATHS.site) result = await handleSite(url.searchParams, pinned);
         else if (url.pathname === PATHS.weather) result = await handleWeather(url.searchParams, pinned);
         else if (url.pathname === PATHS.buildings && req.method === 'POST') result = await handleBuildings(safeJson(body), pinned);
+        else if (url.pathname === PATHS.steam) result = await handleSteam(url.searchParams, pinned);
         else result = { status: 404, body: { message: 'Not found.' } };
 
         res.statusCode = result.status;
@@ -125,6 +126,8 @@ function fixtureAnswer(url: URL, body: string): RelayResult {
       body: { site: { ...data, boundary, structures: federal.structures }, attribution: '© OpenStreetMap contributors, ODbL; FEMA USA Structures, NSI (fixture)' },
     };
   }
+  // The fixture sites are in Minnesota: no New York steam.
+  if (url.pathname === PATHS.steam) return { status: 200, body: { steam: null } };
   return { status: 404, body: { message: 'Not found.' } };
 }
 

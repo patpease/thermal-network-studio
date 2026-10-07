@@ -1,0 +1,2041 @@
+{
+"box": [
+-73.987,
+40.752,
+-73.982,
+40.7565
+],
+"retrieved": "2026-10-07",
+"rows": [
+{
+"property_id": "47813194",
+"property_name": "Bryant Park Studios",
+"address_1": "80 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753334",
+"longitude": "-73.984541",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "45909994",
+"property_name": "32 West 39th Street",
+"address_1": "32 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752072",
+"longitude": "-73.983466",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "33874891",
+"property_name": "Club Quarters- Park Terrace",
+"address_1": "16 WEST 40 STREET",
+"primary_property_type": "Hotel",
+"latitude": "40.752505",
+"longitude": "-73.982574",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "33869335",
+"property_name": "32 WEST 40 STREET",
+"address_1": "32 WEST 40 STREET",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752747",
+"longitude": "-73.983148",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "31556287",
+"property_name": "Skyline Developers - 1050 Avenue Of The Americas",
+"address_1": "1050 Avenue Of The Americas",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.753266",
+"longitude": "-73.985238",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "31555816",
+"property_name": "Skyline Developers - 1040 Avenue Of The Americas",
+"address_1": "1040 Avenue Of The Americas",
+"primary_property_type": "Office",
+"latitude": "40.753024",
+"longitude": "-73.985411",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "31273318",
+"property_name": "New York NY GRAY",
+"address_1": "30 West 39th St",
+"primary_property_type": "Hotel",
+"latitude": "40.752053",
+"longitude": "-73.983419",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "26656143",
+"property_name": "Hilton Garden Inn Times Square (136 WEST 42 STREET)",
+"address_1": "136 WEST 42 STREET",
+"primary_property_type": "Hotel",
+"latitude": "40.755338",
+"longitude": "-73.985313",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "25671355",
+"property_name": "1460 BROADWAY - [1460 Broadway]",
+"address_1": "1460 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754946",
+"longitude": "-73.986161",
+"district_steam_use_kbtu": "3368071",
+"report_year": "2024"
+},
+{
+"property_id": "24222800",
+"property_name": "37 West 39th Street",
+"address_1": "37 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752138",
+"longitude": "-73.983578",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "22156267",
+"property_name": "Hippodrome (1120 6 AVENUE)",
+"address_1": "1120 6 AVENUE",
+"primary_property_type": "Office",
+"latitude": "40.755651",
+"longitude": "-73.983516",
+"district_steam_use_kbtu": "25257398.4",
+"report_year": "2024"
+},
+{
+"property_id": "21354958",
+"property_name": "DPR_5579_Bryant Park Comfort Station (40th St)",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "21354957",
+"property_name": "DPR_5223_Bryant Park Comfort Station (42nd St)",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "21354956",
+"property_name": "Benchmarking Group - 72",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "19466816",
+"property_name": "123 West 43 Street",
+"address_1": "123 West 43 Street",
+"primary_property_type": "Performing Arts",
+"latitude": "40.755843",
+"longitude": "-73.984382",
+"district_steam_use_kbtu": "2647504.1",
+"report_year": "2024"
+},
+{
+"property_id": "15527630",
+"property_name": "1021 Sixth Avenue",
+"address_1": "1021 Sixth Avenue",
+"primary_property_type": "Hotel",
+"latitude": "40.752412",
+"longitude": "-73.985888",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "15527620",
+"property_name": "114 West 40th Street",
+"address_1": "117 West 39th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.753313",
+"longitude": "-73.98636",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "13450382",
+"property_name": "Bryant Park Hotel - 40 West 40th Street",
+"address_1": "40 West 40th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.75306",
+"longitude": "-73.983892",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "11857843",
+"property_name": "130 W 42 St",
+"address_1": "130 West 42nd Street",
+"primary_property_type": "Office",
+"latitude": "40.755278",
+"longitude": "-73.985172",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "10791219",
+"property_name": "25 WEST 39 STREET - [25 West 39th Street]",
+"address_1": "25 WEST 39 STREET",
+"primary_property_type": "Office",
+"latitude": "40.752022",
+"longitude": "-73.983304",
+"district_steam_use_kbtu": "6254482.5",
+"report_year": "2024"
+},
+{
+"property_id": "10550269",
+"property_name": "1030 6th Avenue",
+"address_1": "1030 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.752646",
+"longitude": "-73.985689",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "7732937",
+"property_name": "147 W 43rd St",
+"address_1": "147 W 43rd St",
+"primary_property_type": "Hotel",
+"latitude": "40.756022",
+"longitude": "-73.984808",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "6787535",
+"property_name": "5 Bryant Park",
+"address_1": "5 Bryant Park",
+"primary_property_type": "Office",
+"latitude": "40.753944",
+"longitude": "-73.985949",
+"district_steam_use_kbtu": "13808287.9",
+"report_year": "2024"
+},
+{
+"property_id": "6782066",
+"property_name": "LUMA Hotel",
+"address_1": "120 West 41st Street",
+"primary_property_type": "Hotel",
+"latitude": "40.754529",
+"longitude": "-73.985458",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "6705248",
+"property_name": "1440 Broadway",
+"address_1": "1440 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754611",
+"longitude": "-73.986761",
+"district_steam_use_kbtu": "9530129.3",
+"report_year": "2024"
+},
+{
+"property_id": "6683607",
+"property_name": "First Pioneer-102 West 38th Street",
+"address_1": "102 WEST 38 STREET",
+"primary_property_type": "Office",
+"latitude": "40.752426",
+"longitude": "-73.986227",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "6387489",
+"property_name": "Belasco Theatre",
+"address_1": "111 West 44 Street",
+"primary_property_type": "Performing Arts",
+"latitude": "40.756395",
+"longitude": "-73.98375",
+"district_steam_use_kbtu": "681332.2",
+"report_year": "2024"
+},
+{
+"property_id": "6284170",
+"property_name": "3 Times Square Associates LLC",
+"address_1": "3 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.756376",
+"longitude": "-73.986713",
+"district_steam_use_kbtu": "6421415.7",
+"report_year": "2024"
+},
+{
+"property_id": "6282965",
+"property_name": "Victorian: 54 W 39th St",
+"address_1": "54 W 39th St",
+"primary_property_type": "Office",
+"latitude": "40.752289",
+"longitude": "-73.983982",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "6282926",
+"property_name": "SKS: 120 W 44th St",
+"address_1": "120 W 44th St",
+"primary_property_type": "Hotel",
+"latitude": "40.756461",
+"longitude": "-73.983952",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "6269269",
+"property_name": "16 West 40th Street",
+"address_1": "16 West 40th Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752505",
+"longitude": "-73.982574",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "6254501",
+"property_name": "Allied Partners - 54 West 40 Street",
+"address_1": "54 West 40 Street",
+"primary_property_type": "Office",
+"latitude": "40.753156",
+"longitude": "-73.984119",
+"district_steam_use_kbtu": "0",
+"report_year": "2024"
+},
+{
+"property_id": "6233890",
+"property_name": "1140 Avenue Of Americas",
+"address_1": "1140 Avenue of Americas",
+"primary_property_type": "Office",
+"latitude": "40.75623",
+"longitude": "-73.98309",
+"district_steam_use_kbtu": "4851711.6",
+"report_year": "2024"
+},
+{
+"property_id": "5814658",
+"property_name": "7 Bryant Park (1045 SIXTH AVE)",
+"address_1": "1045 SIXTH AVENUE",
+"primary_property_type": "Financial Office",
+"latitude": "40.753129",
+"longitude": "-73.985361",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "4947679",
+"property_name": "114 West 41st Street (115 WEST 40 ST)",
+"address_1": "115 WEST 40 STREET",
+"primary_property_type": "Office",
+"latitude": "40.753908",
+"longitude": "-73.985869",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "4936637",
+"property_name": "24 West 40th",
+"address_1": "24 West 40th St.",
+"primary_property_type": "Office",
+"latitude": "40.752626",
+"longitude": "-73.982859",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "4624800",
+"property_name": "3 Bryant Park (100 WEST 42 STREET)",
+"address_1": "100 WEST 42 STREET",
+"primary_property_type": "Office",
+"latitude": "40.754979",
+"longitude": "-73.984469",
+"district_steam_use_kbtu": "36782278.4",
+"report_year": "2024"
+},
+{
+"property_id": "4580494",
+"property_name": "109 West 38th LLC",
+"address_1": "109 West 38th Street",
+"primary_property_type": "Office",
+"latitude": "40.752544",
+"longitude": "-73.986462",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "4389732",
+"property_name": "AKA Times Square",
+"address_1": "123 W. 44Th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.756491",
+"longitude": "-73.983977",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "4351763",
+"property_name": "127 West 43 Street",
+"address_1": "127 West 43 Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.755873",
+"longitude": "-73.984454",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "3582683",
+"property_name": "452 Fifth Ave - LL84",
+"address_1": "452 5TH AVENUE",
+"primary_property_type": "Office",
+"latitude": "40.752335",
+"longitude": "-73.982416",
+"district_steam_use_kbtu": "11067747.4",
+"report_year": "2024"
+},
+{
+"property_id": "3544491",
+"property_name": "1450 Broadway",
+"address_1": "1450 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754927",
+"longitude": "-73.98666",
+"district_steam_use_kbtu": "4087838.3",
+"report_year": "2024"
+},
+{
+"property_id": "3518896",
+"property_name": "66-70 West 40th Street",
+"address_1": "66-70 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753238",
+"longitude": "-73.984314",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "3518601",
+"property_name": "58-64 West 40",
+"address_1": "58-64 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753183",
+"longitude": "-73.984184",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "2955754",
+"property_name": "141 West 43rd Street",
+"address_1": "141 West 43 Street",
+"primary_property_type": "Parking",
+"latitude": "40.755978",
+"longitude": "-73.984699",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "2796315",
+"property_name": "Allied Partners - 50 W 40th St",
+"address_1": "50 W 40th St",
+"primary_property_type": "Office",
+"latitude": "40.753129",
+"longitude": "-73.984054",
+"district_steam_use_kbtu": "2399474.3",
+"report_year": "2024"
+},
+{
+"property_id": "2725649",
+"property_name": "One Bryant Park",
+"address_1": "One Bryant Park",
+"primary_property_type": "Financial Office",
+"latitude": "40.755355",
+"longitude": "-73.984248",
+"district_steam_use_kbtu": "49561089.7",
+"report_year": "2024"
+},
+{
+"property_id": "2705511",
+"property_name": "URA Group - 108 West 39th Street",
+"address_1": "108 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.753173",
+"longitude": "-73.986075",
+"district_steam_use_kbtu": "1876979.8",
+"report_year": "2024"
+},
+{
+"property_id": "2683362",
+"property_name": "55 W. 39th St.",
+"address_1": "55 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752313",
+"longitude": "-73.983993",
+"district_steam_use_kbtu": "3634511.8",
+"report_year": "2024"
+},
+{
+"property_id": "2682107",
+"property_name": "1430 Broadway",
+"address_1": "1430 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754158",
+"longitude": "-73.986905",
+"district_steam_use_kbtu": "17953294.5",
+"report_year": "2024"
+},
+{
+"property_id": "2676296",
+"property_name": "Bryant Park Tower Condominium-Residential (100 W 39th street)",
+"address_1": "100 W 39th street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.75303",
+"longitude": "-73.985732",
+"district_steam_use_kbtu": "0",
+"report_year": "2024"
+},
+{
+"property_id": "2676191",
+"property_name": "1441 Broadway ENT",
+"address_1": "1441 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754707",
+"longitude": "-73.986753",
+"district_steam_use_kbtu": "3256014",
+"report_year": "2024"
+},
+{
+"property_id": "60572118",
+"property_name": "CUNY > GCC_340_Guttman Community College",
+"address_1": "50 West 40th St",
+"primary_property_type": "College/University",
+"latitude": "40.753129",
+"longitude": "-73.984054",
+"district_steam_use_kbtu": "2442888.1",
+"report_year": "2024"
+},
+{
+"property_id": "60229092",
+"property_name": "1030 6th Avenue - 1080738",
+"address_1": "1030 6th Avenue",
+"primary_property_type": "Retail Store",
+"latitude": "40.752646",
+"longitude": "-73.985689",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "60228992",
+"property_name": "1030 6th Avenue - 1080737",
+"address_1": "1030 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.752646",
+"longitude": "-73.985689",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "2642032",
+"property_name": "80 West 40th Street LLC",
+"address_1": "80 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753334",
+"longitude": "-73.984541",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "60228892",
+"property_name": "1030 6th Avenue - 1080741",
+"address_1": "1030 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.752646",
+"longitude": "-73.985689",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "59893092",
+"property_name": "3 Bryant Park - Annex",
+"address_1": "100 WEST 42 STREET",
+"primary_property_type": "Restaurant",
+"latitude": "40.754979",
+"longitude": "-73.984469",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "59891993",
+"property_name": "3 Bryant Park - Main",
+"address_1": "100 WEST 42 STREET",
+"primary_property_type": "Office",
+"latitude": "40.754979",
+"longitude": "-73.984469",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "53898492",
+"property_name": "The Knickerbocker Hotel",
+"address_1": "1462 BROADWAY",
+"primary_property_type": "Hotel",
+"latitude": "40.755448",
+"longitude": "-73.986501",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "53176894",
+"property_name": "1440 Broadway",
+"address_1": "1440 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754611",
+"longitude": "-73.986761",
+"district_steam_use_kbtu": "9530149.8",
+"report_year": "2024"
+},
+{
+"property_id": "11809",
+"property_name": "151",
+"address_1": "4 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.756181",
+"longitude": "-73.986244",
+"district_steam_use_kbtu": "7638053.8",
+"report_year": "2024"
+},
+{
+"property_id": "1151970",
+"property_name": "1133",
+"address_1": "1133 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.755942",
+"longitude": "-73.983324",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "1261465",
+"property_name": "Grace Building (1110 6 AVENUE)",
+"address_1": "1110 6 AVENUE",
+"primary_property_type": "Office",
+"latitude": "40.755234",
+"longitude": "-73.983819",
+"district_steam_use_kbtu": "55172922.7",
+"report_year": "2024"
+},
+{
+"property_id": "1327499",
+"property_name": "7 Times Square",
+"address_1": "7 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.755915",
+"longitude": "-73.986681",
+"district_steam_use_kbtu": "12707741.9",
+"report_year": "2024"
+},
+{
+"property_id": "1836392",
+"property_name": "M896 (OECID: 0101380; BBL: 1009960021)",
+"address_1": "123 West 43rd Street",
+"primary_property_type": "K-12 School",
+"latitude": "40.755843",
+"longitude": "-73.984382",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "1845637",
+"property_name": "AB 40th Street LLC (6 WEST 40 STREET)",
+"address_1": "6 WEST 40 STREET",
+"primary_property_type": "Office",
+"latitude": "40.752354",
+"longitude": "-73.982217",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "2544622",
+"property_name": "42-52 West 39 Street LLC / 42 West 39th St",
+"address_1": "42 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752171",
+"longitude": "-73.983701",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "2586171",
+"property_name": "One Ten West Fortieth Associates / 110 W 40th St",
+"address_1": "110 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753818",
+"longitude": "-73.985696",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "2586293",
+"property_name": "4 Bryant Park / 1071 6th Ave",
+"address_1": "1071 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.753894",
+"longitude": "-73.984812",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2024"
+},
+{
+"property_id": "49068792",
+"property_name": "25 West 39th Street",
+"address_1": "25 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752022",
+"longitude": "-73.983304",
+"district_steam_use_kbtu": "6254482.5",
+"report_year": "2024"
+},
+{
+"property_id": "6233890",
+"property_name": "1140 Avenue Of Americas",
+"address_1": "1140 Avenue of Americas",
+"primary_property_type": "Office",
+"latitude": "40.75623",
+"longitude": "-73.98309",
+"district_steam_use_kbtu": "4900713.3",
+"report_year": "2023"
+},
+{
+"property_id": "6683607",
+"property_name": "First Pioneer-102 West 38th Street",
+"address_1": "102 West 38th Street",
+"primary_property_type": "Office",
+"latitude": "40.752426",
+"longitude": "-73.986227",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "6705248",
+"property_name": "1440 Broadway",
+"address_1": "1440 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754611",
+"longitude": "-73.986761",
+"district_steam_use_kbtu": "18262802.1",
+"report_year": "2023"
+},
+{
+"property_id": "6782066",
+"property_name": "LUMA Hotel",
+"address_1": "120 West 41st Street",
+"primary_property_type": "Hotel",
+"latitude": "40.754529",
+"longitude": "-73.985458",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "6787535",
+"property_name": "5 Bryant Park",
+"address_1": "5 Bryant Park",
+"primary_property_type": "Office",
+"latitude": "40.753944",
+"longitude": "-73.985949",
+"district_steam_use_kbtu": "13444248.6",
+"report_year": "2023"
+},
+{
+"property_id": "7732937",
+"property_name": "147 W 43rd St",
+"address_1": "147 W 43rd St",
+"primary_property_type": "Hotel",
+"latitude": "40.756022",
+"longitude": "-73.984808",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "10550269",
+"property_name": "1030 6th Avenue",
+"address_1": "1030 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.752646",
+"longitude": "-73.985689",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "10791219",
+"property_name": "25 West 39th Street",
+"address_1": "25 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752022",
+"longitude": "-73.983304",
+"district_steam_use_kbtu": "7213192.7",
+"report_year": "2023"
+},
+{
+"property_id": "11857843",
+"property_name": "130 W 42 St",
+"address_1": "130 West 42nd Street",
+"primary_property_type": "Office",
+"latitude": "40.755278",
+"longitude": "-73.985172",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "13450382",
+"property_name": "Bryant Park Hotel - 40 West 40th Street",
+"address_1": "40 West 40th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.75306",
+"longitude": "-73.983892",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "15527620",
+"property_name": "114 West 40th Street",
+"address_1": "114 West 40th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.753881",
+"longitude": "-73.985848",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "15527630",
+"property_name": "1021 Sixth Avenue",
+"address_1": "1021 Sixth Avenue",
+"primary_property_type": "Hotel",
+"latitude": "40.752412",
+"longitude": "-73.985888",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "11809",
+"property_name": "Conde Nast Building",
+"address_1": "4 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.756181",
+"longitude": "-73.986244",
+"district_steam_use_kbtu": "10201762.7",
+"report_year": "2023"
+},
+{
+"property_id": "1151970",
+"property_name": "1133",
+"address_1": "1133 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.755942",
+"longitude": "-73.983324",
+"district_steam_use_kbtu": "0",
+"report_year": "2023"
+},
+{
+"property_id": "1261465",
+"property_name": "Grace Building",
+"address_1": "1114 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.755352",
+"longitude": "-73.983732",
+"district_steam_use_kbtu": "56507718.2",
+"report_year": "2023"
+},
+{
+"property_id": "1327499",
+"property_name": "7 Times Square",
+"address_1": "7 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.755915",
+"longitude": "-73.986681",
+"district_steam_use_kbtu": "10338846",
+"report_year": "2023"
+},
+{
+"property_id": "1836392",
+"property_name": "M896 (OECID: 0101380; BBL: 1009960021)",
+"address_1": "123 West 43rd Street",
+"primary_property_type": "K-12 School",
+"latitude": "40.755843",
+"longitude": "-73.984382",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2544622",
+"property_name": "42-52 West 39 Street LLC / 42 West 39th St",
+"address_1": "42 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752171",
+"longitude": "-73.983701",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2586171",
+"property_name": "One Ten West Fortieth Associates / 110 W 40th St",
+"address_1": "110 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753818",
+"longitude": "-73.985696",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2586293",
+"property_name": "4 Bryant Park / 1071 6th Ave",
+"address_1": "1071 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.753894",
+"longitude": "-73.984812",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "1845637",
+"property_name": "AB 40th Street LLC",
+"address_1": "8 West 40th St",
+"primary_property_type": "Office",
+"latitude": "40.752384",
+"longitude": "-73.982289",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2544622",
+"property_name": "42-52 West 39 Street LLC / 42 West 39th St",
+"address_1": "42 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752171",
+"longitude": "-73.983701",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2586171",
+"property_name": "One Ten West Fortieth Associates / 110 W 40th St",
+"address_1": "110 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753818",
+"longitude": "-73.985696",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2586293",
+"property_name": "4 Bryant Park / 1071 6th Ave",
+"address_1": "1071 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.753894",
+"longitude": "-73.984812",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2642032",
+"property_name": "80 West 40th Street LLC",
+"address_1": "80 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753334",
+"longitude": "-73.984541",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2676191",
+"property_name": "1441 Broadway ENT",
+"address_1": "1441 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754707",
+"longitude": "-73.986753",
+"district_steam_use_kbtu": "3843414.7",
+"report_year": "2023"
+},
+{
+"property_id": "2682107",
+"property_name": "1430 Broadway",
+"address_1": "1430 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754158",
+"longitude": "-73.986905",
+"district_steam_use_kbtu": "16698794.7",
+"report_year": "2023"
+},
+{
+"property_id": "2705511",
+"property_name": "URA Group - 108 West 39th Street",
+"address_1": "108 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.753173",
+"longitude": "-73.986075",
+"district_steam_use_kbtu": "2139922.7",
+"report_year": "2023"
+},
+{
+"property_id": "2683362",
+"property_name": "55 W. 39th St.",
+"address_1": "55 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752313",
+"longitude": "-73.983993",
+"district_steam_use_kbtu": "4304620.7",
+"report_year": "2023"
+},
+{
+"property_id": "2725649",
+"property_name": "One Bryant Park",
+"address_1": "One Bryant Park",
+"primary_property_type": "Financial Office",
+"latitude": "40.755355",
+"longitude": "-73.984248",
+"district_steam_use_kbtu": "2536796.2",
+"report_year": "2023"
+},
+{
+"property_id": "2796315",
+"property_name": "Allied Partners - 50 W 40th St",
+"address_1": "50 W 40th St",
+"primary_property_type": "Office",
+"latitude": "40.753129",
+"longitude": "-73.984054",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "2955754",
+"property_name": "141 West 43rd Street",
+"address_1": "141 West 43rd Street",
+"primary_property_type": "Parking",
+"latitude": "40.755978",
+"longitude": "-73.984699",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "3524906",
+"property_name": "PARK HOUSE PLAZA, LLC",
+"address_1": "104 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753724",
+"longitude": "-73.985472",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "3518601",
+"property_name": "58-64 West 40",
+"address_1": "58-64 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753183",
+"longitude": "-73.984184",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "3518896",
+"property_name": "66-70 West 40th Street",
+"address_1": "66-70 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753238",
+"longitude": "-73.984314",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "3544491",
+"property_name": "1450 Broadway",
+"address_1": "1450 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754927",
+"longitude": "-73.98666",
+"district_steam_use_kbtu": "8126414.9",
+"report_year": "2023"
+},
+{
+"property_id": "3582683",
+"property_name": "452 Fifth Ave - LL84",
+"address_1": "452 5TH AVENUE",
+"primary_property_type": "Office",
+"latitude": "40.752335",
+"longitude": "-73.982416",
+"district_steam_use_kbtu": "10497922.4",
+"report_year": "2023"
+},
+{
+"property_id": "3544491",
+"property_name": "1450 Broadway",
+"address_1": "1450 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754927",
+"longitude": "-73.98666",
+"district_steam_use_kbtu": "8126414.9",
+"report_year": "2023"
+},
+{
+"property_id": "31555816",
+"property_name": "Skyline Developers - 1040 Avenue Of The Americas",
+"address_1": "1040 Avenue Of The Americas",
+"primary_property_type": "Office",
+"latitude": "40.753024",
+"longitude": "-73.985411",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "31556287",
+"property_name": "Skyline Developers - 1050 Avenue Of The Americas",
+"address_1": "1050 Avenue Of The Americas",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.753266",
+"longitude": "-73.985238",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "31273318",
+"property_name": "New York NY GRAY",
+"address_1": "30 West 39th St",
+"primary_property_type": "Hotel",
+"latitude": "40.752053",
+"longitude": "-73.983419",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "33572198",
+"property_name": "2100-The Knickerbocker",
+"address_1": "6 Times Square",
+"primary_property_type": "Hotel",
+"latitude": "40.755149",
+"longitude": "-73.986591",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "33869335",
+"property_name": "32 WEST 40 STREET",
+"address_1": "32 WEST 40 STREET",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752747",
+"longitude": "-73.983148",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "33874891",
+"property_name": "Club Quarters- Park Terrace",
+"address_1": "16 WEST 40 STREET",
+"primary_property_type": "Hotel",
+"latitude": "40.752505",
+"longitude": "-73.982574",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "34002866",
+"property_name": "ModernHaus",
+"address_1": "25 West 39th St",
+"primary_property_type": "Hotel",
+"latitude": "40.752022",
+"longitude": "-73.983304",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "19492042",
+"property_name": "Rebel Hospitality - Hotel Mela",
+"address_1": "120 W 44 St",
+"primary_property_type": "Hotel",
+"latitude": "40.756461",
+"longitude": "-73.983952",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "19466816",
+"property_name": "123 West 43 Street",
+"address_1": "123 West 43 Street",
+"primary_property_type": "Performing Arts",
+"latitude": "40.755843",
+"longitude": "-73.984382",
+"district_steam_use_kbtu": "2755788.2",
+"report_year": "2023"
+},
+{
+"property_id": "21354956",
+"property_name": "Benchmarking Group - 72",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "21354957",
+"property_name": "DPR_5223_Bryant Park Comfort Station (42nd St)",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "21354958",
+"property_name": "DPR_5579_Bryant Park Comfort Station (40th St)",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "22156267",
+"property_name": "2022_Hippodrome- 1120 Avenue of the Americas",
+"address_1": "1120 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.755651",
+"longitude": "-73.983516",
+"district_steam_use_kbtu": "22343321.5",
+"report_year": "2023"
+},
+{
+"property_id": "24222800",
+"property_name": "Resolution -  37 West 39th Street",
+"address_1": "37 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752138",
+"longitude": "-73.983578",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "25671355",
+"property_name": "1460 Broadway",
+"address_1": "1460 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754946",
+"longitude": "-73.986161",
+"district_steam_use_kbtu": "182049.2",
+"report_year": "2023"
+},
+{
+"property_id": "25426825",
+"property_name": "Knickerbocker Hotel",
+"address_1": "1466 Broadway",
+"primary_property_type": "Hotel",
+"latitude": "40.755569",
+"longitude": "-73.986465",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "26656143",
+"property_name": "Hilton Garden Inn Times Square",
+"address_1": "136 West 42nd St",
+"primary_property_type": "Hotel",
+"latitude": "40.755338",
+"longitude": "-73.985313",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "4091976",
+"property_name": "1460 Broadway",
+"address_1": "1460 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754946",
+"longitude": "-73.986161",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "4351763",
+"property_name": "127 West 43 Street",
+"address_1": "127 West 43 Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.755873",
+"longitude": "-73.984454",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "4389732",
+"property_name": "AKA Times Square",
+"address_1": "123 West 44th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.756491",
+"longitude": "-73.983977",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "4624800",
+"property_name": "3 Bryant Park",
+"address_1": "1095 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.754688",
+"longitude": "-73.984241",
+"district_steam_use_kbtu": "32724899.4",
+"report_year": "2023"
+},
+{
+"property_id": "4580494",
+"property_name": "109 West 38th LLC",
+"address_1": "109 West 38th Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752544",
+"longitude": "-73.986462",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "4947679",
+"property_name": "114 West 41st Street",
+"address_1": "114 W 41st Street",
+"primary_property_type": "Office",
+"latitude": "40.75446",
+"longitude": "-73.985292",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "4936637",
+"property_name": "24 West 40th",
+"address_1": "24 West 40th St.",
+"primary_property_type": "Office",
+"latitude": "40.752626",
+"longitude": "-73.982859",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "5814658",
+"property_name": "7 Bryant Park",
+"address_1": "1045 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.753129",
+"longitude": "-73.985361",
+"district_steam_use_kbtu": "0",
+"report_year": "2023"
+},
+{
+"property_id": "6151477",
+"property_name": "3 Bryant Park",
+"address_1": "3 Bryant Park",
+"primary_property_type": "Office",
+"latitude": "40.754515",
+"longitude": "-73.984368",
+"district_steam_use_kbtu": "32724899.4",
+"report_year": "2023"
+},
+{
+"property_id": "6254501",
+"property_name": "Allied Partners - 54 West 40 Street",
+"address_1": "54 West 40 Street",
+"primary_property_type": "Office",
+"latitude": "40.753156",
+"longitude": "-73.984119",
+"district_steam_use_kbtu": "0",
+"report_year": "2023"
+},
+{
+"property_id": "6269269",
+"property_name": "16 West 40th Street",
+"address_1": "16 West 40th Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752505",
+"longitude": "-73.982574",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "6282926",
+"property_name": "SKS: 120 W 44th St",
+"address_1": "120 W 44th St",
+"primary_property_type": "Hotel",
+"latitude": "40.756461",
+"longitude": "-73.983952",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "6282965",
+"property_name": "Victorian: 54 W 39th St",
+"address_1": "54 W 39th St",
+"primary_property_type": "Office",
+"latitude": "40.752289",
+"longitude": "-73.983982",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2023"
+},
+{
+"property_id": "6284170",
+"property_name": "3 Times Square Associates LLC (NEW PROFILE)",
+"address_1": "3 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.756376",
+"longitude": "-73.986713",
+"district_steam_use_kbtu": "6234542.8",
+"report_year": "2023"
+},
+{
+"property_id": "6387489",
+"property_name": "Belasco Theatre",
+"address_1": "111 West 44 Street",
+"primary_property_type": "Performing Arts",
+"latitude": "40.756395",
+"longitude": "-73.98375",
+"district_steam_use_kbtu": "496286.1",
+"report_year": "2023"
+},
+{
+"property_id": "19466816",
+"property_name": "123 West 43 Street",
+"address_1": "123 West 43 Street",
+"primary_property_type": "Performing Arts",
+"latitude": "40.755843",
+"longitude": "-73.984382",
+"district_steam_use_kbtu": "3023519.9",
+"report_year": "2022"
+},
+{
+"property_id": "2955754",
+"property_name": "141 West 43rd Street",
+"address_1": "141 West 43rd Street",
+"primary_property_type": "Parking",
+"latitude": "40.755978",
+"longitude": "-73.984699",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "3582683",
+"property_name": "452 Fifth Ave",
+"address_1": "452 5TH AVENUE",
+"primary_property_type": "Office",
+"latitude": "40.752335",
+"longitude": "-73.982416",
+"district_steam_use_kbtu": "14808311.9",
+"report_year": "2022"
+},
+{
+"property_id": "21354958",
+"property_name": "DPR_5579_Bryant Park Comfort Station (40th St)",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "21354957",
+"property_name": "DPR_5223_Bryant Park Comfort Station (42nd St)",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "21354956",
+"property_name": "Benchmarking Group - 72",
+"address_1": "Bryant Park",
+"primary_property_type": "Other - Recreation",
+"latitude": "40.753496",
+"longitude": "-73.982964",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "1836392",
+"property_name": "M896 (OECID: 0101380; BBL: 1009960021)",
+"address_1": "123 West 43rd Street",
+"primary_property_type": "K-12 School",
+"latitude": "40.755843",
+"longitude": "-73.984382",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "4936637",
+"property_name": "24 West 40th",
+"address_1": "24 West 40th St.",
+"primary_property_type": "Office",
+"latitude": "40.752626",
+"longitude": "-73.982859",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "14947985",
+"property_name": "32 W 39th St",
+"address_1": "32 W 39th St",
+"primary_property_type": "Office",
+"latitude": "40.752072",
+"longitude": "-73.983466",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "7732937",
+"property_name": "147 W 43rd St",
+"address_1": "147 W 43rd St",
+"primary_property_type": "Hotel",
+"latitude": "40.756022",
+"longitude": "-73.984808",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6269269",
+"property_name": "16 West 40th Street",
+"address_1": "16 West 40th Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752505",
+"longitude": "-73.982574",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "15527630",
+"property_name": "1021 Sixth Avenue",
+"address_1": "1021 Sixth Avenue",
+"primary_property_type": "Hotel",
+"latitude": "40.752412",
+"longitude": "-73.985888",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "15527620",
+"property_name": "114 West 40th Street",
+"address_1": "114 West 40th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.753881",
+"longitude": "-73.985848",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2586293",
+"property_name": "4 Bryant Park / 1071 6th Ave",
+"address_1": "1071 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.753894",
+"longitude": "-73.984812",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2586171",
+"property_name": "One Ten West Fortieth Associates / 110 W 40th St",
+"address_1": "110 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753818",
+"longitude": "-73.985696",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2544622",
+"property_name": "42-52 West 39 Street LLC / 42 West 39th St",
+"address_1": "42 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752171",
+"longitude": "-73.983701",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2683362",
+"property_name": "55 W. 39th St.",
+"address_1": "55 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752313",
+"longitude": "-73.983993",
+"district_steam_use_kbtu": "3629243",
+"report_year": "2022"
+},
+{
+"property_id": "2682107",
+"property_name": "1430 Broadway",
+"address_1": "1430 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754158",
+"longitude": "-73.986905",
+"district_steam_use_kbtu": "18017451.7",
+"report_year": "2022"
+},
+{
+"property_id": "1845637",
+"property_name": "AB 40th Street LLC",
+"address_1": "8 West 40th St",
+"primary_property_type": "Office",
+"latitude": "40.752384",
+"longitude": "-73.982289",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2694316",
+"property_name": "32 West  40  Street",
+"address_1": "32 West 40 Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752747",
+"longitude": "-73.983148",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6284170",
+"property_name": "3 Times Square Associates LLC (NEW PROFILE)",
+"address_1": "3 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.756376",
+"longitude": "-73.986713",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6254501",
+"property_name": "Allied Partners - 54 West 40 Street",
+"address_1": "54 West 40 Street",
+"primary_property_type": "Office",
+"latitude": "40.753156",
+"longitude": "-73.984119",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2796315",
+"property_name": "Allied Partners - 50 W 40th St",
+"address_1": "50 W 40th St",
+"primary_property_type": "Office",
+"latitude": "40.753129",
+"longitude": "-73.984054",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2705511",
+"property_name": "URA Group - 108 West 39th Street",
+"address_1": "108 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.753173",
+"longitude": "-73.986075",
+"district_steam_use_kbtu": "2643808.2",
+"report_year": "2022"
+},
+{
+"property_id": "3544491",
+"property_name": "1450 Broadway",
+"address_1": "1450 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754927",
+"longitude": "-73.98666",
+"district_steam_use_kbtu": "6044959.2",
+"report_year": "2022"
+},
+{
+"property_id": "1327499",
+"property_name": "7 Times Square",
+"address_1": "7 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.755915",
+"longitude": "-73.986681",
+"district_steam_use_kbtu": "9660653.7",
+"report_year": "2022"
+},
+{
+"property_id": "6387489",
+"property_name": "Belasco Theatre",
+"address_1": "111 West 44 Street",
+"primary_property_type": "Performing Arts",
+"latitude": "40.756395",
+"longitude": "-73.98375",
+"district_steam_use_kbtu": "1056687",
+"report_year": "2022"
+},
+{
+"property_id": "6233890",
+"property_name": "CBRE 1140 Avenue Of Americas",
+"address_1": "1140 Avenue of Americas",
+"primary_property_type": "Office",
+"latitude": "40.75623",
+"longitude": "-73.98309",
+"district_steam_use_kbtu": "4733035.2",
+"report_year": "2022"
+},
+{
+"property_id": "4389732",
+"property_name": "AKA Times Square",
+"address_1": "123 West 44th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.756491",
+"longitude": "-73.983977",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "19492042",
+"property_name": "Rebel Hospitality - Hotel Mela",
+"address_1": "120 W 44 St",
+"primary_property_type": "Hotel",
+"latitude": "40.756461",
+"longitude": "-73.983952",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6151477",
+"property_name": "3 Bryant Park",
+"address_1": "3 Bryant Park",
+"primary_property_type": "Office",
+"latitude": "40.754515",
+"longitude": "-73.984368",
+"district_steam_use_kbtu": "36285008.4",
+"report_year": "2022"
+},
+{
+"property_id": "2642032",
+"property_name": "80 West 40th Street LLC",
+"address_1": "80 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753334",
+"longitude": "-73.984541",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2676191",
+"property_name": "1441 Broadway ENT",
+"address_1": "1441 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754707",
+"longitude": "-73.986753",
+"district_steam_use_kbtu": "1696557.5",
+"report_year": "2022"
+},
+{
+"property_id": "4351763",
+"property_name": "127 West 43 Street",
+"address_1": "127 West 43 Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.755873",
+"longitude": "-73.984454",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6705248",
+"property_name": "1440 Broadway",
+"address_1": "1440 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754611",
+"longitude": "-73.986761",
+"district_steam_use_kbtu": "11366808.1",
+"report_year": "2022"
+},
+{
+"property_id": "5043138",
+"property_name": "The Knickerbocker",
+"address_1": "6 Times Square",
+"primary_property_type": "Hotel",
+"latitude": "40.755149",
+"longitude": "-73.986591",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6782066",
+"property_name": "LUMA Hotel",
+"address_1": "120 West 41st Street",
+"primary_property_type": "Hotel",
+"latitude": "40.754529",
+"longitude": "-73.985458",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "26656143",
+"property_name": "Hilton Garden Inn Times Square",
+"address_1": "136 W 42nd St",
+"primary_property_type": "Hotel",
+"latitude": "40.755338",
+"longitude": "-73.985313",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "22156267",
+"property_name": "2022_Hippodrome- 1120 Avenue of the Americas",
+"address_1": "1120 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.755651",
+"longitude": "-73.983516",
+"district_steam_use_kbtu": "22465326.3",
+"report_year": "2022"
+},
+{
+"property_id": "6683607",
+"property_name": "First Pioneer-102 West 38th Street",
+"address_1": "102 West 38th Street",
+"primary_property_type": "Office",
+"latitude": "40.752426",
+"longitude": "-73.986227",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6233890",
+"property_name": "CBRE 1140 Avenue Of Americas",
+"address_1": "1140 Avenue of Americas",
+"primary_property_type": "Office",
+"latitude": "40.75623",
+"longitude": "-73.98309",
+"district_steam_use_kbtu": "4733035.2",
+"report_year": "2022"
+},
+{
+"property_id": "5814658",
+"property_name": "7 Bryant Park",
+"address_1": "1045 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.753129",
+"longitude": "-73.985361",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "4947679",
+"property_name": "114 West 41st Street",
+"address_1": "114 W 41st Street",
+"primary_property_type": "Office",
+"latitude": "40.75446",
+"longitude": "-73.985292",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "2725649",
+"property_name": "One Bryant Park",
+"address_1": "One Bryant Park",
+"primary_property_type": "Financial Office",
+"latitude": "40.755355",
+"longitude": "-73.984248",
+"district_steam_use_kbtu": "1028773.2",
+"report_year": "2022"
+},
+{
+"property_id": "1151970",
+"property_name": "1133",
+"address_1": "1133 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.755942",
+"longitude": "-73.983324",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "11809",
+"property_name": "Conde Nast Building",
+"address_1": "4 Times Square",
+"primary_property_type": "Office",
+"latitude": "40.756181",
+"longitude": "-73.986244",
+"district_steam_use_kbtu": "19344498.2",
+"report_year": "2022"
+},
+{
+"property_id": "21205214",
+"property_name": "1040 AOA",
+"address_1": "1040 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.753024",
+"longitude": "-73.985411",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "19581532",
+"property_name": "1050 Avenue of the Americas",
+"address_1": "1050 Avenue of the Americas",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.753266",
+"longitude": "-73.985238",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "4580494",
+"property_name": "109 West 38th LLC",
+"address_1": "109 West 38th Street",
+"primary_property_type": "Multifamily Housing",
+"latitude": "40.752544",
+"longitude": "-73.986462",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6787535",
+"property_name": "5 Bryant Park",
+"address_1": "5 Bryant Park",
+"primary_property_type": "Office",
+"latitude": "40.753944",
+"longitude": "-73.985949",
+"district_steam_use_kbtu": "12415818.3",
+"report_year": "2022"
+},
+{
+"property_id": "13450382",
+"property_name": "Bryant Park Hotel - 40 West 40th Street",
+"address_1": "40 West 40th Street",
+"primary_property_type": "Hotel",
+"latitude": "40.75306",
+"longitude": "-73.983892",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "10550269",
+"property_name": "1030 6th Avenue",
+"address_1": "1030 6th Avenue",
+"primary_property_type": "Office",
+"latitude": "40.752646",
+"longitude": "-73.985689",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "3518896",
+"property_name": "66-70 West 40th Street",
+"address_1": "66-70 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753238",
+"longitude": "-73.984314",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "3518601",
+"property_name": "58-64 West 40",
+"address_1": "58-64 West 40th Street",
+"primary_property_type": "Office",
+"latitude": "40.753183",
+"longitude": "-73.984184",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "25671355",
+"property_name": "1460 Broadway",
+"address_1": "1460 Broadway",
+"primary_property_type": "Office",
+"latitude": "40.754946",
+"longitude": "-73.986161",
+"district_steam_use_kbtu": "36405.8",
+"report_year": "2022"
+},
+{
+"property_id": "10791219",
+"property_name": "25 West 39th Street",
+"address_1": "25 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752022",
+"longitude": "-73.983304",
+"district_steam_use_kbtu": "10044580.9",
+"report_year": "2022"
+},
+{
+"property_id": "11857843",
+"property_name": "130 W 42 St",
+"address_1": "130 West 42nd Street",
+"primary_property_type": "Office",
+"latitude": "40.755278",
+"longitude": "-73.985172",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "1261465",
+"property_name": "Grace Building",
+"address_1": "1114 Avenue of the Americas",
+"primary_property_type": "Office",
+"latitude": "40.755352",
+"longitude": "-73.983732",
+"district_steam_use_kbtu": "57217308.9",
+"report_year": "2022"
+},
+{
+"property_id": "6282965",
+"property_name": "Victorian: 54 W 39th St",
+"address_1": "54 W 39th St",
+"primary_property_type": "Office",
+"latitude": "40.752289",
+"longitude": "-73.983982",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "6282926",
+"property_name": "SKS: 120 W 44th St",
+"address_1": "120 W 44th St",
+"primary_property_type": "Hotel",
+"latitude": "40.756461",
+"longitude": "-73.983952",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "25426825",
+"property_name": "Knickerbocker Hotel",
+"address_1": "1466 Broadway",
+"primary_property_type": "Hotel",
+"latitude": "40.755569",
+"longitude": "-73.986465",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+},
+{
+"property_id": "24222800",
+"property_name": "Resolution -  37 West 39th Street",
+"address_1": "37 West 39th Street",
+"primary_property_type": "Office",
+"latitude": "40.752138",
+"longitude": "-73.983578",
+"district_steam_use_kbtu": "Not Available",
+"report_year": "2022"
+}
+]
+}

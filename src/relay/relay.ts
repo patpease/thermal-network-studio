@@ -24,6 +24,7 @@ import { bbox } from '../site/geometry.ts';
 import type { Ring } from '../site/geometry.ts';
 import { normaliseFema, normaliseNsi, STRUCTURES_ATTRIBUTION } from '../site/structures.ts';
 import type { Structures } from '../site/structures.ts';
+import { LL84_HOST, ll84Url, normaliseLl84, touchesNyc } from '../site/steam.ts';
 
 export type Fetcher = (url: string, init?: { method?: string; body?: string; headers?: Record<string, string>; timeoutMs?: number }) => Promise<Response>;
 
@@ -39,6 +40,7 @@ export const PATHS = {
   site: '/api/site',
   weather: '/api/weather',
   buildings: '/api/buildings',
+  steam: '/api/steam',
 } as const;
 
 /**
@@ -78,6 +80,7 @@ export const ALLOWED_HOSTS = Object.freeze([
   ...OVERPASS_HOSTS,
   FEMA_HOST,
   NSI_HOST,
+  LL84_HOST,
 ]);
 
 export function isAllowedHost(hostname: string): boolean {
@@ -88,7 +91,7 @@ export function isAllowedHost(hostname: string): boolean {
 export const RELAY_VERSION = '3';
 
 const DAY = 86400;
-export const CACHE = { place: 30 * DAY, site: 365 * DAY, weather: 30 * DAY, buildings: 7 * DAY } as const;
+export const CACHE = { place: 30 * DAY, site: 365 * DAY, weather: 30 * DAY, buildings: 7 * DAY, steam: 30 * DAY } as const;
 
 export const ATTRIBUTION = {
   weather: 'Weather by Open-Meteo.com (ERA5, Copernicus), CC BY 4.0',
@@ -364,6 +367,41 @@ export function parseBoundary(body: unknown): Ring | RelayResult {
 /** Five decimals (~1 m) — two drawings of the same street share an entry. */
 export function buildingsCacheKey(boundary: Ring): string {
   return `buildings|${RELAY_VERSION}|${boundary.map(([x, y]) => `${x.toFixed(5)},${y.toFixed(5)}`).join(';')}`;
+}
+
+// -------------------------------------------------------------------- steam
+
+/** A box from ?w=&s=&e=&n=, or a problem. Small boxes only: a site's search box. */
+function steamBox(params: URLSearchParams): [number, number, number, number] | RelayResult {
+  const box = ['w', 's', 'e', 'n'].map((k) => Number(params.get(k))) as [number, number, number, number];
+  const [w, s, e, n] = box;
+  if (!box.every(Number.isFinite) || w >= e || s >= n || Math.abs(s) > 90 || Math.abs(n) > 90) return problem(400, 'Give a box: w, s, e, n.');
+  if (e - w > 0.1 || n - s > 0.1) return problem(400, 'That box is larger than a site.');
+  return box;
+}
+
+export function steamCacheKey(params: URLSearchParams): string | null {
+  const box = steamBox(params);
+  return isRelayResult(box) ? null : `steam|${RELAY_VERSION}|${box.map((x) => x.toFixed(4)).join(',')}`;
+}
+
+/**
+ * NYC Local Law 84 properties in a box that report district steam in their
+ * latest year (phase 14). Outside New York City: an empty answer, no request.
+ */
+export async function handleSteam(params: URLSearchParams, fetcher: Fetcher): Promise<RelayResult> {
+  const box = steamBox(params);
+  if (isRelayResult(box)) return box;
+  if (!touchesNyc(box)) return { status: 200, body: { steam: null }, cacheSeconds: CACHE.steam };
+  try {
+    const response = await fetcher(ll84Url(box), { timeoutMs: 15_000 });
+    if (!response.ok) return problem(502, `New York City's benchmarking data returned ${response.status}.`);
+    const rows = (await response.json()) as Record<string, unknown>[];
+    if (!Array.isArray(rows)) return problem(502, "New York City's benchmarking data was not readable.");
+    return { status: 200, body: { steam: normaliseLl84(rows) }, cacheSeconds: CACHE.steam };
+  } catch {
+    return problem(504, "New York City's benchmarking data did not answer.");
+  }
 }
 
 /** What the player reads when no Overpass instance answers. */

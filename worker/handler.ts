@@ -12,12 +12,14 @@ import {
   handleBuildings,
   handlePlace,
   handleSite,
+  handleSteam,
   handleWeather,
   isAllowedHost,
   isRelayResult,
   parseBoundary,
   PATHS,
   RELAY_VERSION,
+  steamCacheKey,
   weatherCacheKey,
   weatherYear,
 } from '../src/relay/relay';
@@ -167,6 +169,9 @@ export async function handle(
         const key = isRelayResult(boundary) ? null : buildingsCacheKey(boundary);
         return cached(cache, key, () => handleBuildings(body, fetcher), waitUntil);
       }
+      case PATHS.steam:
+        if (request.method !== 'GET') return json({ status: 405, body: { message: 'Use GET.' } });
+        return cached(cache, steamCacheKey(p), () => handleSteam(p, fetcher), waitUntil);
       default:
         // Any other /api/* path must 404 rather than fall through to the shell.
         return json({ status: 404, body: { message: 'Not found.' } });

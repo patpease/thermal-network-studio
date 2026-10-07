@@ -702,6 +702,30 @@ Things that looked right and were not:
   the tags the Overpass query already asks for, and its files need an
   MSD-LIVE login.
 
+## District steam in New York City (phase 14)
+
+- **`/api/steam?w=&s=&e=&n=` reads NYC Local Law 84** (NYC Open Data
+  `5zyy-y8am`, host `data.cityofnewyork.us`) through the relay, host pinned
+  and cached 30 days. Outside New York City (`touchesNyc`) it answers
+  `{ steam: null }` with no upstream request, and the browser does not ask
+  at all. Fixture mode answers null (the fixtures are in Minnesota).
+- **A flag, never a quantity** (`site/steam.ts`): each property's latest
+  report year; steam above zero means on steam today. The kBtu figure is not
+  carried — measured vs modelled is on hold. `toNeighbourhood` is identical
+  with or without it, and a test says so.
+- **LL84 points are address points**, on the street frontage — 4–17 m off
+  the footprint across Midtown, where containment alone matched 3 of 25. A
+  point takes the footprint that holds it, else the nearest heated one
+  within `STEAM_MATCH_M` (20 m) with at least half LL84's 25,000 ft² floor,
+  so a small neighbour on the same frontage is never flagged. Unmatched
+  points are counted in Site features.
+- **Shown three ways**: an orange outline on the map (heat colour: how the
+  building is heated), a note on the selected building card, and a Site
+  features row with the report year and the 25,000 ft² coverage limit.
+- **Found while checking it**: FEMA calls much of Midtown "Industrial —
+  Light", so untagged towers become warehouses and possible process loads.
+  On the backlog for a decision.
+
 ## The guided tour
 
 - **"Take the tour" in the header** runs 13 steps through downtown Mankato

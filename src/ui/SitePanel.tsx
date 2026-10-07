@@ -243,6 +243,7 @@ function SelectedBuilding({
   onOverride,
   units,
   check,
+  steamYear,
 }: {
   b: SiteBuilding;
   excluded: boolean;
@@ -250,6 +251,7 @@ function SelectedBuilding({
   onOverride: (a: ArchetypeId | null) => void;
   units: UnitSystem;
   check: PeakCheck | null;
+  steamYear: number | null;
 }) {
   return (
     <section className="card" aria-labelledby="selected-heading">
@@ -276,6 +278,7 @@ function SelectedBuilding({
         {b.levelsGuessed ? MAP_COPY.structures.levels[b.levelsSource] : ''}, {withUnit('area', b.floorArea, units)} conditioned.
         {b.vintageSource === 'nsi-median' && b.vintage && <> {MAP_COPY.structures.vintageMedian(b.vintage.replace('-', '–'))}</>}
       </p>
+      {b.steam && <p className="card__note">{MAP_COPY.steam.building(steamYear)}</p>}
       {b.archetype && (
         <label className="check">
           <input type="checkbox" checked={!excluded} onChange={onToggle} /> {MAP_COPY.include}
@@ -394,6 +397,7 @@ export function SitePanel(props: SitePanelProps) {
               onOverride={(a) => props.onOverride(selected.id, a)}
               units={units}
               check={check}
+              steamYear={site.steam?.year ?? null}
             />
           )}
           {chosen && check?.heatingDay && <PeakDay kind="heating" day={check.heatingDay} building={buildingLabel(chosen)} units={units} />}
@@ -500,7 +504,7 @@ export function SitePanel(props: SitePanelProps) {
 
           <p className="attribution">
             {state.weather && weatherCredit(state.weather.attribution, state.weather.year)} · {sourceLine(site.structures ? ['osm', 'fema-structures', 'nsi'] : ['osm'])} · {place.attribution} ·{' '}
-            {sourceLine(site.sources.some((s) => s.cwns) ? ['cwns', 'cambium', 'nlr-stock'] : ['cambium', 'nlr-stock'])} · {sig(site.areaM2 / 1e6, 2)} km² drawn
+            {sourceLine([...(site.sources.some((s) => s.cwns) ? ['cwns'] : []), ...(site.steam ? ['nyc-ll84'] : []), 'cambium', 'nlr-stock'])} · {sig(site.areaM2 / 1e6, 2)} km² drawn
           </p>
         </>
       )}

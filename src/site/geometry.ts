@@ -103,3 +103,22 @@ export function distance(a: LonLat, b: LonLat): number {
   const m = metresPerDegree((a[1] + b[1]) / 2);
   return Math.hypot((a[0] - b[0]) * m.x, (a[1] - b[1]) * m.y);
 }
+
+/** Metres from a point to the nearest edge of a ring (0 inside it). */
+export function distanceToRing(p: LonLat, ring: Ring): number {
+  if (pointInRing(p, ring)) return 0;
+  const m = metresPerDegree(p[1]);
+  let best = Infinity;
+  for (let i = 0; i < ring.length - 1; i++) {
+    const ax = (ring[i]![0] - p[0]) * m.x;
+    const ay = (ring[i]![1] - p[1]) * m.y;
+    const bx = (ring[i + 1]![0] - p[0]) * m.x;
+    const by = (ring[i + 1]![1] - p[1]) * m.y;
+    const dx = bx - ax;
+    const dy = by - ay;
+    const len = dx * dx + dy * dy;
+    const t = len > 0 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / len)) : 0;
+    best = Math.min(best, Math.hypot(ax + t * dx, ay + t * dy));
+  }
+  return best;
+}

@@ -15,6 +15,7 @@ import { scaleOf } from '../engine/scale.ts';
 import { boreholeRoom } from './classify.ts';
 import { SOURCE_SEARCH_M } from './osm.ts';
 import type { AnchorKind, Site } from './classify.ts';
+import { LL84_MIN_FLOOR_M2 } from './steam.ts';
 
 /**
  * How the panel prints a quantity with its unit. Passed in, so this module
@@ -122,6 +123,16 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
               .map((a) => a.name ?? a.anchor)
               .join(', ')}${anchors.length > 4 ? '…' : ''}${federalAnchors ? ` · ${federalAnchors} from federal occupancy, not OpenStreetMap` : ''}`,
     },
+    ...(site.steam
+      ? [
+          {
+            key: 'steam',
+            criterion: 'District steam today',
+            known: true,
+            finding: `${site.steam.buildings} ${site.steam.buildings === 1 ? 'building reports' : 'buildings report'} district steam use (NYC Local Law 84${site.steam.year ? `, ${site.steam.year}` : ''})${site.steam.unmatched ? `, and ${site.steam.unmatched} more ${site.steam.unmatched === 1 ? 'property' : 'properties'} on no mapped footprint` : ''}. Local Law 84 covers properties over ${format.area(LL84_MIN_FLOOR_M2)}.`,
+          },
+        ]
+      : []),
     {
       key: 'process',
       criterion: 'Possible process loads',

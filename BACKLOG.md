@@ -173,11 +173,21 @@ below. Numbered after 12; 11 and 12 ran out of order.
       queries live (footprint × 250 W/m²), and its files sit behind an
       MSD-LIVE login. **CWNS flows are DESIGN flows**, not measured; the
       tool says so.
-- [ ] **14 District steam connections** (S) — flag the buildings NYC LL84
-      reports on district steam, so the Site tab shows how a building is
-      heated today and what connecting it would replace. Thermal demand
-      only. The measured-vs-modelled comparison is **on hold** (owner, 30
-      September 2026) until a fair comparison basis is found.
+- [x] **14 District steam connections** (S, done 7 October 2026) — the
+      relay's `/api/steam` reads NYC LL84 (NYC Open Data) for a site's box,
+      in New York City only; each property's latest year with district steam
+      above zero flags the building it sits on, or the nearest heated one
+      within 20 m of at least half LL84's floor threshold (LL84 points are
+      address points on the frontage: 4–17 m off across Midtown). An orange
+      outline on the map, a note on the building card, a Site features row.
+      Never a load or the score. Midtown check: 18 buildings, none left
+      unmatched. Measured vs modelled stays **on hold**.
+- [ ] **FEMA occupancy in Manhattan (found in phase 14)** — FEMA USA
+      Structures calls 102 Midtown buildings "Industrial — Light"; where OSM
+      has no use tag (Bank of America Tower among them) they become
+      warehouses, and Site features lists them as possible process loads.
+      One tower also reads 114 storeys. Decide whether FEMA's industrial
+      class should stand in dense downtowns, or yield to NSI or size.
 - [ ] **15 Existing district and thermal systems, partial** (M) — extend the
       existing-networks layer: ORNL Onsite Energy installations (terms
       permitting), OSM district heating plants, NYC steam users from 14.

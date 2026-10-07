@@ -83,6 +83,10 @@ export const MAP_COPY = {
   /** A wastewater plant with an EPA design flow (phase 13). */
   cwnsFlow: (flow: string) => `design flow ${flow}, EPA CWNS 2022`,
   cwnsOnly: 'not in OpenStreetMap',
+  /** NYC district steam (phase 14). */
+  steam: {
+    building: (year: number | null) => `On district steam today: NYC Local Law 84 reports district steam use for this property${year ? ` in ${year}` : ''}. Outlined in orange on the map.`,
+  },
   noSources: (within: string) => `None found in OpenStreetMap or EPA data within ${within}. Sources can be added on the Design tab.`,
   metricsHeading: 'The demand',
   todayHeading: 'Today, without a network',

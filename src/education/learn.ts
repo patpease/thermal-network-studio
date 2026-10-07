@@ -21,10 +21,11 @@ import { DESIGN_DIVERSITY } from '../engine/balance';
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { RULE_OF_THUMB_W_PER_M2 } from '../engine/ruleOfThumb';
 import { RECOVERABLE_DT_K, wastewaterCapacityW } from '../site/wastewater';
+import { LL84_MIN_FLOOR_M2 } from '../site/steam';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
-export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'cwns' | 'nrel-gdr' | 'idea' | 'tool';
+export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'cwns' | 'll84' | 'nrel-gdr' | 'idea' | 'tool';
 
 export const REFERENCES: Record<RefId, { short: string; full: string; url?: string }> = {
   epri: {
@@ -66,6 +67,11 @@ export const REFERENCES: Record<RefId, { short: string; full: string; url?: stri
     short: 'EPA CWNS 2022',
     full: 'U.S. Environmental Protection Agency. Clean Watersheds Needs Survey 2022, national data download (September 2026 file).',
     url: 'https://www.epa.gov/cwns',
+  },
+  ll84: {
+    short: 'NYC LL84',
+    full: 'City of New York. NYC Building Energy and Water Data Disclosure for Local Law 84 (Data for Calendar Year 2022–Present). NYC Open Data, dataset 5zyy-y8am.',
+    url: 'https://data.cityofnewyork.us/Environment/NYC-Building-Energy-and-Water-Data-Disclosure-for-/5zyy-y8am',
   },
   nsi: { short: 'National Structure Inventory', full: 'U.S. Army Corps of Engineers, National Structure Inventory.', url: 'https://www.hec.usace.army.mil/confluence/nsi' },
   'nrel-gdr': {
@@ -156,6 +162,10 @@ export function sections(f: Formatters): Section[] {
         { text: `HEET’s Massachusetts checklist puts the economies-of-scale point at about ${f.size(SCALE_POINT_TONS)} of shared load, with heating and cooling balanced over the year, and advises that minimum. The Site and Design tabs show it as the recommended minimum size.`, refs: ['heet'] },
         { text: `Waste heat can serve buildings within about a quarter mile (${f.length(402)}) of its source. Refrigeration heat from one large supermarket can heat about 15–30 nearby homes.`, refs: ['vctn'] },
         { text: 'Buildings on steam heat need a new heating system to connect. Many older homes need an electrical panel upgrade for a heat pump.', refs: ['heet'] },
+        {
+          text: `In New York City, this tool outlines in orange the buildings that report district steam use under Local Law 84, in each property's latest year. Local Law 84 covers properties over ${f.area(LL84_MIN_FLOOR_M2)}; a smaller building on steam is not marked. The flag does not change any load or the score.`,
+          refs: ['ll84', 'tool'],
+        },
         { text: 'HEET lists weatherization — air sealing and insulation — as an essential part of electrification.', refs: ['heet'] },
         { text: 'Planned street works, repaving and leak-prone gas mains lower the cost of installing a loop. This tool does not see them.', refs: ['heet', 'tool'] },
         { text: 'Bedrock depth, groundwater, well yield and contaminated sites affect drilling. This tool does not see them.', refs: ['heet', 'tool'] },

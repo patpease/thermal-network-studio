@@ -14,6 +14,7 @@ import { bbox, ringArea } from './geometry.ts';
 import type { LonLat, Ring } from './geometry.ts';
 import type { Structures } from './structures.ts';
 import type { WastewaterData } from './wastewater.ts';
+import type { SteamData } from './steam.ts';
 
 export type Geometry =
   | { readonly type: 'point'; readonly at: LonLat }
@@ -49,6 +50,11 @@ export interface SiteData {
    * project saved before them.
    */
   readonly wastewater?: WastewaterData | null;
+  /**
+   * New York City LL84 properties on district steam (phase 14); null if the
+   * relay could not read them. Absent outside New York City.
+   */
+  readonly steam?: SteamData | null;
 }
 
 /** The tags anything downstream reads. Everything else is dropped. */

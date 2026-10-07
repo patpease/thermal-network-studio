@@ -24,8 +24,10 @@ import type { WeatherYear } from '../loads/model';
 import type { SitePayload, WeatherPayload } from '../relay/relay';
 import { boreholeRoom, classifySite, MAX_BUILDINGS } from '../site/classify';
 import { fetchWastewater } from '../site/wastewater';
+import { touchesNyc } from '../site/steam';
+import type { SteamData } from '../site/steam';
 import type { Site } from '../site/classify';
-import { centroid, ringArea } from '../site/geometry';
+import { bbox, centroid, ringArea } from '../site/geometry';
 import type { LonLat, Ring } from '../site/geometry';
 import { connected, EMPTY_SELECTION, toNeighbourhood } from '../site/neighbourhood';
 import type { BuildingOverride, Selection } from '../site/neighbourhood';
@@ -97,6 +99,23 @@ function weatherYear(weather: WeatherPayload): NonNullable<SiteState['weather']>
   };
 }
 
+/**
+ * District steam from the relay, for a site in New York City: undefined
+ * elsewhere (no request), null if the relay could not read it. Never throws.
+ */
+async function fetchSteam(boundary: Ring): Promise<SteamData | null | undefined> {
+  const box = bbox(boundary);
+  if (!touchesNyc(box)) return undefined;
+  try {
+    const [w, s, e, n] = box.map((x) => x.toFixed(6));
+    const r = await fetch(`/api/steam?w=${w}&s=${s}&e=${e}&n=${n}`);
+    if (!r.ok) return null;
+    return ((await r.json()) as { steam: SteamData | null }).steam;
+  } catch {
+    return null;
+  }
+}
+
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
   const body = (await response.json().catch(() => ({}))) as T & { message?: string };
@@ -161,7 +180,7 @@ export function useSite() {
 
     const [lon, lat] = centroid(boundary);
     try {
-      const [place, weather, buildings, wastewater] = await Promise.all([
+      const [place, weather, buildings, wastewater, steam] = await Promise.all([
         getJson<SitePayload>(`/api/site?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`),
         getJson<WeatherPayload>(`/api/weather?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`),
         getJson<{ site: SiteData }>('/api/buildings', {
@@ -171,9 +190,11 @@ export function useSite() {
         }),
         // This site's own static files; null (never an error) if unread.
         fetchWastewater(boundary, SOURCE_SEARCH_M),
+        // New York City only; elsewhere no request is made.
+        fetchSteam(boundary),
       ]);
       if (!stillMine()) return;
-      const data: SiteData = { ...buildings.site, wastewater };
+      const data: SiteData = { ...buildings.site, wastewater, ...(steam !== undefined ? { steam } : {}) };
       const site = classifySite({ ...data, boundary });
       setState((s) => ({
         ...s,

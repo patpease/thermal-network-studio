@@ -154,7 +154,7 @@ sits on the page and is burned into every export.
 - **08–12** — loop and sizing, scale, grid impact, save and open, federal
   building data (done; BACKLOG.md)
 - **13 Anchor loads and more heat sources** (done: CWNS wastewater, federal anchors; IM3 dropped)
-- **14 District steam connections** (planned; measured vs modelled on hold)
+- **14 District steam connections** (done: NYC LL84 flag; measured vs modelled on hold)
 - **15 Existing district and thermal systems, partial** (planned)
 - **16 EU and UK layers** (backlog, not scheduled)
 - **17 Learn tab reference links** (planned)
