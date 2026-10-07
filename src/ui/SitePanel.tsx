@@ -15,6 +15,7 @@ import { MAX_BUILDINGS } from '../site/classify';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site, SiteBuilding } from '../site/classify';
 import { sourceById, sourceLine } from '../config/sources';
+import { M3_PER_MGD } from '../site/wastewater';
 import { NETWORK_KIND_LABEL, NETWORK_SOURCES } from '../site/generated/networks';
 import { NEARBY_NETWORK_M, nearestNetwork, networksNear } from '../site/networks';
 import { centroid } from '../site/geometry';
@@ -460,6 +461,13 @@ export function SitePanel(props: SitePanelProps) {
                       ) : (
                         <span className="muted"> · about {withUnit('powerLarge', s.estimatedCapacityW / 1e6, units, 2)} (estimate)</span>
                       )}
+                      {s.cwns && (
+                        <span className="muted">
+                          {' · '}
+                          {MAP_COPY.cwnsFlow(withUnit('waterFlow', s.cwns.designMgd * M3_PER_MGD, units))}
+                          {s.id.startsWith('cwns:') ? `, ${MAP_COPY.cwnsOnly}` : ''}
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -492,7 +500,7 @@ export function SitePanel(props: SitePanelProps) {
 
           <p className="attribution">
             {state.weather && weatherCredit(state.weather.attribution, state.weather.year)} · {sourceLine(site.structures ? ['osm', 'fema-structures', 'nsi'] : ['osm'])} · {place.attribution} ·{' '}
-            {sourceLine(['cambium', 'nlr-stock'])} · {sig(site.areaM2 / 1e6, 2)} km² drawn
+            {sourceLine(site.sources.some((s) => s.cwns) ? ['cwns', 'cambium', 'nlr-stock'] : ['cambium', 'nlr-stock'])} · {sig(site.areaM2 / 1e6, 2)} km² drawn
           </p>
         </>
       )}

@@ -25,6 +25,7 @@ const fmt = (units: UnitSystem): Formatters => ({
   delta: (k) => withUnit('temperatureDelta', k, units, 2),
   size: (tons) => networkSize(tons, units),
   intensity: (kind, w) => withUnit(kind, w, units, 3),
+  flow: (mgd) => withUnit('waterFlow', mgd * 3_785.411784, units, 3),
 });
 
 const site = classifySite(

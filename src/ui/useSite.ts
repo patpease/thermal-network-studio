@@ -23,12 +23,13 @@ import type { ScenarioResult } from '../engine/scenario';
 import type { WeatherYear } from '../loads/model';
 import type { SitePayload, WeatherPayload } from '../relay/relay';
 import { boreholeRoom, classifySite, MAX_BUILDINGS } from '../site/classify';
+import { fetchWastewater } from '../site/wastewater';
 import type { Site } from '../site/classify';
 import { centroid, ringArea } from '../site/geometry';
 import type { LonLat, Ring } from '../site/geometry';
 import { connected, EMPTY_SELECTION, toNeighbourhood } from '../site/neighbourhood';
 import type { BuildingOverride, Selection } from '../site/neighbourhood';
-import { boundaryProblem } from '../site/osm';
+import { boundaryProblem, SOURCE_SEARCH_M } from '../site/osm';
 import type { SiteData } from '../site/osm';
 import type { Project } from '../io/project';
 
@@ -160,7 +161,7 @@ export function useSite() {
 
     const [lon, lat] = centroid(boundary);
     try {
-      const [place, weather, buildings] = await Promise.all([
+      const [place, weather, buildings, wastewater] = await Promise.all([
         getJson<SitePayload>(`/api/site?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`),
         getJson<WeatherPayload>(`/api/weather?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`),
         getJson<{ site: SiteData }>('/api/buildings', {
@@ -168,9 +169,12 @@ export function useSite() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ boundary }),
         }),
+        // This site's own static files; null (never an error) if unread.
+        fetchWastewater(boundary, SOURCE_SEARCH_M),
       ]);
       if (!stillMine()) return;
-      const site = classifySite({ ...buildings.site, boundary });
+      const data: SiteData = { ...buildings.site, wastewater };
+      const site = classifySite({ ...data, boundary });
       setState((s) => ({
         ...s,
         phase: 'ready',
@@ -180,7 +184,7 @@ export function useSite() {
         selection: init?.selection ?? EMPTY_SELECTION,
         design: init?.design ?? EMPTY_DESIGN,
         placeEdits: init?.placeEdits ?? {},
-        snapshot: { place, buildings: buildings.site, weather },
+        snapshot: { place, buildings: data, weather },
       }));
     } catch (error) {
       if (!stillMine()) return;

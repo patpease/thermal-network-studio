@@ -13,6 +13,7 @@
 import { bbox, ringArea } from './geometry.ts';
 import type { LonLat, Ring } from './geometry.ts';
 import type { Structures } from './structures.ts';
+import type { WastewaterData } from './wastewater.ts';
 
 export type Geometry =
   | { readonly type: 'point'; readonly at: LonLat }
@@ -42,6 +43,12 @@ export interface SiteData {
    * with no heat sources, open space, land use or place names.
    */
   readonly osmUnavailable?: true;
+  /**
+   * EPA CWNS treatment plants near the site (phase 13), read from this
+   * site's own static files; null if they could not be read. Absent in a
+   * project saved before them.
+   */
+  readonly wastewater?: WastewaterData | null;
 }
 
 /** The tags anything downstream reads. Everything else is dropped. */

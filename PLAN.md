@@ -153,7 +153,7 @@ sits on the page and is burned into every export.
 - **07 Education, export, phone pass, deploy**
 - **08–12** — loop and sizing, scale, grid impact, save and open, federal
   building data (done; BACKLOG.md)
-- **13 Anchor loads and more heat sources** (planned)
+- **13 Anchor loads and more heat sources** (done: CWNS wastewater, federal anchors; IM3 dropped)
 - **14 District steam connections** (planned; measured vs modelled on hold)
 - **15 Existing district and thermal systems, partial** (planned)
 - **16 EU and UK layers** (backlog, not scheduled)

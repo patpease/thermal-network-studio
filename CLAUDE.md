@@ -670,6 +670,38 @@ Things that looked right and were not:
   licence, credit "DOE/NREL/ALLIANCE"; Open-Meteo is CC BY 4.0 and ERA5
   carries the Copernicus line, now in the relay's weather credit.
 
+## Wastewater plants and federal anchors (phase 13)
+
+- **EPA CWNS 2022 is static data, fetched per state.** `npm run import:cwns
+  -- <zip>` (pure half `scripts/cwns/lib.ts`) writes
+  `public/data/cwns/<ST>.json` and `index.json` (each state's box). The zip
+  is downloaded by hand — EPA's page asks who you are and serves it through
+  an APEX session — and is not committed. The browser fetches `index.json`
+  and the states the site's search box touches (`site/wastewater.ts`), from
+  its own origin: no CSP change. The plants ride on `SiteData.wastewater`,
+  so a saved file keeps them; a failed read is null, never an error.
+- **Kept: built treatment plants with a Point location and a design flow.**
+  New and Abandonment change types are dropped (D47). City, county and
+  watershed locations are dropped — they are centroids, not plants.
+- **The flow is DESIGN flow** (`CURRENT_DESIGN_FLOW`, MGD). CWNS does not
+  publish measured flow; those go to EPA through discharge reports and are
+  usually lower. Heat = flow × 3 K (`RECOVERABLE_DT_K`, published 2–5 K):
+  1 MGD ≈ 43.8 kg/s ≈ 0.55 MW. `waterFlow` in `units.ts` prints MGD or m³/day.
+- **One plant, never two.** A CWNS point within 150 m of an OSM
+  `man_made=wastewater_plant`, or inside its outline, enriches that
+  candidate (`cwns` on `SourceCandidate`); otherwise it becomes `cwns:<id>`.
+  No fixture site is within a quarter mile of a plant: `tests/cwns.test.ts`
+  draws one beside Mankato's (11.25 MGD), and the browser check used a share
+  link there through `preview:worker`.
+- **Anchors from federal occupancy fill gaps only** (`federalAnchor`): FEMA
+  primary occupancy, then NSI Hazus. An OSM anchor is never overridden, and
+  a test holds it on every fixture. `anchorSource` says where it came from.
+  Federal "industrial" sets `industrial` — listed in Site features as a
+  possible process load, never modelled.
+- **IM3's data-centre atlas was not added**: it is OpenStreetMap data with
+  the tags the Overpass query already asks for, and its files need an
+  MSD-LIVE login.
+
 ## The guided tour
 
 - **"Take the tour" in the header** runs 13 steps through downtown Mankato

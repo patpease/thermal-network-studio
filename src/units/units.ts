@@ -44,7 +44,9 @@ export type Quantity =
    * RECIPROCAL: a bigger number is a smaller load. Converted here and nowhere
    * else, so nothing can compare a ft²/ton figure as if it were a load.
    */
-  | 'coolingIntensity';
+  | 'coolingIntensity'
+  /** A water flow, canonical m³/day: million gallons a day (MGD) in IP. */
+  | 'waterFlow';
 
 /** Watts in one Btu per hour. */
 const W_PER_BTUH = 0.29307107;
@@ -55,6 +57,8 @@ const M2_PER_FT2 = 0.09290304;
 const M_PER_FT = 0.3048;
 /** One ton of refrigeration, W (12,000 Btu/h); `engine/scale.ts` holds the same. */
 const W_PER_TON = 3_516.85;
+/** m³ in one million US gallons. */
+const M3_PER_MILLION_GAL = 3_785.411784;
 /**
  * Canonical SI for the big quantities: MW, MWh, GWh/km²·yr. IP: million
  * Btu/h, MMBtu, and billion Btu/mi²·yr — the unit EPRI's density thresholds
@@ -79,6 +83,7 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     distance: 'mi',
     loadIntensity: 'Btu/h·ft²',
     coolingIntensity: 'ft²/ton',
+    waterFlow: 'MGD',
   },
   si: {
     temperature: '°C',
@@ -94,6 +99,7 @@ export const LABELS: Record<UnitSystem, Record<Quantity, string>> = {
     distance: 'km',
     loadIntensity: 'W/m²',
     coolingIntensity: 'W/m²',
+    waterFlow: 'm³/day',
   },
 };
 
@@ -124,6 +130,8 @@ export function toDisplay(quantity: Quantity, si: number, units: UnitSystem): nu
       return (si * M2_PER_FT2) / W_PER_BTUH;
     case 'coolingIntensity':
       return W_PER_TON / (si * M2_PER_FT2);
+    case 'waterFlow':
+      return si / M3_PER_MILLION_GAL;
   }
 }
 
@@ -155,5 +163,7 @@ export function fromDisplay(quantity: Quantity, shown: number, units: UnitSystem
     case 'coolingIntensity':
       // The reciprocal is its own inverse.
       return W_PER_TON / (shown * M2_PER_FT2);
+    case 'waterFlow':
+      return shown * M3_PER_MILLION_GAL;
   }
 }

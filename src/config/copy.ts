@@ -80,7 +80,10 @@ export const MAP_COPY = {
   notKnown: 'Not known to this tool',
   sourcesHeading: 'Heat sources nearby',
   sourcesNote: 'Capacities are estimates. Change them on the Design tab.',
-  noSources: (within: string) => `None found in OpenStreetMap within ${within}. Sources can be added on the Design tab.`,
+  /** A wastewater plant with an EPA design flow (phase 13). */
+  cwnsFlow: (flow: string) => `design flow ${flow}, EPA CWNS 2022`,
+  cwnsOnly: 'not in OpenStreetMap',
+  noSources: (within: string) => `None found in OpenStreetMap or EPA data within ${within}. Sources can be added on the Design tab.`,
   metricsHeading: 'The demand',
   todayHeading: 'Today, without a network',
   selectedHeading: 'Selected building',

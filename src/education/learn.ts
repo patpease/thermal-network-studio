@@ -20,10 +20,11 @@ import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/cl
 import { DESIGN_DIVERSITY } from '../engine/balance';
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { RULE_OF_THUMB_W_PER_M2 } from '../engine/ruleOfThumb';
+import { RECOVERABLE_DT_K, wastewaterCapacityW } from '../site/wastewater';
 import { SOURCE_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
-export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'nrel-gdr' | 'idea' | 'tool';
+export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'cwns' | 'nrel-gdr' | 'idea' | 'tool';
 
 export const REFERENCES: Record<RefId, { short: string; full: string; url?: string }> = {
   epri: {
@@ -61,6 +62,11 @@ export const REFERENCES: Record<RefId, { short: string; full: string; url?: stri
   stull: { short: 'Stull 2011', full: 'Stull, R. Wet-bulb temperature from relative humidity and air temperature. J. Appl. Meteor. Climatol. 50: 2267–2269, 2011.' },
   osm: { short: 'OpenStreetMap', full: 'OpenStreetMap contributors. Data under the Open Database Licence.', url: 'https://www.openstreetmap.org/copyright' },
   fema: { short: 'FEMA USA Structures', full: 'FEMA and Oak Ridge National Laboratory, USA Structures. CC BY 4.0.', url: 'https://gis-fema.hub.arcgis.com/datasets/fedmaps::usa-structures/about' },
+  cwns: {
+    short: 'EPA CWNS 2022',
+    full: 'U.S. Environmental Protection Agency. Clean Watersheds Needs Survey 2022, national data download (September 2026 file).',
+    url: 'https://www.epa.gov/cwns',
+  },
   nsi: { short: 'National Structure Inventory', full: 'U.S. Army Corps of Engineers, National Structure Inventory.', url: 'https://www.hec.usace.army.mil/confluence/nsi' },
   'nrel-gdr': {
     short: 'NREL GDR 2020',
@@ -89,6 +95,8 @@ export interface Formatters {
   readonly distance: (m: number) => string;
   /** A peak load per floor area, from W/m²: Btu/h·ft² or ft²/ton in IP. */
   readonly intensity: (kind: 'loadIntensity' | 'coolingIntensity', wPerM2: number) => string;
+  /** A water flow from MGD, in the displayed unit. */
+  readonly flow: (mgd: number) => string;
 }
 
 export interface Fact {
@@ -175,6 +183,11 @@ export function sections(f: Formatters): Section[] {
         { text: 'A Vancouver ice rink supplies heat and hot water equal to 43 homes from its refrigeration.', refs: ['vctn'] },
         { text: `Residential wastewater leaves buildings at about ${f.temperature(21)}. A wastewater system can be a heat source or a heat sink.`, refs: ['vctn'] },
         { text: 'A Vancouver neighbourhood meets about 70% of its heating and cooling needs with heat recovered from wastewater.', refs: ['vctn'] },
+        {
+          text: `This tool finds wastewater treatment plants in OpenStreetMap and in EPA’s Clean Watersheds Needs Survey 2022, with each plant’s design flow. A plant’s heat is its flow cooled by ${f.delta(RECOVERABLE_DT_K)}: 1 MGD (${f.flow(1)}) gives about ${f.power(wastewaterCapacityW(1))}.`,
+          refs: ['cwns', 'tool'],
+        },
+        { text: 'Design flow is the flow a plant is built to treat. Measured flows are reported to EPA separately and are usually lower.', refs: ['cwns'] },
         { text: `Sewer water runs about ${f.temperature(12)} to ${f.temperature(22)} through the year. Lake and river water follow the air a month late and stay above ${f.temperature(4)}.`, refs: ['tool'] },
       ],
     },
@@ -201,6 +214,7 @@ export function sections(f: Formatters): Section[] {
           refs: ['tool'],
         },
         { text: 'Where OpenStreetMap has no building, this tool adds the footprints in FEMA USA Structures. Where OpenStreetMap records no use or storeys, it takes them from the National Structure Inventory, else from FEMA.', refs: ['osm', 'fema', 'nsi', 'tool'] },
+        { text: 'Where OpenStreetMap names no school, hospital, civic, emergency or worship building, this tool takes it from FEMA USA Structures, then the National Structure Inventory. Buildings either calls industrial are listed as possible process loads and not modelled.', refs: ['fema', 'nsi', 'tool'] },
         { text: 'The National Structure Inventory gives each structure the median year built of its census block group, not its own. This tool uses it as a guessed age.', refs: ['nsi', 'tool'] },
         { text: `${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, refs: ['tool'] },
       ],

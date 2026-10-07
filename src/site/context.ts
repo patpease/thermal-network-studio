@@ -60,6 +60,8 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
     .sort((a, b) => ANCHOR_ORDER.indexOf(a.anchor!) - ANCHOR_ORDER.indexOf(b.anchor!));
   const opportunistic = site.sources.filter((s) => s.exchange !== 'in-load' || s.kind === 'supermarket');
   const room = boreholeRoom(site.openSpaceM2);
+  const federalAnchors = anchors.filter((b) => b.anchorSource === 'fema' || b.anchorSource === 'nsi').length;
+  const industrial = site.buildings.filter((b) => b.industrial && b.archetype).length;
 
 
   return [
@@ -87,7 +89,7 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
       known: true,
       finding:
         opportunistic.length === 0
-          ? `None found in OpenStreetMap within ${format.distance(SOURCE_SEARCH_M)}`
+          ? `None found within ${format.distance(SOURCE_SEARCH_M)}`
           : `${opportunistic.length} found within ${format.distance(SOURCE_SEARCH_M)}: ${[...new Set(opportunistic.map((s) => s.kind.replace('-', ' ')))].join(', ')}`,
     },
     {
@@ -118,7 +120,16 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
           : `${anchors.length}: ${anchors
               .slice(0, 4)
               .map((a) => a.name ?? a.anchor)
-              .join(', ')}${anchors.length > 4 ? '…' : ''}`,
+              .join(', ')}${anchors.length > 4 ? '…' : ''}${federalAnchors ? ` · ${federalAnchors} from federal occupancy, not OpenStreetMap` : ''}`,
+    },
+    {
+      key: 'process',
+      criterion: 'Possible process loads',
+      known: site.structures !== undefined,
+      finding:
+        industrial === 0
+          ? 'No industrial buildings in federal structure data'
+          : `${industrial} ${industrial === 1 ? 'building' : 'buildings'} federal structure data calls industrial. Process loads are not modelled.`,
     },
   ];
 }

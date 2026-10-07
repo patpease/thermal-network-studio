@@ -9,6 +9,7 @@ import type { SiteMetrics } from '../engine/demand';
 import { REFERENCES, sections, siteFacts } from '../education/learn';
 import type { Fact, Formatters, RefId } from '../education/learn';
 import type { Site } from '../site/classify';
+import { M3_PER_MGD } from '../site/wastewater';
 import type { UnitSystem } from '../units/units';
 import { networkSize, rangeWithUnit, withUnit } from './format';
 
@@ -24,6 +25,7 @@ function formatters(units: UnitSystem): Formatters {
     size: (tons) => networkSize(tons, units),
     distance: (m) => withUnit('distance', m, units, 2),
     intensity: (kind, w) => withUnit(kind, w, units, 3),
+    flow: (mgd) => withUnit('waterFlow', mgd * M3_PER_MGD, units, 3),
   };
 }
 

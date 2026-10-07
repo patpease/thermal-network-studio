@@ -28,6 +28,7 @@ import type { LonLat, Ring } from './geometry.ts';
 import { SOURCE_SEARCH_M } from './osm.ts';
 import type { OsmFeature, SiteData } from './osm.ts';
 import type { FemaStructure, NsiStructure } from './structures.ts';
+import { wastewaterCapacityW } from './wastewater.ts';
 
 /** D11: the most buildings a network may connect. */
 export const MAX_BUILDINGS = 500;
@@ -65,6 +66,13 @@ export interface SiteBuilding {
   readonly floorArea: number;
   readonly vintage: VintageBand | null;
   readonly anchor: AnchorKind | null;
+  /** Where the anchor came from: an OSM tag, or a federal occupancy when OSM names none. */
+  readonly anchorSource: 'osm' | 'fema' | 'nsi' | null;
+  /**
+   * Federal data calls it industrial: a possible process load. Shown in Site
+   * features, never modelled (this tool has no exhaust or process model).
+   */
+  readonly industrial: boolean;
   /** Where the footprint came from: OSM, or a FEMA structure OSM does not have. */
   readonly origin: 'osm' | 'fema';
   /** Where the levels came from. Anything but 'osm' is guessed. */
@@ -90,6 +98,12 @@ export interface SourceCandidate {
   /** A first estimate, always flagged as one. The player can change it. */
   readonly estimatedCapacityW: number;
   readonly temperature: number | null;
+  /**
+   * EPA CWNS data for a wastewater plant (phase 13): its design flow, which
+   * sets the capacity. On an OSM plant it enriches; a candidate whose id
+   * starts `cwns:` is a plant OSM does not have.
+   */
+  readonly cwns?: { readonly id: string; readonly designMgd: number; readonly release: string };
 }
 
 export interface Barrier {
@@ -399,6 +413,32 @@ function anchorOf(t: Readonly<Record<string, string>>): AnchorKind | null {
   return null;
 }
 
+/**
+ * An anchor from federal occupancy (phase 13), used only where OSM names
+ * none: FEMA's primary occupancy first, then the NSI Hazus code.
+ */
+export function federalAnchor(fema: Pick<FemaStructure, 'occupancy' | 'occupancyClass'> | null, nsiOcc: readonly string[]): { anchor: AnchorKind; source: 'fema' | 'nsi' } | null {
+  if (fema) {
+    const o = fema.occupancy.toLowerCase();
+    const c = fema.occupancyClass.toLowerCase();
+    if (o === 'pre-k - 12 schools' || o === 'colleges/universities' || o === 'other educational buildings') return { anchor: 'school', source: 'fema' };
+    if (o === 'hospital') return { anchor: 'hospital', source: 'fema' };
+    if (c === 'government') return { anchor: o === 'emergency response' ? 'emergency' : 'civic', source: 'fema' };
+    if (o === 'religious') return { anchor: 'worship', source: 'fema' };
+  }
+  const HAZUS: Record<string, AnchorKind> = { EDU1: 'school', EDU2: 'school', COM6: 'hospital', GOV1: 'civic', GOV2: 'emergency', REL1: 'worship' };
+  for (const occ of nsiOcc) {
+    const a = HAZUS[occ.split('-')[0]!.toUpperCase()];
+    if (a) return { anchor: a, source: 'nsi' };
+  }
+  return null;
+}
+
+/** Federal data calls the structure industrial (FEMA class, or a Hazus IND code). */
+export function federalIndustrial(fema: Pick<FemaStructure, 'occupancyClass'> | null, nsiOcc: readonly string[]): boolean {
+  return fema?.occupancyClass.toLowerCase() === 'industrial' || nsiOcc.some((o) => /^IND\d/i.test(o));
+}
+
 // ------------------------------------------------------------------ sources
 
 /**
@@ -458,6 +498,9 @@ function sourceKind(t: Readonly<Record<string, string>>): SourceKindFound | null
   if (t['natural'] === 'water') return 'lake';
   return null;
 }
+
+/** An OSM wastewater plant and a CWNS point this close are the same plant. */
+export const CWNS_MATCH_M = 150;
 
 /** Ponds and ornamental water are not a heat source. */
 const MIN_LAKE_M2 = 20_000;
@@ -580,6 +623,9 @@ export function classifySite(data: SiteData): Site {
 
     let anchor = anchorOf(f.tags);
     for (const p of inside) anchor ??= anchorOf(p.tags);
+    const nsiOcc = fed.nsi.map((x) => x.occtype);
+    // A federal anchor fills a gap; it never overrides one OSM names.
+    const fedAnchor = anchor ? null : federalAnchor(fed.fema, nsiOcc);
 
     buildings.push({
       id: f.id,
@@ -593,7 +639,9 @@ export function classifySite(data: SiteData): Site {
       levelsGuessed,
       floorArea: Math.round(floorArea),
       vintage: osmVintage ?? (medianYear !== null ? yearBand(medianYear) : null),
-      anchor,
+      anchor: anchor ?? fedAnchor?.anchor ?? null,
+      anchorSource: anchor ? 'osm' : (fedAnchor?.source ?? null),
+      industrial: federalIndustrial(fed.fema, nsiOcc),
       origin: 'osm',
       levelsSource,
       vintageSource: osmVintage ? 'osm' : medianYear !== null ? 'nsi-median' : null,
@@ -611,6 +659,8 @@ export function classifySite(data: SiteData): Site {
     const footprint = ringArea(s.ring);
     if (footprint < MIN_FOOTPRINT_M2) continue;
     const fed: Federal = { fema: s, nsi: nsiInside(nsi, s.ring) };
+    const nsiOcc = fed.nsi.map((x) => x.occtype);
+    const fedAnchor = federalAnchor(s, nsiOcc);
     const found = fromFederal(fed, footprint) ?? residentialBySize(footprint, 'Type from its size');
     const decision = { ...found, reason: `${data.osmUnavailable ? 'OpenStreetMap unavailable.' : 'Not in OpenStreetMap.'} ${found.reason}` };
     const fl = federalLevels(fed);
@@ -629,7 +679,9 @@ export function classifySite(data: SiteData): Site {
       levelsGuessed: true,
       floorArea: Math.round(floorArea),
       vintage: medianYear !== null ? yearBand(medianYear) : null,
-      anchor: null,
+      anchor: fedAnchor?.anchor ?? null,
+      anchorSource: fedAnchor?.source ?? null,
+      industrial: federalIndustrial(s, nsiOcc),
       origin: 'fema',
       levelsSource: fl?.source ?? 'default',
       vintageSource: medianYear !== null ? 'nsi-median' : null,
@@ -641,6 +693,40 @@ export function classifySite(data: SiteData): Site {
     if (f.tags['building'] && f.geometry.type === 'polygon' && pointInRing(centroid(f.geometry.ring), boundary)) continue;
     const kind = sourceKind(f.tags);
     if (kind) addSource(f, kind, f.geometry.type === 'polygon' ? ringArea(f.geometry.ring) : null);
+  }
+
+  // EPA CWNS treatment plants (phase 13): one OSM has within CWNS_MATCH_M,
+  // or whose outline holds the CWNS point, takes its design flow; the rest
+  // become candidates of their own.
+  if (data.wastewater) {
+    const { release } = data.wastewater;
+    const osmPlants = data.features.filter((f) => f.tags['man_made'] === 'wastewater_plant');
+    for (const p of data.wastewater.plants) {
+      const distanceM = distanceToBoundary(p.at, boundary);
+      const cwns = { id: p.id, designMgd: p.designMgd, release };
+      const twin = osmPlants.find(
+        (f) => distance(anchorPoint(f), p.at) <= CWNS_MATCH_M || (f.geometry.type === 'polygon' && pointInRing(p.at, f.geometry.ring)),
+      );
+      const i = twin ? sources.findIndex((s) => s.id === twin.id) : -1;
+      if (i >= 0) {
+        const s = sources[i]!;
+        if (s.cwns) continue;
+        sources[i] = { ...s, name: s.name ?? p.name, estimatedCapacityW: wastewaterCapacityW(p.designMgd), cwns };
+        continue;
+      }
+      if (twin || distanceM > SOURCE_SEARCH_M) continue;
+      sources.push({
+        id: `cwns:${p.id}`,
+        kind: 'wastewater',
+        name: p.name,
+        at: p.at,
+        distanceM: Math.round(distanceM),
+        exchange: SOURCE_DEFAULTS.wastewater.exchange,
+        estimatedCapacityW: wastewaterCapacityW(p.designMgd),
+        temperature: SOURCE_DEFAULTS.wastewater.temperature,
+        cwns,
+      });
+    }
   }
 
   const barriers: Barrier[] = [];

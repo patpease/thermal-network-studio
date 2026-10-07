@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_UNITS, fromDisplay, LABELS, toDisplay } from '../src/units/units';
 import type { Quantity } from '../src/units/units';
 
-const QUANTITIES: Quantity[] = ['temperature', 'temperatureDelta', 'power', 'energy', 'area', 'length', 'powerLarge', 'energyLarge', 'density', 'loadIntensity', 'coolingIntensity'];
+const QUANTITIES: Quantity[] = ['temperature', 'temperatureDelta', 'power', 'energy', 'area', 'length', 'powerLarge', 'energyLarge', 'density', 'loadIntensity', 'coolingIntensity', 'waterFlow'];
 
 describe('units', () => {
   it('defaults to IP, because the tool is US-first', () => {

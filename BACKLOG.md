@@ -160,10 +160,19 @@ The decisions and their reasons are in `PLAN.md`. This is the checklist.
 Detail, sources, hosting and open questions for each: "Phases 13–17 plan"
 below. Numbered after 12; 11 and 12 ran out of order.
 
-- [ ] **13 Anchor loads and more heat sources** (M) — FEMA occupancy flags
-      anchor loads where OSM names none; EPA CWNS 2022 wastewater plants
-      with flow-based sewer heat; PNNL IM3 data centres with floor-area
-      heat. Wired into the existing source list, suggestion and site facts.
+- [x] **13 Anchor loads and more heat sources** (M, done 7 October 2026) —
+      EPA CWNS 2022: 15,908 built treatment plants with a point and a design
+      flow, in 56 state files under `public/data/cwns/` (`npm run
+      import:cwns -- <zip>`), fetched only for the states a site's box
+      touches; a plant within 150 m of OSM's enriches it, else it is a
+      candidate of its own; heat = design flow × 3 K (1 MGD ≈ 0.55 MW).
+      FEMA then NSI occupancy sets anchors where OSM names none (never over
+      an OSM tag); federal "industrial" is listed as a possible process
+      load, not modelled. **IM3 data centres dropped**: the atlas is derived
+      from OpenStreetMap with the same data-centre tags the tool already
+      queries live (footprint × 250 W/m²), and its files sit behind an
+      MSD-LIVE login. **CWNS flows are DESIGN flows**, not measured; the
+      tool says so.
 - [ ] **14 District steam connections** (S) — flag the buildings NYC LL84
       reports on district steam, so the Site tab shows how a building is
       heated today and what connecting it would replace. Thermal demand

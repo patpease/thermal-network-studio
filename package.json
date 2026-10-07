@@ -23,6 +23,7 @@
     "fixtures:structures": "node scripts/fixtures/structures.ts",
     "validate:autobem": "node scripts/validate/autobem.ts",
     "import:networks": "node scripts/networks/import.ts",
+    "import:cwns": "node scripts/cwns/import.ts",
     "tour:build": "node scripts/tour/build.ts",
     "dev:fixtures": "TNS_FIXTURES=1 vite",
     "brand:icons": "node scripts/brand/icons.ts"
