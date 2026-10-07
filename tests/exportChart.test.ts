@@ -21,22 +21,20 @@ const compose = (over: Partial<Parameters<typeof composeChartSvg>[0]> = {}) =>
   });
 
 describe('an exported chart', () => {
-  it('burns in the scope line, the sources, the host and the month', () => {
+  it('has a one-line footer: the app, the host and the month, and nothing else', () => {
     const { svg } = compose();
-    // Wrapped over lines: every word of the statement is there, in order.
-    const text = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' ');
-    expect(text).toContain('Use to explore how a shared thermal network could work in a neighborhood.');
-    expect(text.replace(/\s+/g, ' ')).toContain(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`);
-    expect(svg).toContain('OpenStreetMap contributors');
-    expect(svg).toContain('ComStock™');
-    expect(svg).toContain(BRAND.host);
-    expect(svg).toContain('September 2026');
+    const text = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]);
+    expect(text.at(-1)).toBe(`${BRAND.appName} · ${BRAND.host} · September 2026`);
+    expect(svg).not.toContain(SCOPE_STATEMENT.body.slice(0, 30));
+    expect(svg).not.toContain('OpenStreetMap');
+    expect(svg).not.toContain('ComStock');
   });
 
-  it('is the desk width, and tall enough for the chart and its footer', () => {
+  it('is the desk width, and the chart takes the height', () => {
     const { svg, height } = compose();
     expect(svg).toContain(`width="${EXPORT_WIDTH}"`);
-    expect(height).toBeGreaterThan(300 + 150);
+    expect(height).toBeGreaterThan(300 + 52);
+    expect(height).toBeLessThan(300 + 260);
   });
 
   it('escapes a title', () => {

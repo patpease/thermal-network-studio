@@ -19,8 +19,7 @@ import type { Challenge } from '../challenges/challenges';
 import type { LonLat, Ring } from '../site/geometry';
 import { metresPerDegree } from '../site/geometry';
 import { MARK_STANDARD, markInner } from '../brand/mark';
-import { SCOPE_STATEMENT } from '../config/copy';
-import { sourceLine } from '../config/sources';
+import { BRAND } from '../config/branding';
 import { ICON_BLUE, ICON_GREEN, ICON_INK, ICON_ORANGE, ICONS } from './icons';
 
 export const AWARD_WIDTH = 1080;
@@ -77,6 +76,9 @@ export function escapeXml(text: string): string {
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 export const monthYear = (d: Date) => `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 
+/** Every export's footer, and all of it: the app, where it lives, the month. */
+export const exportFooter = (d: Date, url: string = BRAND.host) => `${BRAND.appName} · ${url} · ${monthYear(d)}`;
+
 /** "Highland Park · St. Paul, MN", or whatever parts are known. */
 export function placeLines(place: AwardPlace): { main: string; sub: string | null } {
   const clean = (x: string | null | undefined) => (x && x.trim() ? x.trim() : null);
@@ -96,17 +98,6 @@ function wrapTitle(text: string, chars: number): string[] {
   let first = '';
   while (words.length && (first + ' ' + words[0]).trim().length <= chars) first = `${first} ${words.shift()}`.trim();
   return [first, words.join(' ')];
-}
-
-/** Wrap text onto lines of about `chars` characters. */
-function wrapLines(text: string, chars: number): string[] {
-  const lines: string[] = [''];
-  for (const w of text.split(' ')) {
-    const line = lines[lines.length - 1]!;
-    if (line && line.length + 1 + w.length > chars) lines.push(w);
-    else lines[lines.length - 1] = line ? `${line} ${w}` : w;
-  }
-  return lines;
 }
 
 /** The neighbourhood, fitted into a box, as line art. */
@@ -230,7 +221,7 @@ export function awardSvg(input: AwardInput, fonts: AwardFonts = {}): string {
   const medalY = 560;
   const bannerY = 810;
   const bannerH = title.length > 1 ? 124 : 104;
-  const stripTop = 1062;
+  const stripTop = 1090;
   const stripH = 146;
   const thumbW = 250;
 
@@ -240,7 +231,6 @@ export function awardSvg(input: AwardInput, fonts: AwardFonts = {}): string {
 ${mark(L, 44, 56)}
 ${t(L + 74, 66, 18, 'PEASE STUDIO', { weight: 600, fill: C.muted, family: mono, spacing: 3 })}
 ${t(L + 74, 94, 26, 'Thermal Network Studio', { weight: 700 })}
-${t(W - L, 82, 20, monthYear(input.date).toUpperCase(), { weight: 500, fill: C.muted, family: mono, anchor: 'end', spacing: 2 })}
 ${ribbon(W / 2, 128, medalY - 150)}
 ${medal(W / 2, medalY, ICONS[input.challenge.icon])}
 ${banner(W / 2, bannerY, 760, bannerH)}
@@ -257,10 +247,7 @@ ${t(L + 292, stripTop + 78, 64, pct(input.energyReduction), { weight: 800 })}
 ${t(L + 292, stripTop + 118, 24, `${direction(input.energyReduction)} energy`, { weight: 600 })}
 ${t(W - L - thumbW - 28, stripTop + 118, 18, 'than the buildings today', { fill: C.muted, anchor: 'end' })}
 ${outlineMarkup(input.outline, W - L - thumbW, stripTop, thumbW, stripH)}
-<line x1="${L}" y1="1222" x2="${W - L}" y2="1222" stroke="${C.rule}" stroke-width="2"/>
-${t(L, 1258, 26, input.url, { weight: 500, fill: C.accent, family: mono })}
-${wrapLines(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis} Buildings ${sourceLine(['osm', 'fema-structures', 'nsi'])}.`, 128)
-  .map((line, i) => t(L, 1284 + i * 19, 15, line, { fill: C.muted }))
-  .join('\n')}
+<line x1="${L}" y1="1270" x2="${W - L}" y2="1270" stroke="${C.rule}" stroke-width="2"/>
+${t(L, 1312, 22, exportFooter(input.date, input.url), { weight: 500, fill: C.muted, family: mono })}
 </svg>`;
 }

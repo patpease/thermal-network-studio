@@ -1,6 +1,6 @@
 /**
- * A results chart as a PNG, with the scope line and the sources printed on
- * it. An exported chart reaches people who never saw the tool (ZEEL).
+ * A results chart as a PNG. The footer is one line — app, host, month — and
+ * nothing else: the scope statement and the data credits live on the page.
  *
  * The chart is drawn a second time, off screen, at the desk width and inside
  * a `data-theme="light"` stage: an export is never the phone layout and never
@@ -11,18 +11,12 @@
  * Browser only; verified in Chromium.
  */
 import { awardFonts, download } from '../award/raster';
-import { BRAND } from '../config/branding';
-import { SCOPE_STATEMENT } from '../config/copy';
-import { sourceLine } from '../config/sources';
-import { escapeXml, monthYear } from '../award/graphic';
+import { escapeXml, exportFooter } from '../award/graphic';
 import type { LegendItem } from './Chart';
 
 export const EXPORT_WIDTH = 1200;
 /** The width the chart is drawn at inside the export. */
 export const EXPORT_PLOT = 1104;
-
-/** The datasets every results chart draws on, credited on each export. */
-export const EXPORT_SOURCES = ['nlr-stock', 'cambium', 'open-meteo-weather', 'osm', 'fema-structures', 'nsi'] as const;
 
 const PROPS = [
   'fill',
@@ -142,19 +136,13 @@ export function composeChartSvg(input: {
   y += 24;
   const chartTop = y;
   y += input.chartHeight + 36;
-  // The scope statement wraps: it is longer than one line of the export.
-  const scope = wrap(`${SCOPE_STATEMENT.body} ${SCOPE_STATEMENT.emphasis}`, 128);
-  const scopeLines = scope.map((line, i) => t(L, y + 30 + i * 21, 15, line, input.ink));
-  const after = y + 30 + (scope.length - 1) * 21;
-  // Every dataset a results chart draws on, from the register, with its release.
-  const credits = wrap(`${sourceLine(EXPORT_SOURCES)}.`, 150);
+  // One footer line: the app, where it lives, the month. The scope statement
+  // and the data credits live on the page (header, Learn), not on the image.
   const footer = [
     `<line x1="${L}" y1="${y}" x2="${EXPORT_WIDTH - L}" y2="${y}" stroke="#D9DEE5" stroke-width="1.5"/>`,
-    ...scopeLines,
-    ...credits.map((line, i) => t(L, after + 24 + i * 18, 13, line, input.muted)),
-    t(L, after + 30 + credits.length * 18, 13, `${BRAND.appName} · ${BRAND.host} · ${monthYear(input.date)}`, input.muted),
+    t(L, y + 30, 14, exportFooter(input.date), input.muted),
   ];
-  const height = after + 52 + credits.length * 18;
+  const height = y + 52;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${EXPORT_WIDTH}" height="${height}" viewBox="0 0 ${EXPORT_WIDTH} ${height}">
 <style>${face}</style>
 <rect width="${EXPORT_WIDTH}" height="${height}" fill="#FFFFFF"/>

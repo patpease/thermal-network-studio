@@ -26,7 +26,9 @@ physics and publicly accessible building data. Use it to convey an idea, learn
 about thermal energy networks and your neighborhood. Not for a full
 feasibility study, to learn more find an expert and start a dialog." The map
 opens on Boston, MA, the suite's shared starting point. The scope statement is permanent page furniture, never a
-dismissible modal, and from phase 07 it is burned into every export. Never state
+dismissible modal. Exports carry one footer line only — app name, URL, month
+(owner's decision, 7 October 2026, `exportFooter` in `award/graphic.ts`); the
+scope statement and data credits stay on the page. Never state
 a ± tolerance. A score is not a saving.
 
 ## Layout
@@ -159,7 +161,7 @@ targets + weather + model   --calibrate:fit-----> src/loads/generated/calibratio
 - **Attribution.** NLR asks for: "Data includes information from the
   ComStock™ and ResStock™ datasets developed by the National Laboratory of the
   Rockies (NLR) with funding from the U.S. Department of Energy (DOE)." It is
-  in the generated table's banner and must reach the page and exports.
+  in the generated table's banner and on the page (Learn's data sources).
 
 Things in this data that look right and are not:
 
@@ -396,7 +398,7 @@ Things that looked right and were not:
   found. A challenge card shows the site fact that bears on it.
 - **Chart export** (`charts/exportChart.ts`): a desk-width, light-theme copy
   off screen; computed styles copied onto its clone; fonts as data URIs;
-  scope line, sources, host and month printed on it; 2× resolution.
+  one footer line (app, host, month) printed on it; 2× resolution.
 - **The phone is one screen at a time** (D38). Map is a tab below 860 px;
   the map's own toolbar (drawing, placing) is rendered only on a phone, so a
   desk has one Finish button, not two. MapLibre only tracks window resizes;
@@ -584,8 +586,8 @@ Things that looked right and were not:
   the tests read them. Both services answered from this sandbox with plain
   curl AND from `preview:worker` (unlike Overpass's mirrors).
 - **Attribution** — "FEMA USA Structures (FEMA, ORNL), CC BY 4.0; USACE
-  National Structure Inventory" — is on the Site panel, chart exports and the
-  award. They are data licences, like NLR's, and so appear outside Learn;
+  National Structure Inventory" — is on the Site panel and in Learn's data
+  sources (exports carry no credits since 7 October 2026). They are data licences, like NLR's, and so appear outside Learn;
   Learn cites them as sources too.
 
 ## Checking the loads against AutoBEM
@@ -654,9 +656,9 @@ Things that looked right and were not:
 - **`src/config/sources.ts` lists every dataset the tool loads**: licence,
   the credit it asks for, share-alike, the release used (vintage), how it is
   refreshed, and the hosts or generated files it comes through. Learn's
-  references card shows it under "Data sources"; the Site panel line, chart
-  exports (`EXPORT_SOURCES`) and the award build their credits with
-  `sourceLine`, so a release changes in one place.
+  references card shows it under "Data sources"; the Site panel line builds
+  its credits with `sourceLine`, so a release changes in one place. Exports
+  carry no credits (owner's decision): one footer line.
 - **`tests/sources.test.ts` fails if a relay host, the tile host or a file
   under `src/**/generated/` has no entry**, or an entry has no licence,
   credit or release. A new source cannot ship without its licence written

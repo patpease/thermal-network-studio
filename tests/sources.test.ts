@@ -2,7 +2,6 @@ import { existsSync, readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { EXPORT_SOURCES } from '../src/charts/exportChart';
 import { DATA_SOURCES, sourceById, sourceLine } from '../src/config/sources';
 import { TILES } from '../src/map/style';
 import { ALLOWED_HOSTS, ATTRIBUTION } from '../src/relay/relay';
@@ -59,7 +58,7 @@ describe('the data source register', () => {
   });
 
   it('prints a release on every attribution line', () => {
-    const line = sourceLine(EXPORT_SOURCES);
+    const line = sourceLine(['nlr-stock', 'cambium']);
     expect(line).toContain('2025 R3');
     expect(line).toContain('Cambium 2023');
     expect(sourceLine(NETWORK_SOURCES.map((n) => n.id))).toMatch(/\d{4}/);

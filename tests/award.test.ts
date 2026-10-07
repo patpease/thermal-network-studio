@@ -55,16 +55,15 @@ describe('the award graphic', () => {
 
   it('names the challenge, the place, the month and the headline results', () => {
     const svg = awardSvg(input());
-    for (const s of ['Ground in balance', 'Highland Park', 'St. Paul, MN', 'SEPTEMBER 2026', '73%', 'less carbon', '58%', 'CHALLENGE MET']) expect(svg).toContain(s);
+    for (const s of ['Ground in balance', 'Highland Park', 'St. Paul, MN', 'September 2026', '73%', 'less carbon', '58%', 'CHALLENGE MET']) expect(svg).toContain(s);
   });
 
-  it('carries the scope line and the link, and draws no NaN', () => {
+  it('ends on one footer line, the app, the link and the month, and draws no NaN', () => {
     const svg = awardSvg(input());
-    // The scope statement wraps over lines; read the drawn text in order.
-    const drawn = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' ');
-    expect(drawn).toContain('Not for a full feasibility study, to learn more find an expert and start a dialog.');
-    expect(drawn).toContain('OpenStreetMap contributors');
-    expect(svg).toContain('example.test');
+    const drawn = [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]);
+    expect(drawn.at(-1)).toMatch(/^Thermal Network Studio · .*example\.test.* · September 2026$/);
+    expect(drawn.join(' ')).not.toContain('feasibility study');
+    expect(drawn.join(' ')).not.toContain('OpenStreetMap');
     expect(svg).not.toMatch(/NaN|undefined|Infinity/);
   });
 
