@@ -188,6 +188,22 @@ below. Numbered after 12; 11 and 12 ran out of order.
       warehouses, and Site features lists them as possible process loads.
       One tower also reads 114 storeys. Decide whether FEMA's industrial
       class should stand in dense downtowns, or yield to NSI or size.
+- [x] **18 Grid nearby: substations** (S–M, approved and built 8 October
+      2026) — after a boundary is drawn, never as a browse layer
+      (users do not pick a site by its substation). OSM `power=substation`
+      within 1 mile, read in the same Overpass request; transmission and
+      distribution both shown and labelled (`substation=*`, else by voltage
+      class, said so). Map: outline or marker with name and kV. Site tab
+      "Grid nearby" card: nearest substations with distance, voltage, type,
+      operator; the network's winter electric peak beside building-level
+      electrification's; a link to the DOE atlas of utility hosting-capacity
+      maps. A Site features row; Learn facts on substation types, hosting
+      capacity and OSM coverage. No capacity figures (none are public in
+      open data); no per-state utility link list (owner may split that out
+      later). Never a load or the score. Checked live: Midtown Manhattan
+      lists 12 within a mile (Con Edison, with kV where tagged, and subway
+      traction substations); downtown Mankato has none mapped. When OSM
+      does not answer the card says substations are unknown, never "none".
 - [ ] **15 Existing district and thermal systems, partial** (M) — extend the
       existing-networks layer: ORNL Onsite Energy installations (terms
       permitting), OSM district heating plants, NYC steam users from 14.

@@ -726,6 +726,30 @@ Things that looked right and were not:
   Light", so untagged towers become warehouses and possible process loads.
   On the backlog for a decision.
 
+## Grid nearby: substations (phase 18)
+
+- **Shown only after a boundary is drawn**, never as a browse layer (owner:
+  nobody picks a site by its substation). `overpassQuery` adds a second
+  output — `nwr["power"="substation"]` within `SUBSTATION_SEARCH_M` (one
+  mile) — to the request it already makes, so no new host and no extra
+  call. `RELAY_VERSION` went to 4 so cached sites re-fetch. They ride in
+  the raw OSM features, so a saved file keeps them.
+- **`Site.substations`**, nearest first: name, operator, kV from `voltage=*`
+  (`voltagesKv`, volts → kV, highest first) and a labelled type — OSM's
+  `substation=*` (distribution, transmission, traction…), else the voltage
+  class (≥ 69 kV is "transmission voltage"), else "type not recorded".
+  Never a building, a source or anything `toNeighbourhood` passes on.
+- **Map**: the `--map-grid` purple (all three palette blocks), never heat or
+  cooling — a dashed outline where mapped as an area and a labelled marker.
+- **Site tab "Grid nearby" card**: the nearest five, today's and
+  building-level electrification's winter electric peak (and this
+  network's once a design has a source), and a link to DOE's atlas of
+  utility hosting-capacity maps — the only public capacity figures. No
+  capacity is shown or implied. A Site features row names the nearest.
+- **OSM unavailable means unknown, not none**: the first live check came
+  back federal-only and the card said "no substation is mapped". It now
+  says substations are not known, and the features row is blank.
+
 ## The guided tour
 
 - **"Take the tour" in the header** runs 13 steps through downtown Mankato

@@ -83,6 +83,23 @@ export const MAP_COPY = {
   /** A wastewater plant with an EPA design flow (phase 13). */
   cwnsFlow: (flow: string) => `design flow ${flow}, EPA CWNS 2022`,
   cwnsOnly: 'not in OpenStreetMap',
+  /** Substations within a mile (grid nearby). */
+  grid: {
+    heading: 'Grid nearby',
+    within: (d: string) => `Substations within ${d} in OpenStreetMap, nearest first.`,
+    none: (d: string) => `No substation is mapped in OpenStreetMap within ${d}.`,
+    unknown: 'OpenStreetMap did not answer, so substations are not known. Try OpenStreetMap again above.',
+    unnamed: 'Unnamed substation',
+    kind: (kind: string, fromVoltage: boolean) => (fromVoltage ? `${kind} voltage` : kind.replace(/_/g, ' ')),
+    noKind: 'type not recorded',
+    more: (n: number) => `and ${n} more`,
+    peakHeading: 'Winter electric peak',
+    today: 'Today',
+    ble: 'A heat pump in every building',
+    network: 'This network',
+    capacity: 'Available capacity at a substation is on the utility’s hosting capacity map.',
+    atlas: 'U.S. Atlas of hosting capacity maps',
+  },
   /** NYC district steam (phase 14). */
   steam: {
     building: (year: number | null) => `On district steam today: NYC Local Law 84 reports district steam use for this property${year ? ` in ${year}` : ''}. Outlined in orange on the map.`,

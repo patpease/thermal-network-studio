@@ -157,6 +157,7 @@ sits on the page and is burned into every export.
 - **14 District steam connections** (done: NYC LL84 flag; measured vs modelled on hold)
 - **15 Existing district and thermal systems, partial** (planned)
 - **16 EU and UK layers** (backlog, not scheduled)
+- **18 Grid nearby: substations** (done: OSM substations within a mile, DOE hosting-capacity atlas link)
 - **17 Learn tab reference links** (planned)
 
 ## Proposed archetypes (Q1 — for review)

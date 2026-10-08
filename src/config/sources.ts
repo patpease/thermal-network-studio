@@ -68,7 +68,7 @@ export const DATA_SOURCES: readonly DataSource[] = [
     id: 'osm',
     name: 'OpenStreetMap',
     publisher: 'OpenStreetMap contributors',
-    use: 'Building footprints, uses and storeys; heat sources, open space, land use and place names.',
+    use: 'Building footprints, uses and storeys; heat sources, open space, land use and place names; substations within a mile.',
     licence: 'Open Database Licence (ODbL) 1.0',
     licenceUrl: 'https://www.openstreetmap.org/copyright',
     attribution: '© OpenStreetMap contributors',

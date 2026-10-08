@@ -25,7 +25,7 @@ import type { ArchetypeId } from '../loads/archetypes.ts';
 import type { VintageBand } from '../loads/zones.ts';
 import { bbox, centroid, distance, distanceToRing, lineCrossesRing, pointInRing, ringArea } from './geometry.ts';
 import type { LonLat, Ring } from './geometry.ts';
-import { SOURCE_SEARCH_M } from './osm.ts';
+import { SOURCE_SEARCH_M, SUBSTATION_SEARCH_M } from './osm.ts';
 import type { OsmFeature, SiteData } from './osm.ts';
 import type { FemaStructure, NsiStructure } from './structures.ts';
 import { wastewaterCapacityW } from './wastewater.ts';
@@ -112,6 +112,44 @@ export interface SourceCandidate {
   readonly cwns?: { readonly id: string; readonly designMgd: number; readonly release: string };
 }
 
+/**
+ * A substation within a mile (grid nearby). Context only: never a load, a
+ * source or the score.
+ */
+export interface Substation {
+  readonly id: string;
+  readonly name: string | null;
+  readonly operator: string | null;
+  /** kV, highest first, from `voltage=*` (volts, semicolon-separated). Empty when untagged. */
+  readonly voltagesKv: readonly number[];
+  /**
+   * `kind` is OSM's `substation=*` when tagged. Otherwise the voltage class
+   * (69 kV and above is transmission voltage), with `kindFrom: 'voltage'`, or
+   * null when neither is known.
+   */
+  readonly kind: string | null;
+  readonly kindFrom: 'osm' | 'voltage' | null;
+  /** Outline when mapped as an area; a point otherwise. */
+  readonly ring: Ring | null;
+  readonly at: LonLat;
+  /** Metres from the boundary; 0 inside it. */
+  readonly distanceM: number;
+}
+
+/** Transmission voltage starts at 69 kV in US practice. */
+export const TRANSMISSION_KV = 69;
+
+/** "115000;13800" → [115, 13.8]. Unparseable parts are dropped. */
+export function voltagesKv(tag: string | undefined): number[] {
+  if (!tag) return [];
+  return [...new Set(tag.split(/[;,]/).map((v) => Number.parseFloat(v.trim())).filter((v) => Number.isFinite(v) && v > 0).map((v) => Math.round(v / 100) / 10))].sort(
+    (a, b) => b - a,
+  );
+}
+
+/** "115/13.8 kV", or '' when untagged. kV is the unit OSM's volts are always read in. */
+export const kvLabel = (kv: readonly number[]) => (kv.length ? `${kv.join('/')} kV` : '');
+
 export interface Barrier {
   readonly id: string;
   readonly kind: 'highway' | 'railway' | 'river';
@@ -124,6 +162,8 @@ export interface Site {
   readonly buildings: readonly SiteBuilding[];
   readonly sources: readonly SourceCandidate[];
   readonly barriers: readonly Barrier[];
+  /** Substations within a mile, nearest first. */
+  readonly substations: readonly Substation[];
   /** Parks, pitches and surface parking inside the boundary, m². */
   readonly openSpaceM2: number;
   readonly skipped: number;
@@ -807,6 +847,28 @@ export function classifySite(data: SiteData): Site {
     steamSummary = { year: data.steam.year, buildings: matched, unmatched };
   }
 
+  // Substations within a mile (grid nearby).
+  const substations: Substation[] = [];
+  for (const f of data.features) {
+    if (f.tags['power'] !== 'substation') continue;
+    const { distanceM } = nearestPoint(f, boundary);
+    if (distanceM > SUBSTATION_SEARCH_M) continue;
+    const kv = voltagesKv(f.tags['voltage']);
+    const tagged = f.tags['substation']?.trim() || null;
+    substations.push({
+      id: f.id,
+      name: f.tags['name'] ?? null,
+      operator: f.tags['operator'] ?? null,
+      voltagesKv: kv,
+      kind: tagged ?? (kv.length ? (kv[0]! >= TRANSMISSION_KV ? 'transmission' : 'distribution') : null),
+      kindFrom: tagged ? 'osm' : kv.length ? 'voltage' : null,
+      ring: f.geometry.type === 'polygon' ? f.geometry.ring : null,
+      at: anchorPoint(f),
+      distanceM: Math.round(distanceM),
+    });
+  }
+  substations.sort((a, b) => a.distanceM - b.distanceM);
+
   sources.sort((a, b) => a.distanceM - b.distanceM);
   return {
     placeName: neighbourhoodName(data.features, boundary),
@@ -815,6 +877,7 @@ export function classifySite(data: SiteData): Site {
     buildings,
     sources,
     barriers: uniqueBarriers,
+    substations,
     openSpaceM2: Math.round(openSpace),
     skipped: data.skipped,
     ...(data.osmUnavailable ? { osmUnavailable: true as const } : {}),

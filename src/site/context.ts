@@ -13,7 +13,8 @@
 import type { SiteMetrics } from '../engine/demand.ts';
 import { scaleOf } from '../engine/scale.ts';
 import { boreholeRoom } from './classify.ts';
-import { SOURCE_SEARCH_M } from './osm.ts';
+import { SOURCE_SEARCH_M, SUBSTATION_SEARCH_M } from './osm.ts';
+import { kvLabel } from './classify.ts';
 import type { AnchorKind, Site } from './classify.ts';
 import { LL84_MIN_FLOOR_M2 } from './steam.ts';
 
@@ -62,6 +63,7 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
   const opportunistic = site.sources.filter((s) => s.exchange !== 'in-load' || s.kind === 'supermarket');
   const room = boreholeRoom(site.openSpaceM2);
   const federalAnchors = anchors.filter((b) => b.anchorSource === 'fema' || b.anchorSource === 'nsi').length;
+  const nearestSub = site.substations[0] ?? null;
   const industrial = site.buildings.filter((b) => b.industrial && b.archetype).length;
 
 
@@ -133,6 +135,17 @@ export function siteContext(site: Site, metrics: SiteMetrics | null, format: For
           },
         ]
       : []),
+    {
+      key: 'substation',
+      criterion: 'Nearest substation',
+      // Federal data alone (OSM did not answer) says nothing about substations.
+      known: !site.osmUnavailable,
+      finding: nearestSub
+        ? `${nearestSub.name ?? 'Unnamed'}${nearestSub.voltagesKv.length ? `, ${kvLabel(nearestSub.voltagesKv)}` : ''}, ${nearestSub.distanceM === 0 ? 'inside the boundary' : `${format.distance(nearestSub.distanceM)} away`}`
+        : site.osmUnavailable
+          ? ''
+          : `None mapped in OpenStreetMap within ${format.distance(SUBSTATION_SEARCH_M)}`,
+    },
     {
       key: 'process',
       criterion: 'Possible process loads',

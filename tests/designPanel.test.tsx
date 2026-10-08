@@ -25,6 +25,7 @@ const SITE: Site = {
     { id: 'shop', kind: 'supermarket', name: 'Hy-Vee', at: [-93.995, 44.005], distanceM: 0, exchange: 'in-load', estimatedCapacityW: 0, temperature: null },
   ],
   barriers: [],
+  substations: [],
   openSpaceM2: 36_000,
   skipped: 0,
 };

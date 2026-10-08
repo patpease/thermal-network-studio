@@ -25,6 +25,7 @@ import { boreFieldArea } from '../engine/design';
 import type { Design } from '../engine/design';
 import { metresPerDegree } from '../site/geometry';
 import type { LonLat, Ring } from '../site/geometry';
+import { kvLabel } from '../site/classify';
 import type { Site } from '../site/classify';
 import { effective } from '../site/neighbourhood';
 import type { Selection } from '../site/neighbourhood';
@@ -154,6 +155,18 @@ function designData(design: Design): FeatureCollection {
   return { type: 'FeatureCollection', features };
 }
 
+/** Substations within a mile: outlines where mapped as areas, a marker for every one. */
+function substationData(site: Site | null): FeatureCollection {
+  if (!site) return EMPTY;
+  const features: Feature[] = [];
+  for (const s of site.substations) {
+    if (s.ring) features.push({ type: 'Feature', properties: { outline: true }, geometry: { type: 'Polygon', coordinates: [s.ring.map((p) => [p[0], p[1]])] } });
+    const label = [s.name, kvLabel(s.voltagesKv)].filter(Boolean).join(' · ');
+    features.push({ type: 'Feature', properties: { outline: false, label }, geometry: { type: 'Point', coordinates: [s.at[0], s.at[1]] } });
+  }
+  return { type: 'FeatureCollection', features };
+}
+
 const NETWORKS_DATA: FeatureCollection = {
   type: 'FeatureCollection',
   features: EXISTING_NETWORKS.map((n) => ({
@@ -174,6 +187,7 @@ function withOverlays(p: MapPalette): StyleSpecification {
       draft: { type: 'geojson', data: EMPTY },
       sources: { type: 'geojson', data: EMPTY },
       design: { type: 'geojson', data: EMPTY },
+      substations: { type: 'geojson', data: EMPTY },
       // Existing networks: static data, the same on every map.
       networks: { type: 'geojson', data: NETWORKS_DATA },
     },
@@ -315,6 +329,38 @@ function withOverlays(p: MapPalette): StyleSpecification {
         paint: { 'text-color': p.ink, 'text-halo-color': p.surface, 'text-halo-width': 1.5 },
       },
       {
+        // Substations within a mile (grid nearby): the grid colour, never heat
+        // or cooling. A dashed outline where mapped as an area, and a marker
+        // for every one, labelled with its name and kV.
+        id: 'substation-outline',
+        type: 'line',
+        source: 'substations',
+        filter: ['get', 'outline'],
+        paint: { 'line-color': p.grid, 'line-width': 2, 'line-dasharray': [3, 1.5] },
+      },
+      {
+        id: 'substation-points',
+        type: 'circle',
+        source: 'substations',
+        filter: ['!', ['get', 'outline']],
+        paint: { 'circle-radius': 5, 'circle-color': p.grid, 'circle-stroke-color': p.surface, 'circle-stroke-width': 2 },
+      },
+      {
+        id: 'substation-labels',
+        type: 'symbol',
+        source: 'substations',
+        filter: ['!', ['get', 'outline']],
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 11,
+          'text-offset': [0, 1.1],
+          'text-anchor': 'top',
+          'text-optional': true,
+        },
+        paint: { 'text-color': p.ink, 'text-halo-color': p.surface, 'text-halo-width': 1.5 },
+      },
+      {
         // Existing networks: a hollow ink ring, apart from the filled heat
         // and cooling markers of sources a design can connect. A point that
         // is only the town is drawn fainter.
@@ -374,6 +420,7 @@ export function MapView(props: MapViewProps) {
     (m.getSource('draft') as GeoJSONSource | undefined)?.setData(draftData(p.drawing || p.editing ? p.draft : [], p.editing));
     (m.getSource('sources') as GeoJSONSource | undefined)?.setData(sourceData(p.site, p.design));
     (m.getSource('design') as GeoJSONSource | undefined)?.setData(designData(p.design));
+    (m.getSource('substations') as GeoJSONSource | undefined)?.setData(substationData(p.site));
   };
 
   useEffect(() => {

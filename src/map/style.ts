@@ -39,6 +39,8 @@ export interface MapPalette {
   readonly cool: string;
   readonly ink: string;
   readonly surface: string;
+  /** Substations (grid nearby): never heat or cooling. */
+  readonly grid: string;
 }
 
 const TOKENS: Record<keyof MapPalette, string> = {
@@ -60,6 +62,7 @@ const TOKENS: Record<keyof MapPalette, string> = {
   cool: '--cool',
   ink: '--ink',
   surface: '--surface',
+  grid: '--map-grid',
 };
 
 /** Read the palette from an element's computed style (the document, normally). */

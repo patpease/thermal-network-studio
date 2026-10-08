@@ -16,16 +16,16 @@ import { AIR_SOURCE_LIMITS } from '../engine/heatpumps';
 import { BLE } from '../engine/grid';
 import type { Challenge } from '../challenges/challenges';
 import { SCOPE_STATEMENT } from '../config/copy';
-import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES } from '../site/classify';
+import { boreholeRoom, HOME_AVERAGE_HEAT_W, SUPERMARKET_HOMES, TRANSMISSION_KV } from '../site/classify';
 import { DESIGN_DIVERSITY } from '../engine/balance';
 import { SCALE_POINT_TONS, scaleOf } from '../engine/scale';
 import { RULE_OF_THUMB_W_PER_M2 } from '../engine/ruleOfThumb';
 import { RECOVERABLE_DT_K, wastewaterCapacityW } from '../site/wastewater';
 import { LL84_MIN_FLOOR_M2 } from '../site/steam';
-import { SOURCE_SEARCH_M } from '../site/osm';
+import { SOURCE_SEARCH_M, SUBSTATION_SEARCH_M } from '../site/osm';
 import type { Site } from '../site/classify';
 
-export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'cwns' | 'll84' | 'nrel-gdr' | 'idea' | 'tool';
+export type RefId = 'epri' | 'bdc' | 'heet' | 'vctn' | 'nlr' | 'cambium' | 'epa' | 'claesson' | 'stull' | 'osm' | 'fema' | 'nsi' | 'cwns' | 'll84' | 'doe-hc' | 'nrel-gdr' | 'idea' | 'tool';
 
 export const REFERENCES: Record<RefId, { short: string; full: string; url?: string }> = {
   epri: {
@@ -72,6 +72,11 @@ export const REFERENCES: Record<RefId, { short: string; full: string; url?: stri
     short: 'NYC LL84',
     full: 'City of New York. NYC Building Energy and Water Data Disclosure for Local Law 84 (Data for Calendar Year 2022–Present). NYC Open Data, dataset 5zyy-y8am.',
     url: 'https://data.cityofnewyork.us/Environment/NYC-Building-Energy-and-Water-Data-Disclosure-for-/5zyy-y8am',
+  },
+  'doe-hc': {
+    short: 'DOE hosting capacity atlas',
+    full: 'U.S. Department of Energy. U.S. Atlas of Electric Distribution System Hosting Capacity Maps. Linked here; its data is not part of this tool.',
+    url: 'https://www.energy.gov/cmei/vehicles/us-atlas-electric-distribution-system-hosting-capacity-maps',
   },
   nsi: { short: 'National Structure Inventory', full: 'U.S. Army Corps of Engineers, National Structure Inventory.', url: 'https://www.hec.usace.army.mil/confluence/nsi' },
   'nrel-gdr': {
@@ -216,6 +221,10 @@ export function sections(f: Formatters): Section[] {
         { text: 'HEET shows networked geothermal giving a lower winter electric peak than air-source heat pumps or electric resistance heat.', refs: ['heet'] },
         { text: `Building-level electrification (BLE) puts an air-source heat pump in each building. In this tool its heating COP follows outdoor air, with resistance heat below ${f.temperature(BLE.resistanceBelow)}, and hot water comes from a heat pump water heater at COP ${BLE.dhwCop}.`, refs: ['tool'] },
         { text: 'The winter electric peak is the largest hour of electricity from December to February. The Results tab compares the network (TEN) with BLE on the same loads. It is not scored.', refs: ['tool'] },
+        { text: `After a boundary is drawn, the Site tab lists the substations OpenStreetMap maps within ${f.distance(SUBSTATION_SEARCH_M)}, with their voltage where recorded. They do not change any load or the score.`, refs: ['osm', 'tool'] },
+        { text: `A substation's type is its OpenStreetMap substation tag, such as transmission or distribution. Where that is missing, its highest voltage sets the class: ${TRANSMISSION_KV} kV and above is transmission voltage.`, refs: ['osm', 'tool'] },
+        { text: 'OpenStreetMap does not map every substation, and often records no voltage.', refs: ['osm'] },
+        { text: 'A utility’s hosting capacity map shows the load or generation a substation or circuit can take without upgrades. DOE’s atlas lists the published maps by state and utility.', refs: ['doe-hc'] },
         { text: 'In the coldest hours a network uses the plant that still runs. Heat left to electric backup adds to its winter peak.', refs: ['tool'] },
         { text: 'The ground over 25 years is shown and not scored. A challenge may require it.', refs: ['tool'] },
         { text: 'Annual loads match NLR’s building stock data. The hour-by-hour shape is this tool’s model.', refs: ['nlr', 'tool'] },

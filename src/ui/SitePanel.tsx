@@ -11,11 +11,12 @@ import { MAP_COPY, SCALE_COPY } from '../config/copy';
 import { ARCHETYPES } from '../loads/archetypes';
 import type { ArchetypeId } from '../loads/archetypes';
 import type { Place } from '../relay/relay';
-import { MAX_BUILDINGS } from '../site/classify';
-import { SOURCE_SEARCH_M } from '../site/osm';
+import { kvLabel, MAX_BUILDINGS } from '../site/classify';
+import { SOURCE_SEARCH_M, SUBSTATION_SEARCH_M } from '../site/osm';
 import type { Site, SiteBuilding } from '../site/classify';
 import { sourceById, sourceLine } from '../config/sources';
 import { M3_PER_MGD } from '../site/wastewater';
+import type { GridImpact } from '../engine/grid';
 import { NETWORK_KIND_LABEL, NETWORK_SOURCES } from '../site/generated/networks';
 import { NEARBY_NETWORK_M, nearestNetwork, networksNear } from '../site/networks';
 import { centroid } from '../site/geometry';
@@ -117,6 +118,63 @@ function Stat({ label, value, note }: { label: string; value: string; note?: str
 const NETWORKS_SHOWN = 6;
 
 /** Thermal networks already running near the site: to learn from, not to connect. */
+const SUBSTATIONS_SHOWN = 5;
+export const HOSTING_CAPACITY_ATLAS = 'https://www.energy.gov/cmei/vehicles/us-atlas-electric-distribution-system-hosting-capacity-maps';
+
+/** Substations within a mile, and the site's winter electric peak beside them (grid nearby). */
+function GridNearby({ site, grid, designed, units }: { site: Site; grid: GridImpact | null; designed: boolean; units: UnitSystem }) {
+  const c = MAP_COPY.grid;
+  const within = withUnit('distance', SUBSTATION_SEARCH_M, units, 1);
+  const shown = site.substations.slice(0, SUBSTATIONS_SHOWN);
+  const kw = (w: number) => withUnit('electricPower', w, units);
+  return (
+    <section className="card" aria-labelledby="grid-heading">
+      <h2 id="grid-heading" className="card__heading">
+        {c.heading}
+      </h2>
+      {site.osmUnavailable ? (
+        <p className="card__note">{c.unknown}</p>
+      ) : shown.length === 0 ? (
+        <p className="card__note">{c.none(within)}</p>
+      ) : (
+        <>
+          <p className="card__note">{c.within(within)}</p>
+          <ul className="list">
+            {shown.map((s) => (
+              <li key={s.id}>
+                <span className="dot dot--grid" aria-hidden />
+                {s.name ?? c.unnamed}{' '}
+                <span className="muted">
+                  — {s.kind ? c.kind(s.kind, s.kindFrom === 'voltage') : c.noKind}
+                  {s.voltagesKv.length > 0 && `, ${kvLabel(s.voltagesKv)}`}, {s.distanceM === 0 ? 'inside' : `${withUnit('length', s.distanceM, units, 2)} away`}
+                  {s.operator && ` · ${s.operator}`}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {site.substations.length > SUBSTATIONS_SHOWN && <p className="card__note">{c.more(site.substations.length - SUBSTATIONS_SHOWN)}</p>}
+        </>
+      )}
+      {grid && (
+        <>
+          <h3 className="card__subheading">{c.peakHeading}</h3>
+          <div className="stats">
+            <Stat label={c.today} value={kw(grid.today.winterW)} />
+            <Stat label={c.ble} value={kw(grid.ble.winterW)} />
+            {designed && <Stat label={c.network} value={kw(grid.network.winterW)} />}
+          </div>
+        </>
+      )}
+      <p className="card__note">
+        {c.capacity}{' '}
+        <a href={HOSTING_CAPACITY_ATLAS} target="_blank" rel="noopener noreferrer">
+          {c.atlas}
+        </a>
+      </p>
+    </section>
+  );
+}
+
 function NetworksNearby({ at, units }: { at: LonLat; units: UnitSystem }) {
   const near = networksNear(at);
   const within = withUnit('distance', NEARBY_NETWORK_M, units, 2);
@@ -479,6 +537,8 @@ export function SitePanel(props: SitePanelProps) {
               </>
             )}
           </section>
+
+          <GridNearby site={site} grid={result?.grid ?? null} designed={state.design.sources.length > 0} units={units} />
 
           <NetworksNearby at={centroid(site.boundary)} units={units} />
 

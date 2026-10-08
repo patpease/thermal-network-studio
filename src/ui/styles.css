@@ -490,6 +490,11 @@ select {
   background: var(--cool);
 }
 
+/* A substation (grid nearby): the map's grid colour, never heat or cooling. */
+.dot--grid {
+  background: var(--map-grid);
+}
+
 /* An existing network: a hollow ring in ink, drawn apart from the heat
    sources a design can connect. */
 .dot--network {

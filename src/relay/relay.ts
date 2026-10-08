@@ -88,7 +88,7 @@ export function isAllowedHost(hostname: string): boolean {
 }
 
 /** Bump to invalidate every cached answer when a derivation changes. */
-export const RELAY_VERSION = '3';
+export const RELAY_VERSION = '4';
 
 const DAY = 86400;
 export const CACHE = { place: 30 * DAY, site: 365 * DAY, weather: 30 * DAY, buildings: 7 * DAY, steam: 30 * DAY } as const;

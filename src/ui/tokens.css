@@ -78,6 +78,7 @@
   --site-excluded: #bcc5cf;
   /* A placed bore field: earth, not heat or cooling — it does both. */
   --source-ground: #9a6420;
+  --map-grid: #7B5EA7;
 
   /* Chart marks. Validated as a set (dataviz validate_palette.js, all pairs)
      against each theme's surface. Light keeps the UI's heat and cool; dark
@@ -134,6 +135,7 @@
     --site-work: #6d7ea3;
     --site-excluded: #3b4959;
     --source-ground: #8b5b14;
+    --map-grid: #B39DDB;
     --chart-heat: #D6761F;
     --chart-cool: #3B93DA;
     --chart-ground: #8b5b14;
@@ -186,6 +188,7 @@
   --site-work: #6d7ea3;
   --site-excluded: #3b4959;
   --source-ground: #8b5b14;
+  --map-grid: #B39DDB;
   --chart-heat: #D6761F;
   --chart-cool: #3B93DA;
   --chart-ground: #8b5b14;

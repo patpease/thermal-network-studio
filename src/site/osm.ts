@@ -87,6 +87,10 @@ const KEEP = new Set([
   'name',
   'operator',
   'place',
+  // Substations (grid nearby): power=substation, its voltages and type.
+  'power',
+  'voltage',
+  'substation',
 ]);
 
 function keepTags(tags: Record<string, string> | undefined): Record<string, string> {
@@ -120,7 +124,7 @@ const isClosed = (path: readonly LonLat[]) =>
   path.length >= 4 && path[0]![0] === path[path.length - 1]![0] && path[0]![1] === path[path.length - 1]![1];
 
 /** Tags whose ways are areas when closed (OSM's own convention, abridged). */
-const AREA_KEYS = ['building', 'landuse', 'leisure', 'natural', 'amenity', 'man_made', 'shop', 'water', 'parking', 'tourism'];
+const AREA_KEYS = ['building', 'landuse', 'leisure', 'natural', 'amenity', 'man_made', 'shop', 'water', 'parking', 'tourism', 'power'];
 
 /**
  * Join a relation's outer members into one ring where they chain end to end.
@@ -187,16 +191,22 @@ export const MAX_BOUNDARY_M2 = 4_000_000;
  */
 export const SOURCE_SEARCH_M = 402;
 
+/** How far outside the boundary substations are looked for: one mile. */
+export const SUBSTATION_SEARCH_M = 1_609;
+
 /**
  * The Overpass query for a boundary: buildings, POIs and land use inside it;
  * waste-heat and water sources within SOURCE_SEARCH_M of it; roads, rail and
  * open space crossing it. Geometry is clipped to the grown bounding box, so a
- * lake next to the site does not arrive as the whole lake.
+ * lake next to the site does not arrive as the whole lake. Then, as a second
+ * output, substations within SUBSTATION_SEARCH_M (one mile).
  */
 export function overpassQuery(boundary: Ring): string {
   const poly = boundary.map(([lon, lat]) => `${lat.toFixed(6)} ${lon.toFixed(6)}`).join(' ');
   const [w, s, e, n] = bbox(boundary, SOURCE_SEARCH_M);
   const box = `${s.toFixed(6)},${w.toFixed(6)},${n.toFixed(6)},${e.toFixed(6)}`;
+  const [gw, gs, ge, gn] = bbox(boundary, SUBSTATION_SEARCH_M);
+  const grid = `${gs.toFixed(6)},${gw.toFixed(6)},${gn.toFixed(6)},${ge.toFixed(6)}`;
   return `[out:json][timeout:25][maxsize:67108864];
 (
   way["building"](poly:"${poly}");
@@ -220,7 +230,9 @@ export function overpassQuery(boundary: Ring): string {
   way["waterway"~"^(river|canal)$"](${box});
   node["place"~"^(neighbourhood|suburb|quarter)$"]["name"](${box});
 );
-out geom(${box}) tags;`;
+out geom(${box}) tags;
+nwr["power"="substation"](${grid});
+out geom(${grid}) tags;`;
 }
 
 /** Why a boundary is refused before any query is made, or null if it is fine. */
